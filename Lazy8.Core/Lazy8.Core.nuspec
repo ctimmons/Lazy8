@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Lazy8.Core</id>
+    <version>$version$</version>
+    <authors>Chris R. Timmons</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>infinity-32.png</icon>
+    <description>Lazy8.Core is a general purpose C# library running on .Net Core 3.1 or later.</description>
+    <tags>general purpose library</tags>
+    <repository url="https://github.com/ctimmons/Lazy8" />
+    <dependencies>
+      <group targetFramework=".NETCoreApp3.1" />
+    </dependencies>
+  </metadata>
+</package>

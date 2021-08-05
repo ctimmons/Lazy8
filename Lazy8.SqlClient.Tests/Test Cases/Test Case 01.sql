@@ -1,0 +1,7 @@
+SELECT 42;
+go
+SELECT 42;
+--~
+SELECT 42;
+--~
+SELECT 42;
