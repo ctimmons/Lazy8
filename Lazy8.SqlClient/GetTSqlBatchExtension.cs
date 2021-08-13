@@ -16,10 +16,10 @@ using Lazy8.Core;
 
 namespace Lazy8.SqlClient
 {
-  /// <include file='doc.xml' path='docs/members[@name="sqlclient"]/GetTSqlBatchExtension/*'/>
+  /// <include file='GetTSqlBatchExtension.xml' path='docs/members[@name="sqlclient"]/GetTSqlBatchExtension/*'/>
   public static class GetTSqlBatchExtension
   {
-    /// <include file='doc.xml' path='docs/members[@name="sqlclient"]/GetTSqlBatches/*'/>
+    /// <include file='GetTSqlBatchExtension.xml' path='docs/members[@name="sqlclient"]/GetTSqlBatches/*'/>
     public static IEnumerable<String> GetTSqlBatches(this String tsql)
     {
       /* StringBuilder's default buffer size is 16 characters. It cannot be known in advance

@@ -16,6 +16,8 @@ using System.Xml.Schema;
 
 using Microsoft.Data.SqlClient;
 
+using Lazy8.Core;
+
 namespace Lazy8.SqlClient
 {
   public static class SqlServerExtensionMethods
@@ -27,7 +29,7 @@ namespace Lazy8.SqlClient
     {
       /* Check connectionString's form.  This line of code throws an
          exception if connectionString is malformed. */
-      _ = new SqlConnectionStringBuilder() { ConnectionString = connectionString };
+      _ = new SqlConnectionStringBuilder(connectionString);
 
       /* Check connectionString's content.  This code throws an exception
          if the server rejects connectionString. */
@@ -58,8 +60,9 @@ namespace Lazy8.SqlClient
 
     public static DataSet GetDataSet(this SqlConnection connection, String storedProcedureName, SqlParameter[] sqlParameters)
     {
-      /* sqlParameters can never be null, so there's no need to check for that.
-         And there's no need to check it for emptiness because parameters in a stored procedure are optional. */
+      sqlParameters.Name(nameof(sqlParameters)).NotNull();
+
+      /* There's no need to check sqlParameters for emptiness because parameters in a stored procedure are optional. */
 
       using (var command = new SqlCommand() { Connection = connection, CommandType = CommandType.StoredProcedure, CommandText = storedProcedureName })
       {

@@ -6,17 +6,10 @@
       </summary>
       <remarks>
         <para>
-          [Author's Note:  I hated having to write this code at all.  Microsoft already knows about some of the bugs[0] listed below,
-          but refuses to fix them or, in the alternative, open source the relevant source code so I can fix them.  It makes a person
-          gaze longingly at Linux and PostgreSQL.
-        </para>
-        <para>
-          [0]: https://feedback.azure.com/forums/908035-sql-server/suggestions/32901208--go-in-2nd-half-of-nested-block-comments-breaks-b
-        </para>
-        <para>
-          Several comments reference Extended Backus-Naur Form (EBNF) when explaining the lexical structure being parsed.
-          A great introduction to EBNF is a .pdf titled 'EBNF: A Notation to Describe Syntax', located at
-          https://www.ics.uci.edu/~pattis/misc/ebnf2.pdf.]
+          [Author's Note:  I hated having to write this code at all.  Microsoft already knows about some of the
+          <a href="https://feedback.azure.com/forums/908035-sql-server/suggestions/32901208--go-in-2nd-half-of-nested-block-comments-breaks-b">GO-related bugs</a>
+          in the possible solutions listed below.  But they refuse to fix them or, in the alternative, open source
+          the relevant source code so I can fix them.  It makes a person gaze longingly at Linux and PostgreSQL.]
         </para>
         <para>
           Executing a T-SQL batch file that contains multiple batches (separated by GO statements) isn't easy.
@@ -45,67 +38,35 @@
           <h3>What's the Problem?</h3>
         </para>
         <para>
-          Sometimes an application needs to execute a T-SQL file containing multiple batches.
+          Sometimes an application needs to execute a T-SQL file containing multiple batches (i.e. the file contains one or more GO statements).
           This presents an immediate problem because the standard way an app executes T-SQL
-          is thru the various Microsoft.Data.SqlClient.SqlCommand methods. As noted above, those methods will raise an exception
-          when they hit a GO statement. Several solutions are available, but - with one exception - all are either buggy or incomplete.
-          The next section goes over those solutions along with the problems of each.
+          is thru the various Microsoft.Data.SqlClient class methods. As noted above, those methods will raise an exception
+          when they hit a GO statement. At least three "out of the box" solutions are available.
         </para>
         <para>
-          <h3>Solutions</h3>
+          The existent solutions are:
+          <list type="bullet">
+            <item>
+              <description>
+                The <c>TSqlParser</c> class, found in the <c>Microsoft.SqlServer.DacFx</c> NuGet package (parse only)
+              </description>
+            </item>
+            <item>
+              <description>
+                SQL Server Management Objects (`SMO`), found in the <c>Microsoft.SqlServer.SqlManagementObject</c> NuGet package
+              </description>
+            </item>
+            <item>
+              <description>
+                And, if it's installed, the <c>sqlcmd.exe</c> command line utility
+              </description>
+            </item>
+          </list>
         </para>
         <para>
-          The first possible solution is to shell out to sqlcmd.exe and have it execute the T-SQL batches.
-          Unfortunately this isn't feasible for several reasons.
-        </para>
-        <para>
-          First, sqlcmd.exe (or osql.exe in older versions of SQL Server) might not be available to the application
-          for a variety of reasons. It might either not be installed, or the app might not have sufficient permissions
-          to run it. It would actually be surprising if that utility were accessible by an app in a production environment.
-        </para>
-        <para>
-          Even if sqlcmd.exe can be executed, it has either one or two bugs where it cannot correctly parse legal GO statements
-          (depending on sqlcmd.exe's version).
-        </para>
-        <para>
-          The first bug, which we'll call Bug #1, involves a legally constructed comment containing a GO statment
-          (note that T-SQL allows nested block comments). Some versions of sqlcmd.exe will throw a parsing exception
-          when processing a comment like this:
-        </para>
-        <para>
-          /*<br/>
-          /**/<br/>
-          GO<br/>
-          */
-        </para>
-        <para>
-          A comment with this structure is not an uncommon occurrence. Because T-SQL allows nested block comments, developers will
-          frequently comment out a block of code by wrapping the block in /* and */ comment delimiters.
-        </para>
-        <para>
-          The second bug (Bug #2), is similar in that it involves a trailing block comment. The documentation for GO
-          clearly states that trailing comments are allowed, but doesn't say whether that's limited to only single-line
-          comments, or includes both single-line comments and block comments.  So it should be assumed that both
-          types of comments can appear after a GO statement. Unfortunately, this isn't true.
-          Like Bug #1, some versions of sqlcmd.exe will throw a parsing exception when processing a comment like this:
-        </para>
-        <para>
-          GO /**/
-        </para>
-        <para>
-          Again, like Bug #1, this can easily happen as a matter of normal programming practice.  In the final analysis,
-          trusting sqlcmd.exe to executing multiple batches has some significant risks.
-        </para>
-        <para>
-          The second possible solution involves the use of either of two Microsoft libraries available via NuGet:
-          SQL Server Management Objects (SMO), and Microsoft SQL Server Data-Tier Application Framework (DacFx).
-        </para>
-        <para>
-          SMO provides a method - ExecuteNonQuery() - that recognizes GO statements.  However, that method suffers
-          from Bug #1.  DacFx has a TSqlParser class that can split a T-SQL file containing GO statements into
-          separate T-SQL fragments.  TSqlParser doesn't suffer from Bug #1, but it does have Bug #2.
-          TSqlParser also has its own unique bug.  It will throw a parsing exception whenever a GO statement
-          is followed by a number, as in a perfectly legal statement such as "GO 5".
+          Unfortunately, all three of these potential solutions have bugs.  There are too many to list here, so I
+          created a simple console app that displays all of the GO-related bugs I could find.  It's on GitHub in the
+          <a href="https://github.com/ctimmons/cs_display_tsql_go_bugs">ctimmons/cs_display_tsql_go_bugs</a> repo.
         </para>
         <para>
           If pre-existing utilities and libraries can't handle the problem, it's time to turn to home-grown solutions.
@@ -117,17 +78,18 @@
           extremely difficult and impossible.  But I'll briefly list the reasons here so as to be complete.
         </para>
         <para>
-          First, the word GO can appear in comments (see Bug #1), and string literals.  Naively splitting on GO will
+          First, the word GO can appear in comments and string literals.  Naively splitting on GO will
           most likely result in the file being split in incorrect places.  Second, if a regex is first used to remove
           block comments, that regex can remove the wrong text because string literals can contain character sequences
           like '/*' and '*/'.  This would cause the comment-removal regex to remove the wrong text.
         </para>
+          <h3>Solution</h3>
         <para>
-          The fourth solution is what's implemented in this class.  It uses a lexical scanner to perform a single pass
+          The only bug-free solution I could think of was to create this class.  It uses a lexical scanner to perform a single pass
           of the T-SQL code, identifying and ignoring any comments it comes across.  All other text is copied to a string.
           When the scanner encounters a GO statement, the number of GO repetitions is determined (i.e. is the statement
-          "GO n", or just "GO"?).  If 'n' is greater than one, the T-SQL fragement is wrapped in a WHILE loop so it will
-          be executed 'n' times.  If 'n' is one, or isn't present at all, the T-SQL fragement is simply added to the
+          "GO &lt;count&gt;", or just "GO"?).  If 'count' is greater than one, the T-SQL fragement is wrapped in a WHILE loop so it will
+          be executed 'count' times.  If 'count' is one, or isn't present at all, the T-SQL fragement is simply added to the
           resulting list of strings.
         </para>
       </remarks>
