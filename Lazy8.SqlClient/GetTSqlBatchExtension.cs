@@ -112,8 +112,8 @@ END;
     {
       StringBuilder result = new();
 
-      var charValue = scanner.Peek();
-      while (charValue != -1)
+      Int32 charValue;
+      while ((charValue = scanner.Peek()) != -1)
       {
         var ch = (Char) charValue;
         if (Char.IsDigit(ch))
@@ -122,7 +122,6 @@ END;
           break;
 
         scanner.Read();
-        charValue = scanner.Peek();
       }
 
       return result.ToString();
