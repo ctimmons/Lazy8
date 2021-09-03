@@ -44,6 +44,8 @@ namespace Lazy8.Core
         switch (runProcessType)
         {
           case RunProcessType.IgnoreResult:
+            process.WaitForExit(timeoutInMilliseconds);
+            process.WaitForExit();
             return (process.ExitCode, null);
           case RunProcessType.ReturnResult:
             /* Avoid deadlocks by reading the entire standard output stream and
@@ -53,6 +55,7 @@ namespace Lazy8.Core
             */
             var output = process.StandardOutput.ReadToEnd();
             process.WaitForExit(timeoutInMilliseconds);
+            process.WaitForExit();
             return (process.ExitCode, output);
           default:
             throw new ArgumentException(String.Format(Properties.Resources.Utils_UnknownRunProcessType, runProcessType));

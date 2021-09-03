@@ -464,7 +464,14 @@ namespace Lazy8.Core
     /// </summary>
     /// <param name="stream">An instance of an object derived from <see cref="Stream"/>.</param>
     /// <returns>A <see cref="String"/> containing the MD5 checksum.</returns>
-    public static String MD5Checksum(this Stream stream) => _md5.ComputeHash(stream).Select(c => c.ToString("X2")).Join("");
+    public static String MD5Checksum(this Stream stream) => stream.MD5ChecksumAsByteArray().Select(c => c.ToString("X2")).Join("");
+
+    /// <summary>
+    /// Return the MD5 checksum for the contents of <paramref name="stream"/>.
+    /// </summary>
+    /// <param name="stream">An instance of an object derived from <see cref="Stream"/>.</param>
+    /// <returns>A <see cref="Byte[]"/> containing the MD5 checksum.</returns>
+    public static Byte[] MD5ChecksumAsByteArray(this Stream stream) => _md5.ComputeHash(stream);
 
     /// <summary>
     /// Removes the last (rightmost) file extension from <paramref name="filename"/>.

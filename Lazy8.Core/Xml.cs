@@ -4,7 +4,6 @@
    See the LICENSE file in the root folder for details. */
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

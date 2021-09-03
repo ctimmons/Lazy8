@@ -290,6 +290,14 @@ namespace Lazy8.Core
     public static String MD5Checksum(this String value) => MD5Checksum(value, Encoding.ASCII);
 
     /// <summary>
+    /// Return the MD5 checksum for <paramref name="value"/>, using an ASCII encoding for <paramref name="value"/>.
+    /// <para>
+    /// <paramref name="value"/> must be non-null.
+    /// </para>
+    /// </summary>
+    public static Byte[] MD5ChecksumAsByteArray(this String value) => MD5ChecksumAsByteArray(value, Encoding.ASCII);
+
+    /// <summary>
     /// Return the MD5 checksum for <paramref name="value"/>, using <paramref name="encoding"/> as an encoding for <paramref name="value"/>.
     /// <para>
     /// Both <paramref name="value"/> and <paramref name="encoding"/> must be non-null.
@@ -302,6 +310,21 @@ namespace Lazy8.Core
 
       using (var ms = new MemoryStream(encoding.GetBytes(value)))
         return ms.MD5Checksum();
+    }
+
+    /// <summary>
+    /// Return the MD5 checksum for <paramref name="value"/>, using <paramref name="encoding"/> as an encoding for <paramref name="value"/>.
+    /// <para>
+    /// Both <paramref name="value"/> and <paramref name="encoding"/> must be non-null.
+    /// </para>
+    /// </summary>
+    public static Byte[] MD5ChecksumAsByteArray(this String value, Encoding encoding)
+    {
+      value.Name(nameof(value)).NotNull();
+      encoding.Name(nameof(encoding)).NotNull();
+
+      using (var ms = new MemoryStream(encoding.GetBytes(value)))
+        return ms.MD5ChecksumAsByteArray();
     }
 
     /// <summary>
