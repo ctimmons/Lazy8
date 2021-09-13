@@ -47,15 +47,7 @@ namespace Lazy8.SqlClient
     public static DataSet GetDataSet(this SqlConnection connection, String sql)
     {
       using (var command = new SqlCommand() { Connection = connection, CommandType = CommandType.Text, CommandText = sql })
-      {
-        using (var adapter = new SqlDataAdapter())
-        {
-          var dataSet = new DataSet();
-          adapter.SelectCommand = command;
-          adapter.Fill(dataSet);
-          return dataSet;
-        }
-      }
+        return GetDataSet(command);
     }
 
     public static DataSet GetDataSet(this SqlConnection connection, String storedProcedureName, SqlParameter[] sqlParameters)
@@ -69,21 +61,26 @@ namespace Lazy8.SqlClient
         command.Parameters.Clear();
         command.Parameters.AddRange(sqlParameters);
 
-        using (var adapter = new SqlDataAdapter())
-        {
-          var dataSet = new DataSet();
-          adapter.SelectCommand = command;
-          adapter.Fill(dataSet);
-          return dataSet;
-        }
+        return GetDataSet(command);
+      }
+    }
+
+    public static DataSet GetDataSet(SqlCommand command)
+    {
+      using (var adapter = new SqlDataAdapter())
+      {
+        var dataSet = new DataSet();
+        adapter.SelectCommand = command;
+        adapter.Fill(dataSet);
+        return dataSet;
       }
     }
 
     public static IEnumerable<DataRow> GetDataRows(this SqlConnection connection, String sql) =>
       connection.GetDataSet(sql).Tables[0].Rows.Cast<DataRow>();
 
-    public static Object GetSingleValue(this SqlConnection connection, String sql) =>
-      connection.GetDataRows(sql).First()[0];
+    public static T GetSingleValue<T>(this SqlConnection connection, String sql) =>
+      (T) connection.GetDataRows(sql).First()[0];
 
     public static Int32 ExecuteNonQuery(this SqlConnection connection, String sql)
     {
