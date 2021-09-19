@@ -5,11 +5,28 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Lazy8.Core
 {
   public static class DateTimeUtils
   {
+    /// <summary>
+    /// Returns the week number for the given <see cref="DateTime"/>'s month.
+    /// Assumes that Sunday is the start of the week.
+    /// </summary>
+    /// <param name="date">A <see cref="DateTime"/>.</param>
+    /// <returns>A 1-based integer.</returns>
+    public static Int32 WeekNumberOfMonth(this DateTime date)
+    {
+      static Int32 getWeekNumberOfYear(DateTime d) =>
+        CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(d, CalendarWeekRule.FirstDay, DayOfWeek.Sunday);
+
+      var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
+      var weekNumberOffset = getWeekNumberOfYear(firstDayOfMonth);
+      return (getWeekNumberOfYear(date) - weekNumberOffset) + 1;
+    }
+
     /// <summary>
     /// Given a <see cref="DateTime"/> value, return an <see cref="Int32"/> indicating what calendar quarter the DateTime occurs in (1, 2, 3, or 4).
     /// </summary>

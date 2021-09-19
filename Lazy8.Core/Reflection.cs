@@ -12,6 +12,8 @@ namespace Lazy8.Core
 {
   public class ReflectionUtils
   {
+    public static T GetPropertyValue<T>(Object obj, String propName) => (T) obj.GetType().GetProperty(propName).GetValue(obj, null);
+
     /// <summary>
     /// Return an <see cref="IEnumerable{String}"/> containing all of the public instance property
     /// names of type <typeparamref name="T"/>.

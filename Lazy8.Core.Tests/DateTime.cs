@@ -35,6 +35,34 @@ namespace Lazy8.Core.Tests
     }
 
     [Test]
+    public void WeekNumberOfMonthTest()
+    {
+      /* April 2017 is spread over 6 numerical weeks. */
+
+      Assert.That(new DateTime(2017, 4, 1).WeekNumberOfMonth(), Is.EqualTo(1));
+      Assert.That(new DateTime(2017, 4, 2).WeekNumberOfMonth(), Is.EqualTo(2));
+      Assert.That(new DateTime(2017, 4, 9).WeekNumberOfMonth(), Is.EqualTo(3));
+      Assert.That(new DateTime(2017, 4, 16).WeekNumberOfMonth(), Is.EqualTo(4));
+      Assert.That(new DateTime(2017, 4, 23).WeekNumberOfMonth(), Is.EqualTo(5));
+      Assert.That(new DateTime(2017, 4, 30).WeekNumberOfMonth(), Is.EqualTo(6));
+
+      /* Like the vast majority of months, September 2021 has 5 numerical weeks. */
+
+      Assert.That(new DateTime(2021, 9, 1).WeekNumberOfMonth(), Is.EqualTo(1));
+      Assert.That(new DateTime(2021, 9, 8).WeekNumberOfMonth(), Is.EqualTo(2));
+      Assert.That(new DateTime(2021, 9, 15).WeekNumberOfMonth(), Is.EqualTo(3));
+      Assert.That(new DateTime(2021, 9, 22).WeekNumberOfMonth(), Is.EqualTo(4));
+      Assert.That(new DateTime(2021, 9, 29).WeekNumberOfMonth(), Is.EqualTo(5));
+
+      /* February occasionally starts on a Sunday (e.g. 2015), and in that case has 4 numerical weeks. */
+
+      Assert.That(new DateTime(2015, 2, 1).WeekNumberOfMonth(), Is.EqualTo(1));
+      Assert.That(new DateTime(2015, 2, 8).WeekNumberOfMonth(), Is.EqualTo(2));
+      Assert.That(new DateTime(2015, 2, 15).WeekNumberOfMonth(), Is.EqualTo(3));
+      Assert.That(new DateTime(2015, 2, 28).WeekNumberOfMonth(), Is.EqualTo(4));
+    }
+
+    [Test]
     public void AddQuarterTest()
     {
       this.RunActionOverQuarterDateRanges(

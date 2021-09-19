@@ -66,6 +66,7 @@ namespace Lazy8.Core
       };
 
       this._writer.WriteLine($"{timestamp} - {type} - {message}");
+      this._writer.Flush();
     }
 
     public void WriteLine(LogEntryType logEntryType, String message, params Object[] args)
