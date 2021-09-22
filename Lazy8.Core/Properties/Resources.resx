@@ -178,10 +178,11 @@
     <value>File does not exist</value>
   </data>
   <data name="Exceptions_MissingFile" xml:space="preserve">
-    <value>\nMissing file is '{0}'.</value>
+    <value>Missing file is '{0}'.</value>
   </data>
   <data name="Exceptions_StackTrace" xml:space="preserve">
-    <value>\nStack Trace:\n{0}</value>
+    <value>Stack Trace:
+{0}</value>
   </data>
   <data name="MathUtils_BadDigit" xml:space="preserve">
     <value>The parameter 'otherBaseNumber' ({0}) contains digits that are not valid for the parameter 'fromBase' {1}.</value>

@@ -241,7 +241,7 @@ namespace Lazy8.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \nMissing file is &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Missing file is &apos;{0}&apos;..
         /// </summary>
         public static string Exceptions_MissingFile {
             get {
@@ -250,7 +250,8 @@ namespace Lazy8.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \nStack Trace:\n{0}.
+        ///   Looks up a localized string similar to Stack Trace:
+        ///{0}.
         /// </summary>
         public static string Exceptions_StackTrace {
             get {

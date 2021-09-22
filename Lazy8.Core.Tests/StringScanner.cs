@@ -126,7 +126,10 @@ namespace Lazy8.Core.Tests
     [Test]
     public void LiteralMatchTest()
     {
-      var s = new StringScanner("01");
+      var s = new StringScanner("go 1");
+      Assert.That(s.MatchLiteral("GO"), Is.True);
+
+      s = new StringScanner("01");
       Assert.That(s.MatchLiteral("0"), Is.True);
       Assert.That(s.MatchLiteral("1"), Is.True);
       Assert.That(s.MatchLiteral("1"), Is.False);

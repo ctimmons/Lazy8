@@ -86,7 +86,7 @@ namespace Lazy8.Core
     {
       this._s = s ?? throw new ArgumentException(String.Format(Properties.Resources.StringScanner_NullConstructorValue, nameof(s)));
       this._length = s.Length;
-      this._stringComparison = isCaseSensitive ? StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture;
+      this._stringComparison = isCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
     }
 
     /// <summary>
@@ -164,7 +164,7 @@ namespace Lazy8.Core
     /// </summary>
     /// <param name="predicate">A method that takes a Char and returns a Boolean.</param>
     /// <returns>A String with zero or more matched characters.</returns>
-    public String PredicateMatch(Predicate<Char> predicate)
+    public String MatchWhile(Predicate<Char> predicate)
     {
       StringBuilder result = new();
       Int32 nextChar;
@@ -187,11 +187,28 @@ namespace Lazy8.Core
       this.SavePosition();
 
       var sPosition = 0;
-      Boolean predicate(Char c) =>
-        (sPosition < s.Length) &&
-        String.Equals(this._s[this._index].ToString(), s[sPosition++].ToString(), this._stringComparison);
+      Int32 nextChar;
+      while (true)
+      {
+        nextChar = this.Peek();
+        if (nextChar == -1)
+          break;
 
-      var success = (this.PredicateMatch(predicate) == s);
+        if (sPosition == s.Length)
+          break;
+
+        var s1 = ((Char) nextChar).ToString();
+        var s2 = s[sPosition].ToString();
+        var comparison = String.Equals(s1, s2, this._stringComparison);
+        if (!comparison)
+          break;
+
+        sPosition++;
+
+        this.Read();
+      }
+
+      var success = sPosition == s.Length;
       if (success)
         this.AcceptNewPosition();
       else
@@ -206,19 +223,19 @@ namespace Lazy8.Core
     /// Starting from the scanner's current position, skip one or more line ending characters (carriage return (\r) or line feed (\n)).
     /// <para>Logically equivalent to the LINQ expression "s.TakeWhile(c => (c == '\n') || (c == '\r'))".</para>
     /// </summary>
-    public void SkipLineEndings() => this.PredicateMatch(IsLineEnding);
+    public void SkipLineEndings() => this.MatchWhile(IsLineEnding);
 
     /// <summary>
     /// Starting from the scanner's current position, skip one or more whitespace characters (but not
     /// line ending characters (carriage return (\r) or line feed (\n))).
     /// <para>Logically equivalent to the LINQ expression "s.TakeWhile(c => Char.IsWhiteSpace(c) &amp;&amp; (c != '\n') &amp;&amp; (c != '\r'))".</para>
     /// </summary>
-    public void SkipLinearWhitespace() => this.PredicateMatch(c => !IsLineEnding(c) && Char.IsWhiteSpace(c));
+    public void SkipLinearWhitespace() => this.MatchWhile(c => !IsLineEnding(c) && Char.IsWhiteSpace(c));
 
     /// <summary>
     /// Skips all whitespace, regardless of type. Combination of <see cref="SkipLineEndings"/> and <see cref="SkipLinearWhitespace"/>.
     /// </summary>
-    public void SkipWhitespace() => this.PredicateMatch(Char.IsWhiteSpace);
+    public void SkipWhitespace() => this.MatchWhile(Char.IsWhiteSpace);
 
     /// <summary>
     /// Push the scanner's current position onto an internal stack.
