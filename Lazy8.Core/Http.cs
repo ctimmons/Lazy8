@@ -6,6 +6,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -59,6 +60,18 @@ namespace Lazy8.Core
         using (var destinationStream = File.OpenWrite(Path.Combine(destinationFolder, destinationFilename)))
           await (await responseMessage.Content.ReadAsStreamAsync()).CopyToAsync(destinationStream);
       }
+    }
+  }
+
+  public class GZipWebClient : WebClient
+  {
+    /* WebClient won't automatically decompress gzipped data, hence this hack. */
+
+    protected override WebRequest GetWebRequest(Uri address)
+    {
+      var request = (HttpWebRequest) base.GetWebRequest(address);
+      request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+      return request;
     }
   }
 }
