@@ -67,6 +67,9 @@ namespace Lazy8.Core
   {
     /* WebClient won't automatically decompress gzipped data, hence this hack. */
 
+    public GZipWebClient() : base() =>
+      this.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
+
     protected override WebRequest GetWebRequest(Uri address)
     {
       var request = (HttpWebRequest) base.GetWebRequest(address);
