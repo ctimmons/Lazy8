@@ -719,12 +719,13 @@ namespace Lazy8.Core
     /// </para>
     /// </summary>
     /// <param name="series">A <see cref="String"/>.</param>
+    /// <param name="shouldNormalizeOverlaps">A <see cref="Boolean"/> indicating if duplicates resulting from overlapping ranges should be eliminated (true) or not (false).  Defaults to false.</param>
     /// <returns>An <see cref="IEnumerable&lt;Int32&gt;"/>.</returns>
-    public static IEnumerable<Int32> GetSeries(this String series)
+    public static IEnumerable<Int32> GetSeries(this String series, Boolean shouldNormalizeOverlaps = false)
     {
       series.Name(nameof(series)).NotNull();
 
-      return
+      var result =
         series
         .Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
         .Select(s => s.Trim())
@@ -749,6 +750,8 @@ namespace Lazy8.Core
             }
           })
         .SelectMany(x => x);
+
+       return shouldNormalizeOverlaps ? result.Distinct() : result;
     }
 
     public static String ChopBeginningAndEnd(this String s, Int32 n = 1)

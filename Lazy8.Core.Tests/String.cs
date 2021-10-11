@@ -650,6 +650,8 @@ namespace Lazy8.Core.Tests
       Assert.That("1, 2, 3".GetSeries().ToList(), Is.EqualTo(new List<Int32>() { 1, 2, 3 }));
       Assert.That("1-3".GetSeries().ToList(), Is.EqualTo(new List<Int32>() { 1, 2, 3 }));
       Assert.That("3, 2, 1, 6-8".GetSeries().ToList(), Is.EqualTo(new List<Int32>() { 3, 2, 1, 6, 7, 8 }));
+      Assert.That("3, 2, 1, 6-8, 6-8".GetSeries().ToList(), Is.EqualTo(new List<Int32>() { 3, 2, 1, 6, 7, 8, 6, 7, 8 }));
+      Assert.That("3, 2, 1, 6-8, 6-8".GetSeries(true).ToList(), Is.EqualTo(new List<Int32>() { 3, 2, 1, 6, 7, 8 }));
     }
 
     [Test]
