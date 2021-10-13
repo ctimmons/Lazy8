@@ -171,17 +171,21 @@ namespace Lazy8.Core
     }
 
     /// <summary>
-    /// 
+    /// Return an <see cref="System.Int32"/> indicating the "day rank" of the given date within its month.  E.g. the first Tuesday, third Friday, etc.
     /// </summary>
-    /// <param name="date"></param>
-    /// <returns></returns>
+    /// <param name="date">A <see cref="System.DateTime"/>.</param>
+    /// <returns>An <see cref="System.Int32"/>.</returns>
     public static Int32 NthDayInMonth(this DateTime date) => (Int32) Math.Ceiling(date.Day / 7.0d); // First Monday, third Thursday, etc.
 
     /// <summary>
-    /// 
+    /// Return a <see cref="System.Boolean"/> indicating if the given date is a U.S. Federal holiday.
+    /// <para>Note that the return value is accurate for dates after 1978.  The legislative history of
+    /// both Washington's Birthday and Veterans Day is somewhat muddled, resulting in these holidays being
+    /// observed at several different times during a particular year.</para>
+    /// <para>Also note that Columbus Day may be altered or disappear altogether at some point after this code was written (c. 2021).</para>
     /// </summary>
-    /// <param name="date"></param>
-    /// <returns></returns>
+    /// <param name="date">A <see cref="System.DateTime"/>.</param>
+    /// <returns>A <see cref="System.Boolean"/>.</returns>
     public static Boolean IsUSFederalHoliday(this DateTime date)
     {
       /* U.S. federal holidays are defined by law at https://www.law.cornell.edu/uscode/text/5/6103. */
@@ -191,30 +195,27 @@ namespace Lazy8.Core
       var isLastMondayInMay = isMonday && date.AddDays(7).Month == 6;
 
       return
-        (date.Month == 1 && date.Day == 1) ||                            // January 1
-        (date.Month == 1 && isMonday && date.NthDayInMonth() == 3) ||    // MLK Day
-        (date.Month == 2 && isMonday && date.NthDayInMonth() == 3) ||    // Washington's Birthday
-        (date.Month == 5 && isLastMondayInMay) ||                        // Memorial Day
-        (date.Month == 6 && date.Day == 19 && date.Year >= 2021) ||      // Juneteenth National Independence Day (only 2021 and later)
-        (date.Month == 7 && date.Day == 4) ||                            // Independence Day
-        (date.Month == 9 && isMonday && date.NthDayInMonth() == 1) ||    // Labor Day
-        (date.Month == 10 && isMonday && date.NthDayInMonth() == 2) ||   // Columbus Day
-        (date.Month == 11 && date.Day == 11) ||                          // Veterans Day
-        (date.Month == 11 && isThursday && date.NthDayInMonth() == 4) || // Thanksgiving Day
-        (date.Month == 12 && date.Day == 25);                            // Christmas Day
+        (date.Month == 1 && date.Day == 1) ||                                              // January 1
+        (date.Month == 1 && isMonday && date.NthDayInMonth() == 3 && date.Year >= 1986) || // MLK Day
+        (date.Month == 2 && isMonday && date.NthDayInMonth() == 3) ||                      // Washington's Birthday
+        (date.Month == 5 && isLastMondayInMay) ||                                          // Memorial Day
+        (date.Month == 6 && date.Day == 19 && date.Year >= 2021) ||                        // Juneteenth National Independence Day
+        (date.Month == 7 && date.Day == 4) ||                                              // Independence Day
+        (date.Month == 9 && isMonday && date.NthDayInMonth() == 1) ||                      // Labor Day
+        (date.Month == 10 && isMonday && date.NthDayInMonth() == 2) ||                     // Columbus Day
+        (date.Month == 11 && date.Day == 11) ||                                            // Veterans Day
+        (date.Month == 11 && isThursday && date.NthDayInMonth() == 4) ||                   // Thanksgiving Day
+        (date.Month == 12 && date.Day == 25);                                              // Christmas Day
     }
 
     /// <summary>
-    /// 
+    /// If a U.S. Federal holiday falls on a Saturday or Sunday, the holiday is observed
+    /// on the preceding Friday (for Saturday holidays), or the following Monday (for Sunday holidays).
     /// </summary>
-    /// <param name="date"></param>
-    /// <returns></returns>
+    /// <param name="date">A <see cref="System.DateTime"/>.</param>
+    /// <returns>A <see cref="System.Boolean"/>.</returns>
     public static Boolean IsObservedUSFederalHoliday(this DateTime date)
     {
-      /* If a federal holiday falls on a Saturday or Sunday, the holiday is observed
-         on the preceding Friday (for Saturday holidays), or the following Monday
-         (for Sunday holidays). */
-
       var isFriday = date.DayOfWeek == DayOfWeek.Friday;
       var isMonday = date.DayOfWeek == DayOfWeek.Monday;
 
@@ -224,10 +225,10 @@ namespace Lazy8.Core
     }
 
     /// <summary>
-    /// 
+    /// Indicates if the given date parameter falls on a weekend.
     /// </summary>
-    /// <param name="date"></param>
-    /// <returns></returns>
+    /// <param name="date">A <see cref="System.DateTime"/>.</param>
+    /// <returns>A <see cref="System.Boolean"/>.</returns>
     public static Boolean IsWeekend(this DateTime date) => (date.DayOfWeek == DayOfWeek.Saturday) || (date.DayOfWeek == DayOfWeek.Sunday);
   }
 }
