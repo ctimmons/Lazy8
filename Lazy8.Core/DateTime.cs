@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Lazy8.Core
 {
@@ -161,15 +162,72 @@ namespace Lazy8.Core
     /// <returns>An <see cref="IEnumerable&lt;DateTime&gt;"/> of <see cref="DateTime"/> values.</returns>
     public static IEnumerable<DateTime> To(this DateTime startDateTime, DateTime endDateTime)
     {
-      var signedNumberOfDays = (endDateTime - startDateTime).Days;
-      var sign = (signedNumberOfDays < 0) ? -1 : 1;
-      var absoluteNumberOfDays = Math.Abs(signedNumberOfDays) + 1; /* "+ 1" to ensure both the start and end dates are included in the result set. */
-      var result = new List<DateTime>(absoluteNumberOfDays);
+      var range = Enumerable.Range(0, Math.Abs((endDateTime - startDateTime).Days) + 1);
 
-      for (var day = 0; day < absoluteNumberOfDays; day++)
-        result.Add(startDateTime.AddDays(day * sign));
-
-      return result;
+      return
+        (startDateTime > endDateTime)
+        ? range.Reverse().Select(n => endDateTime.AddDays(n))
+        : range.Select(n => startDateTime.AddDays(n));
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns></returns>
+    public static Int32 NthDayInMonth(this DateTime date) => (Int32) Math.Ceiling(date.Day / 7.0d); // First Monday, third Thursday, etc.
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns></returns>
+    public static Boolean IsUSFederalHoliday(this DateTime date)
+    {
+      /* U.S. federal holidays are defined by law at https://www.law.cornell.edu/uscode/text/5/6103. */
+
+      var isMonday = date.DayOfWeek == DayOfWeek.Monday;
+      var isThursday = date.DayOfWeek == DayOfWeek.Thursday;
+      var isLastMondayInMay = isMonday && date.AddDays(7).Month == 6;
+
+      return
+        (date.Month == 1 && date.Day == 1) ||                            // January 1
+        (date.Month == 1 && isMonday && date.NthDayInMonth() == 3) ||    // MLK Day
+        (date.Month == 2 && isMonday && date.NthDayInMonth() == 3) ||    // Washington's Birthday
+        (date.Month == 5 && isLastMondayInMay) ||                        // Memorial Day
+        (date.Month == 6 && date.Day == 19 && date.Year >= 2021) ||      // Juneteenth National Independence Day (only 2021 and later)
+        (date.Month == 7 && date.Day == 4) ||                            // Independence Day
+        (date.Month == 9 && isMonday && date.NthDayInMonth() == 1) ||    // Labor Day
+        (date.Month == 10 && isMonday && date.NthDayInMonth() == 2) ||   // Columbus Day
+        (date.Month == 11 && date.Day == 11) ||                          // Veterans Day
+        (date.Month == 11 && isThursday && date.NthDayInMonth() == 4) || // Thanksgiving Day
+        (date.Month == 12 && date.Day == 25);                            // Christmas Day
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns></returns>
+    public static Boolean IsObservedUSFederalHoliday(this DateTime date)
+    {
+      /* If a federal holiday falls on a Saturday or Sunday, the holiday is observed
+         on the preceding Friday (for Saturday holidays), or the following Monday
+         (for Sunday holidays). */
+
+      var isFriday = date.DayOfWeek == DayOfWeek.Friday;
+      var isMonday = date.DayOfWeek == DayOfWeek.Monday;
+
+      return
+        (isFriday && date.AddDays(1).IsUSFederalHoliday()) ||
+        (isMonday && date.AddDays(-1).IsUSFederalHoliday());
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns></returns>
+    public static Boolean IsWeekend(this DateTime date) => (date.DayOfWeek == DayOfWeek.Saturday) || (date.DayOfWeek == DayOfWeek.Sunday);
   }
 }
