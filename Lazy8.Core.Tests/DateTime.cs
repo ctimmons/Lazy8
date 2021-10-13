@@ -143,33 +143,33 @@ namespace Lazy8.Core.Tests
     {
       var startDateTime = new DateTime(2000, 1, 1);
       var endDateTime = new DateTime(2000, 1, 1);
-      var days = startDateTime.To(endDateTime);
+      var range = startDateTime.To(endDateTime);
 
       /* A start date that is the same as the end date should result
          in a list of days with one DateTime value, and that value should be
          the same as the start and end dates. */
-      Assert.That(days.Count(), Is.EqualTo(1));
-      Assert.That(days.First(), Is.EqualTo(startDateTime));
+      Assert.That(range.Count(), Is.EqualTo(1));
+      Assert.That(range.First(), Is.EqualTo(startDateTime));
 
       //////////////////////////////////////////////////////////////////////////////////
 
-      endDateTime = new DateTime(2000, 1, 10);
-      days = startDateTime.To(endDateTime);
+      endDateTime = new DateTime(2000, 1, 3);
+      range = startDateTime.To(endDateTime);
 
       /* A start date that is earlier than the end date should result
          in a list of DateTimes that fall between those two dates, inclusive. */
-      Assert.That(days.Count(), Is.EqualTo(10));
+      Assert.That(range.ToArray(), Is.EqualTo(new[] { new DateTime(2000, 1, 1), new DateTime(2000, 1, 2), new DateTime(2000, 1, 3) } ));
 
       //////////////////////////////////////////////////////////////////////////////////
 
-      startDateTime = new DateTime(2000, 1, 10);
+      startDateTime = new DateTime(2000, 1, 3);
       endDateTime = new DateTime(2000, 1, 1);
-      days = startDateTime.To(endDateTime);
+      range = startDateTime.To(endDateTime);
 
       /* A start date that is later than the end date should result
          in a list of DateTimes that fall between those two dates, inclusive,
          but in descending order. */
-      Assert.That(days.Count(), Is.EqualTo(10));
+      Assert.That(range.ToArray(), Is.EqualTo(new[] { new DateTime(2000, 1, 3), new DateTime(2000, 1, 2), new DateTime(2000, 1, 1) }));
     }
   }
 }

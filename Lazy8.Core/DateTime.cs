@@ -181,7 +181,7 @@ namespace Lazy8.Core
     /// Return a <see cref="System.Boolean"/> indicating if the given date is a U.S. Federal holiday.
     /// <para>Note that the return value is accurate for dates after 1978.  The legislative history of
     /// both Washington's Birthday and Veterans Day is somewhat muddled, resulting in these holidays being
-    /// observed at several different times during a particular year.</para>
+    /// observed at several different times in years prior to 1978.</para>
     /// <para>Also note that Columbus Day may be altered or disappear altogether at some point after this code was written (c. 2021).</para>
     /// </summary>
     /// <param name="date">A <see cref="System.DateTime"/>.</param>
