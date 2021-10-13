@@ -171,5 +171,81 @@ namespace Lazy8.Core.Tests
          but in descending order. */
       Assert.That(range.ToArray(), Is.EqualTo(new[] { new DateTime(2000, 1, 3), new DateTime(2000, 1, 2), new DateTime(2000, 1, 1) }));
     }
+
+    [Test]
+    public void NthDayInMonthTest()
+    {
+      Assert.That(new DateTime(2021, 10, 1).NthDayInMonth(), Is.EqualTo(1)); // First Friday.
+      Assert.That(new DateTime(2021, 10, 8).NthDayInMonth(), Is.EqualTo(2)); // Second Friday.
+      Assert.That(new DateTime(2021, 10, 13).NthDayInMonth(), Is.EqualTo(2)); // Second Wednesday.
+      Assert.That(new DateTime(2021, 10, 30).NthDayInMonth(), Is.EqualTo(5)); // Fifth Saturday.
+    }
+
+    [Test]
+    public void IsUSFederalHolidayTest()
+    {
+      /* New Year's day. */
+      Assert.That(new DateTime(2021, 1, 1).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 1, 2).IsUSFederalHoliday(), Is.EqualTo(false));
+
+      /* MLK day (came into effect 1986). */
+      Assert.That(new DateTime(1986, 1, 20).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(1985, 1, 21).IsUSFederalHoliday(), Is.EqualTo(false));
+
+      /* Washington's Birthday. */
+      Assert.That(new DateTime(2021, 2, 15).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 2, 16).IsUSFederalHoliday(), Is.EqualTo(false));
+
+      /* Memorial Day */
+      Assert.That(new DateTime(2021, 5, 31).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 5, 30).IsUSFederalHoliday(), Is.EqualTo(false));
+
+      /* Juneteenth National Independence Day (came into effect 2021). */
+      Assert.That(new DateTime(2021, 6, 19).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2020, 6, 19).IsUSFederalHoliday(), Is.EqualTo(false));
+
+      /* Independence Day */
+      Assert.That(new DateTime(2021, 7, 4).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 7, 5).IsUSFederalHoliday(), Is.EqualTo(false));
+
+      /* Labor Day */
+      Assert.That(new DateTime(2021, 9, 6).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 9, 7).IsUSFederalHoliday(), Is.EqualTo(false));
+
+      /* Columbus Day */
+      Assert.That(new DateTime(2021, 10, 11).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 10, 12).IsUSFederalHoliday(), Is.EqualTo(false));
+
+      /* Veterans Day */
+      Assert.That(new DateTime(2021, 11, 11).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 11, 12).IsUSFederalHoliday(), Is.EqualTo(false));
+
+      /* Thanksgiving Day */
+      Assert.That(new DateTime(2021, 11, 25).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 11, 26).IsUSFederalHoliday(), Is.EqualTo(false));
+
+      /* Christmas Day */
+      Assert.That(new DateTime(2021, 12, 25).IsUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 12, 26).IsUSFederalHoliday(), Is.EqualTo(false));
+    }
+
+    [Test]
+    public void IsObservedUSFederalHolidayTest()
+    {
+      Assert.That(new DateTime(2021, 6, 18).IsObservedUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 6, 19).IsObservedUSFederalHoliday(), Is.EqualTo(false));
+
+      Assert.That(new DateTime(2021, 7, 5).IsObservedUSFederalHoliday(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 7, 4).IsObservedUSFederalHoliday(), Is.EqualTo(false));
+    }
+
+    [Test]
+    public void IsWeekendTest()
+    {
+      Assert.That(new DateTime(2021, 5, 7).IsWeekend(), Is.EqualTo(false));
+      Assert.That(new DateTime(2021, 5, 8).IsWeekend(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 5, 9).IsWeekend(), Is.EqualTo(true));
+      Assert.That(new DateTime(2021, 5, 10).IsWeekend(), Is.EqualTo(false));
+    }
   }
 }
