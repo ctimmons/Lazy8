@@ -230,6 +230,21 @@ namespace Lazy8.Core
         .OrderBy(i => _digits.Replace(selector(i), match => match.Value.PadLeft(maxDigits, '0')), stringComparer ?? StringComparer.CurrentCulture);
     }
 
+    /// <summary>
+    /// Apply System.String.Trim() to all members of <paramref name="strings"/>.
+    /// </summary>
+    /// <param name="strings">An IEnumerable containing strings.</param>
+    /// <returns>An IEnumerable of the trimmed strings.</returns>
     public static IEnumerable<String> Trim(this IEnumerable<String> strings) => strings.Select(s => s.Trim());
+
+    /// <summary>
+    /// Returns all of the values in <paramref name="enumValues"/> as an IEnumerable&lt;String&gt;.
+    /// </summary>
+    /// <typeparam name="T">An enumeration type.</typeparam>
+    /// <param name="enumValues">A System.Enum value.</param>
+    /// <returns>An enumeration of the values in <paramref name="enumValues"/>.</returns>
+    public static IEnumerable<String> ToEnumerable<T>(this T enumValues)
+      where T : Enum =>
+      enumValues.ToString().Split(',').Select(s => s.Trim());
   }
 }

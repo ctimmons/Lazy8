@@ -13,6 +13,8 @@ using System.Threading;
 
 namespace Lazy8.Core
 {
+  /* A collection of miscellaneous code that doesn't really fit anywhere else. */
+
   public enum RunProcessType { IgnoreResult, ReturnResult }
 
   public static class GeneralUtils
@@ -157,6 +159,23 @@ namespace Lazy8.Core
       var mb = sf.GetMethod();
 
       return $"{Path.GetFileName(sf.GetFileName())}::{mb.DeclaringType.FullName}.{mb.Name} - Line {sf.GetFileLineNumber()}";
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="assembly"></param>
+    /// <returns></returns>
+    public static T GetAssemblyAttribute<T>(this Assembly assembly)
+      where T : Attribute
+    {
+      var attributes = assembly.GetCustomAttributes(typeof(T), true);
+
+      return
+        ((attributes == null) || (attributes.Length == 0))
+        ? null
+        : (T) attributes[0];
     }
   }
 }

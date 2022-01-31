@@ -206,7 +206,7 @@ namespace Lazy8.Core
     public static String Repeat(this String value, Int32 count)
     {
       value.Name(nameof(value)).NotNull();
-      count.Name(nameof(count)).GreaterThan(0);
+      count.Name(nameof(count)).GreaterThanOrEqualTo(0);
 
       /* This method may be called frequently.
 
@@ -215,10 +215,13 @@ namespace Lazy8.Core
 
          Use the lambda overload of GetOrAdd() to ensure a new StringBuilder is only
          created when the requested string isn't found in the dictionary. */
-      return
-        (count == 1)
-        ? value
-        : _memoizedRepeatStrings.GetOrAdd((value, count), _ => (new StringBuilder(value.Length * count)).Insert(0, value, count).ToString());
+
+      if (count == 0)
+        return "";
+      else if (count == 1)
+        return value;
+      else
+        return _memoizedRepeatStrings.GetOrAdd((value, count), _ => (new StringBuilder(value.Length * count)).Insert(0, value, count).ToString());
     }
 
     /// <summary>
