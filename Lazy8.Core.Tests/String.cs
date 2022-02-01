@@ -226,12 +226,16 @@ namespace Lazy8.Core.Tests
       Assert.That(() => s.Repeat(count), Throws.TypeOf<ArgumentNullException>());
 
       s = "";
-      count = 0;
+      count = -1;
       Assert.That(() => s.Repeat(count), Throws.TypeOf<ArgumentOutOfRangeException>());
 
       s = "";
       count = 2;
       Assert.That(s.Repeat(count) == "", "A repeated empty string should be an empty string.");
+
+      s = "a";
+      count = 0;
+      Assert.That(s.Repeat(count) == "");
 
       s = "a";
       count = 1;
