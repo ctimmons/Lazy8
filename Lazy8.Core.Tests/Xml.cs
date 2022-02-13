@@ -75,23 +75,6 @@ Another line.
     public Xml() : base() { }
 
     [Test]
-    public void BinaryFileToFromTest()
-    {
-      var filename = Path.GetTempFileName();
-
-      XmlUtils.SerializeObjectToBinaryFile(TestClass.GetInstance(), filename);
-      try
-      {
-        var testClass = XmlUtils.DeserializeObjectFromBinaryFile<TestClass>(filename);
-        Assert.That(TestClass.AreTestClassInstancesEqual(TestClass.GetInstance(), testClass), Is.True);
-      }
-      finally
-      {
-        File.Delete(filename);
-      }
-    }
-
-    [Test]
     public void XmlFileToFromTest()
     {
       var filename = Path.GetTempFileName();

@@ -39,30 +39,6 @@ namespace Lazy8.Core
     }
 
     /// <summary>
-    /// Deserialize and return the binary-formatted object of type <typeparamref name="T"/> that's stored in <paramref name="filename"/>.
-    /// </summary>
-    /// <typeparam name="T">Any type.</typeparam>
-    /// <param name="filename">A <see cref="String"/> containing an existing filename.</param>
-    /// <returns>An object of type <typeparamref name="T"/>.</returns>
-    public static T DeserializeObjectFromBinaryFile<T>(String filename)
-    {
-      using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-        return (T) new BinaryFormatter().Deserialize(fs);
-    }
-
-    /// <summary>
-    /// Given a <paramref name="value"/> of type <typeparamref name="T"/>, format it as a binary object and store it in <paramref name="filename"/>.
-    /// </summary>
-    /// <typeparam name="T">Any type.</typeparam>
-    /// <param name="value">An object of type <typeparamref name="T"/>.</param>
-    /// <param name="filename">A <see cref="String"/> containing a filename.</param>
-    public static void SerializeObjectToBinaryFile<T>(T value, String filename)
-    {
-      using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
-        new BinaryFormatter().Serialize(stream, value);
-    }
-
-    /// <summary>
     /// Given a <paramref name="value"/> of type <typeparamref name="T"/>, format it as an XML document and store it in <paramref name="filename"/>.
     /// </summary>
     /// <typeparam name="T">Any type.</typeparam>
