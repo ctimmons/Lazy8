@@ -1,21 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Version>1.0.0.0</Version>
     <Authors>Chris R. Timmons</Authors>
-    <Description>Lazy8.Core is a general purpose C# library running on .Net Core 3.1 or later.</Description>
+    <Description>Lazy8.Core is a general purpose C# library running on .Net 6.0.</Description>
     <RepositoryUrl>https://github.com/ctimmons/Lazy8</RepositoryUrl>
     <PackageIcon>infinity-32.png</PackageIcon>
     <PackageTags>general purpose library</PackageTags>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+    <Deterministic>True</Deterministic>
+    <AssemblyVersion>1.0.10.0</AssemblyVersion>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -23,14 +25,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\infinity-32.png">
       <Pack>True</Pack>
@@ -41,9 +41,10 @@
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="&quot;C:\Users\ctimmons\Documents\Data\Dev\Visual Studio\CSharp\IncrementAssemblyVersion\bin\Debug\net6.0\IncrementAssemblyVersion.exe&quot; &quot;$(ProjectPath)&quot;" />
+  </Target>
 </Project>

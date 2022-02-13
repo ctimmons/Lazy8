@@ -90,7 +90,7 @@ namespace Lazy8.SqlClient
          This somewhat resembles quantum entanglement - the ability of separated objects
          to share a condition or state, which Albert Einstein colorfully dismissed as
          "spooky action at a distance".  It seems Microsoft never got the memo, and thought
-         implementing quantum entanglement in their own code is a "Good Thing", thereby
+         implementing quantum entanglement in their code is a "Good Thing", thereby
          giving simple programmers like you and me endless headaches.
 
            (When referring to "Sql*" types and values, I mean the primitive type wrappers in the
@@ -102,6 +102,7 @@ namespace Lazy8.SqlClient
              an exception.  The invalid DbType values are SByte, UInt16, UInt32, UInt64, and VarNumeric.
            - When either Value or SqlValue is set, both DbType and SqlDbType are also set
              (if possible - see below).
+           - Setting Value to a Char or Char[] value will silently convert Value to a string.
            - When either Value or SqlValue is set to an Sql* value, they both refer to
              that value.
            - When either Value or SqlValue is set to a non-Sql* value that maps to an
@@ -212,10 +213,10 @@ namespace Lazy8.SqlClient
 
     public SerializableSqlParameter() : base() { }
 
+    /* Use this constructor to get a serializable instance of this class. */
+
     public SerializableSqlParameter(SqlParameter sqlParameter) : this()
     {
-      /* Use this constructor to get a serializable instance of this class. */
-
       /* Note that SqlParameter's DbType and SqlValue properties are not serialized.
          See the comments at the beginning of this class as to why these two
          properties can and should be ignored. */

@@ -154,7 +154,7 @@ namespace Lazy8.SqlClient.Tests
       else if ((expectedSqlParameter.Value is SqlXml expectedSqlXml) && (actualSqlParameter.Value is SqlXml actualSqlXml))
         Assert.That(expectedSqlXml.Value, Is.EqualTo(actualSqlXml.Value), "(SqlXml) Value");
       else
-        /* For all other types, use the type's Equal method.  Most of the Sql* types override this method. */
+        /* For all other types, use the type's Equal method.  Most of the Sql* types override their Equals method. */
         Assert.That(expectedSqlParameter.Value, Is.EqualTo(actualSqlParameter.Value), "Default Equal() method.");
     }
 
