@@ -31,6 +31,12 @@ namespace Lazy8.Core
     /// <returns>If the result is to be ignored, null is returned.  Otherwise, a <see cref="String"/> containing the result created by the process is returned.</returns>
     public static (Int32 ExitCode, String Output) RunProcess(String command, String arguments, RunProcessType runProcessType, Int32 timeoutInMilliseconds = Timeout.Infinite)
     {
+      command.Name(nameof(command)).NotNull().NotNullEmptyOrOnlyWhitespace().FileExists();
+      timeoutInMilliseconds.Name(nameof(timeoutInMilliseconds)).GreaterThanOrEqualTo(Timeout.Infinite);
+
+      command = Path.GetFullPath(command);
+      arguments ??= "";
+
       // todo: expand to read stderr, include in output tuple (or struct/class). add param to allow combining stdout and stderr into Output member.
       var psi =
         new ProcessStartInfo()
@@ -38,11 +44,15 @@ namespace Lazy8.Core
           FileName = command,
           Arguments = arguments,
           RedirectStandardOutput = (runProcessType == RunProcessType.ReturnResult),
-          UseShellExecute = false
+          UseShellExecute = false,
+          CreateNoWindow = true
         };
 
       using (var process = Process.Start(psi))
       {
+        if (process == null)
+          throw new ArgumentException(String.Format(Properties.Resources.Utils_ProcessCouldNotBeStarted, $"{command} {arguments}".Trim()));
+
         switch (runProcessType)
         {
           case RunProcessType.IgnoreResult:

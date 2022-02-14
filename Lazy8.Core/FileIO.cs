@@ -484,7 +484,9 @@ namespace Lazy8.Core
     /// Returns the path of the currently executing assembly.
     /// </summary>
     /// <returns>A <see cref="String"/> containing the directory of the currently executing assembly.</returns>
-    public static String GetExecutablePath() => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location).AddTrailingSeparator();
+    /* GetEntryAssembly() may return null if called from unmanaged code.
+       That's not the case here, so using the ! operator to suppress a null dereferencing warning is OK. */
+    public static String GetExecutablePath() => Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location).AddTrailingSeparator();
 
     private static readonly Regex _multipleBackslashes = new(@"\\+", RegexOptions.Singleline);
 

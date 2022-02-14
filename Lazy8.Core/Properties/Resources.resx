@@ -241,6 +241,9 @@
   <data name="StringUtils_RegexFilemask" xml:space="preserve">
     <value>'{0}' does not contain either the * or ? characters.</value>
   </data>
+  <data name="Utils_ProcessCouldNotBeStarted" xml:space="preserve">
+    <value>A call to Process.Start() returned null.  The command '{0}' could not be executed.  It may be a URL, or there's already a process running that command.</value>
+  </data>
   <data name="Utils_UnknownRunProcessType" xml:space="preserve">
     <value>Unknown RunProcessType value ({0}).</value>
   </data>
