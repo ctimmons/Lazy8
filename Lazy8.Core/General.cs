@@ -90,8 +90,12 @@ namespace Lazy8.Core
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static String GetEmbeddedTextResource(this String resourceName)
     {
-      using (var sr = new StreamReader(Assembly.GetCallingAssembly().GetManifestResourceStream(resourceName)))
-        return sr.ReadToEnd();
+      var resourceStream = Assembly.GetCallingAssembly().GetManifestResourceStream(resourceName);
+      if (resourceStream == null)
+        return "";
+      else
+        using (var sr = new StreamReader(resourceStream))
+          return sr.ReadToEnd();
     }
 
     /// <summary>
