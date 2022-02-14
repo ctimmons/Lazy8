@@ -67,7 +67,15 @@ namespace Lazy8.Core
   {
     /* WebClient won't automatically decompress gzipped data, hence this hack. */
 
+    /* Suppress the WebClient obsolete warning.
+    
+       The WebClient help entry says to use HttpClient instead.
+       This is awful advice.  HttpClient is "all async, all the time", which
+       is both poor design and inappropriate for this class. */
+
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
     public GZipWebClient() : base() =>
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
       this.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
 
     protected override WebRequest GetWebRequest(Uri address)

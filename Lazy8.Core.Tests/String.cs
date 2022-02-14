@@ -21,7 +21,7 @@ namespace Lazy8.Core.Tests
     public void ToMemoryStreamTest()
     {
       String s = null;
-      Assert.That(() => { using (var ms = s.ToMemoryStream()) ; }, Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => { using (var ms = s.ToMemoryStream()) { } }, Throws.TypeOf<ArgumentNullException>());
 
       s = "";
       using (var ms = s.ToMemoryStream())
