@@ -446,7 +446,7 @@ namespace Lazy8.Core
     /// <returns>A <see cref="Boolean"/> value.</returns>
     public static Boolean IsDirectoryEmpty(this DirectoryInfo directoryInfo) => !directoryInfo.EnumerateFileSystemInfos().Any();
 
-    private static readonly MD5CryptoServiceProvider _md5 = new();
+    private static readonly MD5 _md5 = MD5.Create();
 
     /// <summary>
     /// Return the MD5 checksum for the contents of <paramref name="filename"/>.
