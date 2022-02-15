@@ -152,7 +152,7 @@ namespace Lazy8.Core
     public static IEnumerable<String> Lines(this TextReader textReader)
     {
       String line;
-      while ((line = textReader.ReadLine()) != null)
+      while ((line = textReader.ReadLine()!) != null)
         yield return line;
     }
 
@@ -218,7 +218,7 @@ namespace Lazy8.Core
 
        Licensed under CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/)
        See https://stackoverflow.com/help/licensing for more info. */
-    public static IEnumerable<T> OrderByNatural<T>(this IEnumerable<T> items, Func<T, String> selector, StringComparer stringComparer = null)
+    public static IEnumerable<T> OrderByNatural<T>(this IEnumerable<T> items, Func<T, String> selector, StringComparer? stringComparer = null)
     {
       var maxDigits =
         items

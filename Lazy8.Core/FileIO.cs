@@ -282,7 +282,10 @@ namespace Lazy8.Core
          That's why the di and diEnumerator variables,
          and the associated if/then logic, are necessary. */
 
-      DirectoryInfo di = null;
+      if (errorHandler == null)
+        errorHandler = (s, e) => { };
+
+      DirectoryInfo? di = null;
       try
       {
         di = new DirectoryInfo(path);
@@ -300,7 +303,7 @@ namespace Lazy8.Core
       {
         yield return di;
 
-        IEnumerable<FileSystemInfo> diEnumerator = null;
+        IEnumerable<FileSystemInfo>? diEnumerator = null;
         try
         {
           diEnumerator = di.EnumerateFileSystemInfos(filemask);
@@ -320,7 +323,7 @@ namespace Lazy8.Core
           {
             if ((fsi is DirectoryInfo) && (searchOption == SearchOption.AllDirectories))
             {
-              foreach (var fsi2 in EnumerateFileSystemInfos(fsi.FullName, filemask, searchOption, errorHandler))
+              foreach (var fsi2 in EnumerateFileSystemInfos(fsi.FullName, filemask, searchOption, errorHandler!))
                 yield return fsi2;
             }
             else if (fsi is FileInfo)
@@ -486,7 +489,7 @@ namespace Lazy8.Core
     /// <returns>A <see cref="String"/> containing the directory of the currently executing assembly.</returns>
     /* GetEntryAssembly() may return null if called from unmanaged code.
        That's not the case here, so using the ! operator to suppress a null dereferencing warning is OK. */
-    public static String GetExecutablePath() => Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location).AddTrailingSeparator();
+    public static String GetExecutablePath() => Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!.AddTrailingSeparator();
 
     private static readonly Regex _multipleBackslashes = new(@"\\+", RegexOptions.Singleline);
 

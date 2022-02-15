@@ -44,7 +44,7 @@ namespace Lazy8.Core
         if (currentException.StackTrace != null)
           result.Add(String.Format(Properties.Resources.Exceptions_StackTrace, currentException.StackTrace.ToString()));
 
-        rec(currentException.InnerException);
+        rec(currentException.InnerException!);
       }
 
       rec(ex);

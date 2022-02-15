@@ -52,10 +52,10 @@ namespace Lazy8.Core
     /// <typeparam name="T">Any type.</typeparam>
     /// <param name="filename">A <see cref="String"/> containing an existing filename.</param>
     /// <returns>An object of type <typeparamref name="T"/>.</returns>
-    public static T DeserializeObjectFromXmlFile<T>(String filename)
+    public static T? DeserializeObjectFromXmlFile<T>(String filename)
     {
       using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-        return (T) (new XmlSerializer(typeof(T))).Deserialize(fs);
+        return (T?) (new XmlSerializer(typeof(T))).Deserialize(fs);
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ namespace Lazy8.Core
     /// <typeparam name="T">Any type.</typeparam>
     /// <param name="value">An object of type <typeparamref name="T"/>.</param>
     /// <returns>An <see cref="XDocument"/>.</returns>
-    public static XDocument SerializeObjectToXDocument<T>(T value)
+    public static XDocument SerializeObjectToXDocument<T>(T? value)
     {
       var doc = new XDocument();
       using (var writer = doc.CreateWriter())
@@ -76,7 +76,7 @@ namespace Lazy8.Core
          The comments have to be inserted by a separate call to InsertXmlComments(). */
 
       /* This must be executed after writer has been closed. */
-      InsertXmlComments(value, doc.Elements(), 1);
+      InsertXmlComments(value!, doc.Elements(), 1);
 
       return doc;
     }
@@ -87,11 +87,11 @@ namespace Lazy8.Core
     /// <typeparam name="T">Any type.</typeparam>
     /// <param name="value">An <see cref="XDocument"/> instance.</param>
     /// <returns>The deserialized object of type <typeparamref name="T"/>.</returns>
-    public static T DeserializeObjectFromXDocument<T>(XDocument value)
+    public static T? DeserializeObjectFromXDocument<T>(XDocument value)
     {
       var doc = new XDocument(value);
       using (var reader = doc.CreateReader())
-        return (T) (new XmlSerializer(typeof(T))).Deserialize(reader);
+        return (T?) (new XmlSerializer(typeof(T))).Deserialize(reader);
     }
 
     /// <summary>
@@ -109,10 +109,10 @@ namespace Lazy8.Core
     /// <typeparam name="T">Any type.</typeparam>
     /// <param name="s">A <see cref="String"/>.</param>
     /// <returns>The deserialized object of type <typeparamref name="T"/>.</returns>
-    public static T DeserializeObjectFromXmlString<T>(String s)
+    public static T? DeserializeObjectFromXmlString<T>(String s)
     {
       using (var sr = new StringReader(s))
-        return (T) (new XmlSerializer(typeof(T))).Deserialize(sr);
+        return (T?) (new XmlSerializer(typeof(T))).Deserialize(sr);
     }
 
     private static readonly Type _xmlCommentAttributeType = typeof(XmlCommentAttribute);
@@ -122,7 +122,7 @@ namespace Lazy8.Core
     
        This method assumes xElements is a serialization of obj.
        If that's not the case, the behavior of this method is unpredictable. */
-    private static void InsertXmlComments(Object obj, IEnumerable<XElement> xElements, Int32 level)
+    private static void InsertXmlComments(Object? obj, IEnumerable<XElement> xElements, Int32 level)
     {
       /* Base case. */
       if ((obj == null) || !xElements.Any())

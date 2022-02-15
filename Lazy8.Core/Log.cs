@@ -37,7 +37,7 @@ namespace Lazy8.Core
 
   public class Log
   {
-    private readonly TextWriter _writer;
+    private readonly TextWriter? _writer;
 
     private Log()
       : base()
@@ -47,7 +47,8 @@ namespace Lazy8.Core
     public Log(TextWriter writer)
       : this()
     {
-      writer.Name("writer").NotNull();
+      writer.Name(nameof(writer)).NotNull();
+
       this._writer = writer;
     }
 
@@ -65,7 +66,7 @@ namespace Lazy8.Core
         _ => "UNK",
       };
 
-      this._writer.WriteLine($"{timestamp} - {type} - {message}");
+      this._writer!.WriteLine($"{timestamp} - {type} - {message}");
       this._writer.Flush();
     }
 

@@ -29,7 +29,7 @@ namespace Lazy8.Core
     /// <param name="arguments">An optional list of arguments to pass to <paramref name="command"/>.</param>
     /// <param name="runProcessType">A <see cref="RunProcessType"/> enumeration value indicating whether to ignore or return the result created by the process.</param>
     /// <returns>If the result is to be ignored, null is returned.  Otherwise, a <see cref="String"/> containing the result created by the process is returned.</returns>
-    public static (Int32 ExitCode, String Output) RunProcess(String command, String arguments, RunProcessType runProcessType, Int32 timeoutInMilliseconds = Timeout.Infinite)
+    public static (Int32 ExitCode, String? Output) RunProcess(String command, String arguments, RunProcessType runProcessType, Int32 timeoutInMilliseconds = Timeout.Infinite)
     {
       command.Name(nameof(command)).NotNull().NotNullEmptyOrOnlyWhitespace().FileExists();
       timeoutInMilliseconds.Name(nameof(timeoutInMilliseconds)).GreaterThanOrEqualTo(Timeout.Infinite);
@@ -214,7 +214,7 @@ namespace Lazy8.Core
     /// <typeparam name="T"></typeparam>
     /// <param name="assembly"></param>
     /// <returns></returns>
-    public static T GetAssemblyAttribute<T>(this Assembly assembly)
+    public static T? GetAssemblyAttribute<T>(this Assembly assembly)
       where T : Attribute
     {
       var attributes = assembly.GetCustomAttributes(typeof(T), true);

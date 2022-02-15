@@ -15,12 +15,13 @@ namespace Lazy8.Core
     public static T GetPropertyValue<T>(Object obj, String propName) where T : class
     {
       obj.Name(nameof(obj)).NotNull();
+      propName.Name(nameof(propName)).NotNullEmptyOrOnlyWhitespace();
 
       var pi = obj.GetType().GetProperty(propName);
       if (pi == null)
         throw new Exception(String.Format(Properties.Resources.Reflection_PropertyNotFound, propName));
       
-      return (T) pi.GetValue(obj, null);
+      return (T) pi.GetValue(obj, null)!;
     }
 
     /// <summary>
@@ -103,7 +104,7 @@ namespace Lazy8.Core
           continue;
 
         var defaultInstanceValue = propertyInfo.GetValue(defaultInstance);
-        var newInstanceValue = propertyInfo.GetValue(instance);
+        var newInstanceValue = propertyInfo.GetValue(instance)!;
         if (!Equals(defaultInstanceValue, newInstanceValue))
           result.Add($"{propertyInfo.Name} = {GetLiteralDisplayValue(newInstanceValue)}");
       }
@@ -137,7 +138,7 @@ namespace Lazy8.Core
       }
       else
       {
-        return value.ToString();
+        return value.ToString()!;
       }
     }
   }
