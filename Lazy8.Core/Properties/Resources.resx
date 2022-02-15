@@ -217,6 +217,9 @@
   <data name="Random_UnknownLetterCaseMixValue" xml:space="preserve">
     <value>Unknown value of LetterCaseMix enumeration ({0}).</value>
   </data>
+  <data name="Reflection_PropertyNotFound" xml:space="preserve">
+    <value>The property '{0}' was not found.</value>
+  </data>
   <data name="StringScanner_NoSavedPosition" xml:space="preserve">
     <value>There is no previously saved position.  Are you missing a call to SavePosition()?</value>
   </data>
@@ -240,6 +243,15 @@
   </data>
   <data name="StringUtils_RegexFilemask" xml:space="preserve">
     <value>'{0}' does not contain either the * or ? characters.</value>
+  </data>
+  <data name="Utils_NoDeclaringTypeFoundOnStackFrame" xml:space="preserve">
+    <value>No declaring type could be found for stack frame {0}.</value>
+  </data>
+  <data name="Utils_NoMethodFoundOnStackFrame" xml:space="preserve">
+    <value>No executing method could be found for stack frame {0}.</value>
+  </data>
+  <data name="Utils_NoStackFrameExists" xml:space="preserve">
+    <value>No stack frame exists at level {0}.</value>
   </data>
   <data name="Utils_ProcessCouldNotBeStarted" xml:space="preserve">
     <value>A call to Process.Start() returned null.  The command '{0}' could not be executed.  It may be a URL, or there's already a process running that command.</value>

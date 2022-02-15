@@ -359,6 +359,15 @@ namespace Lazy8.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The property &apos;{0}&apos; was not found..
+        /// </summary>
+        public static string Reflection_PropertyNotFound {
+            get {
+                return ResourceManager.GetString("Reflection_PropertyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There is no previously saved position.  Are you missing a call to SavePosition()?.
         /// </summary>
         public static string StringScanner_NoSavedPosition {
@@ -427,6 +436,33 @@ namespace Lazy8.Core.Properties {
         public static string StringUtils_RegexFilemask {
             get {
                 return ResourceManager.GetString("StringUtils_RegexFilemask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No declaring type could be found for stack frame {0}..
+        /// </summary>
+        public static string Utils_NoDeclaringTypeFoundOnStackFrame {
+            get {
+                return ResourceManager.GetString("Utils_NoDeclaringTypeFoundOnStackFrame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No executing method could be found for stack frame {0}..
+        /// </summary>
+        public static string Utils_NoMethodFoundOnStackFrame {
+            get {
+                return ResourceManager.GetString("Utils_NoMethodFoundOnStackFrame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No stack frame exists at level {0}..
+        /// </summary>
+        public static string Utils_NoStackFrameExists {
+            get {
+                return ResourceManager.GetString("Utils_NoStackFrameExists", resourceCulture);
             }
         }
         

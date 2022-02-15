@@ -210,7 +210,10 @@ namespace Lazy8.Core
     public static String GetLastChildsInnerText(this XmlNode node, String xpath)
     {
       var singleNode = node.SelectSingleNode(xpath);
-      return (singleNode == null) ? "" : singleNode.LastChild.InnerText;
+      if ((singleNode == null) || (singleNode.LastChild == null))
+        return "";
+      else
+        return singleNode.LastChild.InnerText;
     }
 
     /// <summary>

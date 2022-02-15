@@ -12,7 +12,16 @@ namespace Lazy8.Core
 {
   public class ReflectionUtils
   {
-    public static T GetPropertyValue<T>(Object obj, String propName) => (T) obj.GetType().GetProperty(propName).GetValue(obj, null);
+    public static T GetPropertyValue<T>(Object obj, String propName) where T : class
+    {
+      obj.Name(nameof(obj)).NotNull();
+
+      var pi = obj.GetType().GetProperty(propName);
+      if (pi == null)
+        throw new Exception(String.Format(Properties.Resources.Reflection_PropertyNotFound, propName));
+      
+      return (T) pi.GetValue(obj, null);
+    }
 
     /// <summary>
     /// Return an <see cref="IEnumerable{String}"/> containing all of the public instance field
@@ -42,10 +51,10 @@ namespace Lazy8.Core
     /// <typeparam name="T">Any type.</typeparam>
     /// <param name="source">Any <see cref="Object"/>.</param>
     /// <returns>A <see cref="String"/>.</returns>
-    public static String GetPublicPropertyValues<T>(Object source) => 
+    public static String GetPublicPropertyValues<T>(Object source) where T : class => 
       GetPublicPropertyNames<T>()
-      .Select(propertyName => propertyName + " = " + (source.GetType().GetProperty(propertyName).GetValue(source, null) ?? "NULL"))
-      .ToList()
+      .Select(propertyName => new { Name = propertyName, Value = GetPropertyValue<T>(source, propertyName) })
+      .Select(propertyNameValuePair => propertyNameValuePair.Name + " = " + ((propertyNameValuePair.Value == null) ? "NULL" : propertyNameValuePair.Value))
       .Join("\n");
 
     /// <summary>
@@ -61,8 +70,7 @@ namespace Lazy8.Core
       return
         type
         .GetProperties(bindingFlags)
-        .Select(propertyInfo => propertyInfo.Name + " = " + (type.GetProperty(propertyInfo.Name).GetValue(source, null) ?? "NULL"))
-        .ToList()
+        .Select(propertyInfo => propertyInfo.Name + " = " + (type.GetProperty(propertyInfo.Name)!.GetValue(source, null) ?? "NULL"))
         .Join("\n");
     }
 
@@ -105,6 +113,8 @@ namespace Lazy8.Core
 
     private static String GetLiteralDisplayValue(Object value)
     {
+      value.Name(nameof(value)).NotNull();
+
       if (value is Char)
       {
         return $"'{value}'";
@@ -116,7 +126,7 @@ namespace Lazy8.Core
       else if (value is Enum)
       {
         var ve = (value as Enum);
-        var typename = ve.GetType().Name;
+        var typename = ve!.GetType().Name;
         return
           ve
           .ToString()

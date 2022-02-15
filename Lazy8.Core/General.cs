@@ -106,8 +106,8 @@ namespace Lazy8.Core
     public static Boolean IsJITOptimized(this Assembly assembly)
     {
       foreach (var attribute in assembly.GetCustomAttributes(typeof(DebuggableAttribute), false))
-        if (attribute is DebuggableAttribute)
-          return !(attribute as DebuggableAttribute).IsJITOptimizerDisabled;
+        if (attribute is DebuggableAttribute debuggableAttribute)
+          return !debuggableAttribute.IsJITOptimizerDisabled;
 
       return true;
     }
@@ -122,10 +122,10 @@ namespace Lazy8.Core
     {
       static Int32 rec(Int32 hashcode, Object obj)
       {
-        if (obj is IEnumerable)
+        if (obj is IEnumerable enumerable)
         {
           /* Recursive case. */
-          foreach (var o in (obj as IEnumerable))
+          foreach (var o in enumerable)
             hashcode = rec(hashcode, o);
 
           return hashcode;
@@ -140,6 +140,28 @@ namespace Lazy8.Core
       return rec(0, objects);
     }
 
+    private static void ValidateStackFrame(StackFrame sf, Int32 stackFrameLevel)
+    {
+      /* I know this looks weird - how can a constructor return null?
+         Well, somehow it can.  It makes sense in that the requested stackFrameLevel does not exist.
+         This can happen in a release build where the stack frame has been optimized away. */
+      if (sf == null)
+        throw new Exception(String.Format(Properties.Resources.Utils_NoStackFrameExists, stackFrameLevel));
+
+      var mb = sf.GetMethod();
+
+      /* GetMethod() may return null.  This can happen in release builds where the actual
+         method call has been optimized away. */
+      if (mb == null)
+        throw new Exception(String.Format(Properties.Resources.Utils_NoMethodFoundOnStackFrame, stackFrameLevel));
+
+      var declaringType = mb.DeclaringType;
+
+      /* Like GetMethod(), DeclaringType can be optimized away in release builds. */
+      if (declaringType == null)
+        throw new Exception(String.Format(Properties.Resources.Utils_NoDeclaringTypeFoundOnStackFrame, stackFrameLevel));
+    }
+
     /// <summary>
     /// Return the method name for the given <paramref name="stackFrameLevel"/> (greater than zero).
     /// </summary>
@@ -147,9 +169,15 @@ namespace Lazy8.Core
     /// <returns>The name of the method that created the given stack frame.</returns>
     public static String GetMethodName(Int32 stackFrameLevel = 1)
     {
+      stackFrameLevel.Name(nameof(stackFrameLevel)).GreaterThan(0);
+
       var sf = new StackFrame(stackFrameLevel);
-      var mb = sf.GetMethod();
-      return $"{mb.DeclaringType.FullName}.{mb.Name}";
+
+      ValidateStackFrame(sf, stackFrameLevel);
+
+      var mb = sf.GetMethod()!;
+
+      return $"{mb.DeclaringType!.FullName}.{mb.Name}";
     }
 
     /// <summary>
@@ -169,10 +197,15 @@ namespace Lazy8.Core
     /// </returns>
     public static String GetStackInfo(Int32 levels = 2)
     {
-      var sf = new StackFrame(levels, true /* Get the file name, line number, and column number of the stack frame. */);
-      var mb = sf.GetMethod();
+      levels.Name(nameof(levels)).GreaterThanOrEqualTo(0);
 
-      return $"{Path.GetFileName(sf.GetFileName())}::{mb.DeclaringType.FullName}.{mb.Name} - Line {sf.GetFileLineNumber()}";
+      var sf = new StackFrame(levels, true /* Get the file name, line number, and column number of the stack frame. */);
+
+      ValidateStackFrame(sf, levels);
+
+      var mb = sf.GetMethod()!;
+
+      return $"{Path.GetFileName(sf.GetFileName())}::{mb.DeclaringType!.FullName}.{mb.Name} - Line {sf.GetFileLineNumber()}";
     }
 
     /// <summary>
