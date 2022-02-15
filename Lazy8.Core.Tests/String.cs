@@ -20,8 +20,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void ToMemoryStreamTest()
     {
-      String s = null;
-      Assert.That(() => { using (var ms = s.ToMemoryStream()) { } }, Throws.TypeOf<ArgumentNullException>());
+      String? s = null;
+      Assert.That(() => { using (var ms = s!.ToMemoryStream()) { } }, Throws.TypeOf<ArgumentNullException>());
 
       s = "";
       using (var ms = s.ToMemoryStream())
@@ -39,8 +39,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void RegexEscapeTest()
     {
-      String s = null;
-      Assert.That(() => s.RegexEscape(), Throws.TypeOf<ArgumentNullException>());
+      String? s = null;
+      Assert.That(() => s!.RegexEscape(), Throws.TypeOf<ArgumentNullException>());
 
       s = "abc";
       Assert.That(Regex.Escape(s) == s.RegexEscape());
@@ -61,8 +61,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void GetRegexFromFilemaskTest()
     {
-      String s = null;
-      Assert.That(() => s.GetRegexFromFilemask(), Throws.TypeOf<ArgumentNullException>());
+      String? s = null;
+      Assert.That(() => s!.GetRegexFromFilemask(), Throws.TypeOf<ArgumentNullException>());
 
       s = "";
       Assert.That(() => s.GetRegexFromFilemask(), Throws.TypeOf<ArgumentException>());
@@ -89,11 +89,11 @@ namespace Lazy8.Core.Tests
     [Test]
     public void StripTest()
     {
-      String s = null;
-      Assert.That(() => s.Strip("x".ToCharArray()), Throws.TypeOf<ArgumentNullException>());
+      String? s = null;
+      Assert.That(() => s!.Strip("x".ToCharArray()), Throws.TypeOf<ArgumentNullException>());
 
       s = "";
-      Assert.That(() => s.Strip(null), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => s.Strip(null!), Throws.TypeOf<ArgumentNullException>());
 
       s = "";
       Assert.That(s.Strip("x".ToCharArray()) == "");
@@ -114,25 +114,25 @@ namespace Lazy8.Core.Tests
     [Test]
     public void CoalesceTest()
     {
-      Assert.That(() => StringUtils.Coalesce(null), Throws.TypeOf<ArgumentNullException>());
-      Assert.That(() => StringUtils.Coalesce((String) null), Throws.TypeOf<ArgumentException>());
+      Assert.That(() => StringUtils.Coalesce(null!), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => StringUtils.Coalesce((String) null!), Throws.TypeOf<ArgumentException>());
 
       Assert.That(() => StringUtils.Coalesce(), Throws.TypeOf<ArgumentException>());
       Assert.That(() => StringUtils.Coalesce(""), Throws.TypeOf<ArgumentException>());
       Assert.That(() => StringUtils.Coalesce("  "), Throws.TypeOf<ArgumentException>());
-      Assert.That(() => StringUtils.Coalesce(null, null), Throws.TypeOf<ArgumentException>());
-      Assert.That(() => StringUtils.Coalesce("", null), Throws.TypeOf<ArgumentException>());
-      Assert.That(() => StringUtils.Coalesce("  ", null), Throws.TypeOf<ArgumentException>());
+      Assert.That(() => StringUtils.Coalesce(null!, null!), Throws.TypeOf<ArgumentException>());
+      Assert.That(() => StringUtils.Coalesce("", null!), Throws.TypeOf<ArgumentException>());
+      Assert.That(() => StringUtils.Coalesce("  ", null!), Throws.TypeOf<ArgumentException>());
       Assert.That(() => StringUtils.Coalesce("  ", ""), Throws.TypeOf<ArgumentException>());
       Assert.That(() => StringUtils.Coalesce("", "  "), Throws.TypeOf<ArgumentException>());
       Assert.That(() => StringUtils.Coalesce("  ", "  "), Throws.TypeOf<ArgumentException>());
       Assert.That(() => StringUtils.Coalesce("", ""), Throws.TypeOf<ArgumentException>());
-      Assert.That(() => StringUtils.Coalesce(null, ""), Throws.TypeOf<ArgumentException>());
-      Assert.That(() => StringUtils.Coalesce(null, "  "), Throws.TypeOf<ArgumentException>());
+      Assert.That(() => StringUtils.Coalesce(null!, ""), Throws.TypeOf<ArgumentException>());
+      Assert.That(() => StringUtils.Coalesce(null!, "  "), Throws.TypeOf<ArgumentException>());
 
       Assert.That(StringUtils.Coalesce("a") == "a");
-      Assert.That(StringUtils.Coalesce("a", null) == "a");
-      Assert.That(StringUtils.Coalesce(null, "a") == "a");
+      Assert.That(StringUtils.Coalesce("a", null!) == "a");
+      Assert.That(StringUtils.Coalesce(null!, "a") == "a");
       Assert.That(StringUtils.Coalesce("a", "") == "a");
       Assert.That(StringUtils.Coalesce("", "a") == "a");
       Assert.That(StringUtils.Coalesce("a", "  ") == "a");
@@ -142,8 +142,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void UpToTest()
     {
-      String s = null;
-      Assert.That(() => s.UpTo('.'), Throws.TypeOf<ArgumentNullException>());
+      String? s = null;
+      Assert.That(() => s!.UpTo('.'), Throws.TypeOf<ArgumentNullException>());
 
       s = "";
       Assert.That(s.UpTo('.') == "");
@@ -196,11 +196,11 @@ namespace Lazy8.Core.Tests
     [Test]
     public void IndexOfCITest()
     {
-      String s = null;
-      Assert.That(() => s.IndexOfCI("x"), Throws.TypeOf<ArgumentNullException>());
+      String? s = null;
+      Assert.That(() => s!.IndexOfCI("x"), Throws.TypeOf<ArgumentNullException>());
 
       s = "abcdef";
-      Assert.That(() => s.IndexOfCI(null), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => s.IndexOfCI(null!), Throws.TypeOf<ArgumentNullException>());
 
       Assert.That(s.IndexOfCI("c") == 2);
       Assert.That(s.IndexOfCI("C") == 2);
@@ -221,9 +221,9 @@ namespace Lazy8.Core.Tests
     [Test]
     public void RepeatTest()
     {
-      String s = null;
+      String? s = null;
       var count = 1;
-      Assert.That(() => s.Repeat(count), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => s!.Repeat(count), Throws.TypeOf<ArgumentNullException>());
 
       s = "";
       count = -1;
@@ -253,8 +253,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void LastWordTest()
     {
-      String s = null;
-      Assert.That(() => s.LastWord(), Throws.TypeOf<ArgumentNullException>());
+      String? s = null;
+      Assert.That(() => s!.LastWord(), Throws.TypeOf<ArgumentNullException>());
 
       s = "a";
       Assert.That(s.LastWord() == s);
@@ -269,16 +269,16 @@ namespace Lazy8.Core.Tests
     [Test]
     public void SurroundWithTest()
     {
-      String s = null;
-      String delimiter = null;
-      Assert.That(() => s.SurroundWith(delimiter), Throws.TypeOf<ArgumentNullException>());
+      String? s = null;
+      String? delimiter = null;
+      Assert.That(() => s!.SurroundWith(delimiter!), Throws.TypeOf<ArgumentNullException>());
 
       s = "";
-      Assert.That(() => s.SurroundWith(delimiter), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => s.SurroundWith(delimiter!), Throws.TypeOf<ArgumentNullException>());
 
       s = null;
       delimiter = "";
-      Assert.That(() => s.SurroundWith(delimiter), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => s!.SurroundWith(delimiter), Throws.TypeOf<ArgumentNullException>());
 
       s = "";
       delimiter = "";
@@ -313,16 +313,16 @@ namespace Lazy8.Core.Tests
          MD5 ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") = d174ab98d277d9f5a5611c2c9f419d9f
          MD5 ("12345678901234567890123456789012345678901234567890123456789012345678901234567890") = 57edf4a22be3c955ac49da2e2107b67a */
 
-      String input = null;
-      Encoding encoding = null;
-      Assert.That(() => input.MD5Checksum(encoding), Throws.TypeOf<ArgumentNullException>());
+      String? input = null;
+      Encoding? encoding = null;
+      Assert.That(() => input!.MD5Checksum(encoding!), Throws.TypeOf<ArgumentNullException>());
 
       input = "";
-      Assert.That(() => input.MD5Checksum(encoding), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => input.MD5Checksum(encoding!), Throws.TypeOf<ArgumentNullException>());
 
       input = null;
       encoding = Encoding.ASCII;
-      Assert.That(() => input.MD5Checksum(encoding), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => input!.MD5Checksum(encoding), Throws.TypeOf<ArgumentNullException>());
 
       input = "";
       Assert.That(input.MD5Checksum(encoding) == "D41D8CD98F00B204E9800998ECF8427E");
@@ -349,16 +349,16 @@ namespace Lazy8.Core.Tests
     [Test]
     public void TrimStartTest()
     {
-      String source = null;
-      String stringToTrim = null;
-      Assert.That(() => source.TrimStart(stringToTrim), Throws.TypeOf<ArgumentNullException>());
+      String? source = null;
+      String? stringToTrim = null;
+      Assert.That(() => source!.TrimStart(stringToTrim!), Throws.TypeOf<ArgumentNullException>());
 
       source = "";
-      Assert.That(() => source.TrimStart(stringToTrim), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => source.TrimStart(stringToTrim!), Throws.TypeOf<ArgumentNullException>());
 
       source = null;
       stringToTrim = "";
-      Assert.That(() => source.TrimStart(stringToTrim), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => source!.TrimStart(stringToTrim), Throws.TypeOf<ArgumentNullException>());
 
       source = "";
       stringToTrim = "";
@@ -384,16 +384,16 @@ namespace Lazy8.Core.Tests
     [Test]
     public void TrimEndTest()
     {
-      String source = null;
-      String stringToTrim = null;
-      Assert.That(() => source.TrimEnd(stringToTrim), Throws.TypeOf<ArgumentNullException>());
+      String? source = null;
+      String? stringToTrim = null;
+      Assert.That(() => source!.TrimEnd(stringToTrim!), Throws.TypeOf<ArgumentNullException>());
 
       source = "";
-      Assert.That(() => source.TrimEnd(stringToTrim), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => source.TrimEnd(stringToTrim!), Throws.TypeOf<ArgumentNullException>());
 
       source = null;
       stringToTrim = "";
-      Assert.That(() => source.TrimEnd(stringToTrim), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => source!.TrimEnd(stringToTrim), Throws.TypeOf<ArgumentNullException>());
 
       source = "";
       stringToTrim = "";
@@ -422,8 +422,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void AddTrailingForwardSlashTest()
     {
-      String s = null;
-      Assert.That(() => s.AddTrailingForwardSlash(), Throws.TypeOf<ArgumentNullException>());
+      String? s = null;
+      Assert.That(() => s!.AddTrailingForwardSlash(), Throws.TypeOf<ArgumentNullException>());
 
       s = "";
       Assert.That(s.AddTrailingForwardSlash() == "/");
@@ -444,8 +444,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void RemoveHtmlTest()
     {
-      String input = null;
-      Assert.That(() => input.RemoveHtml(), Throws.TypeOf<ArgumentNullException>());
+      String? input = null;
+      Assert.That(() => input!.RemoveHtml(), Throws.TypeOf<ArgumentNullException>());
 
       input = "";
       Assert.That(input.RemoveHtml() == "");
@@ -465,8 +465,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void RemoveWhitespaceTest()
     {
-      String input = null;
-      Assert.That(() => input.RemoveWhitespace(), Throws.TypeOf<ArgumentNullException>());
+      String? input = null;
+      Assert.That(() => input!.RemoveWhitespace(), Throws.TypeOf<ArgumentNullException>());
 
       input = "";
       Assert.That(input.RemoveWhitespace() == "");
@@ -488,8 +488,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void AreAllEmptyTest()
     {
-      List<String> strings = null;
-      Assert.That(() => strings.AreAllEmpty(), Throws.TypeOf<ArgumentNullException>());
+      List<String>? strings = null;
+      Assert.That(() => strings!.AreAllEmpty(), Throws.TypeOf<ArgumentNullException>());
 
       strings = new List<String>();
       Assert.That(strings.AreAllEmpty(), Is.True);
@@ -511,8 +511,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void AreAnyEmptyTest()
     {
-      List<String> strings = null;
-      Assert.That(() => strings.AreAnyEmpty(), Throws.TypeOf<ArgumentNullException>());
+      List<String>? strings = null;
+      Assert.That(() => strings!.AreAnyEmpty(), Throws.TypeOf<ArgumentNullException>());
 
       strings = new List<String>();
       Assert.That(strings.AreAnyEmpty(), Is.False);
@@ -531,8 +531,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void IndentTest()
     {
-      String input = null;
-      Assert.That(() => input.Indent(4), Throws.TypeOf<ArgumentNullException>());
+      String? input = null;
+      Assert.That(() => input!.Indent(4), Throws.TypeOf<ArgumentNullException>());
 
       input = "";
       Assert.That(input.Indent(4) == "    ");
@@ -557,7 +557,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void CRLFTest()
     {
-      Assert.That(() => ((String) null).CRLF(), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => ((String) null!).CRLF(), Throws.TypeOf<ArgumentNullException>());
 
       Assert.That("".CRLF() == "");
 
@@ -586,7 +586,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void LFTest()
     {
-      Assert.That(() => ((String) null).LF(), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => ((String) null!).LF(), Throws.TypeOf<ArgumentNullException>());
 
       Assert.That("".LF() == "");
 
@@ -647,7 +647,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void GetSeriesTest()
     {
-      Assert.That(() => ((String) null).GetSeries(), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => ((String) null!).GetSeries(), Throws.TypeOf<ArgumentNullException>());
 
       Assert.That("".GetSeries().ToList(), Is.EqualTo(new List<Int32>()));
       Assert.That("1".GetSeries().ToList(), Is.EqualTo(new List<Int32>() { 1 }));
@@ -661,7 +661,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void ChopBeginningAndEndTest()
     {
-      Assert.That(() => ((String) null).ChopBeginningAndEnd(), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => ((String) null!).ChopBeginningAndEnd(), Throws.TypeOf<ArgumentNullException>());
 
       var s = "";
       Assert.That(() => s.ChopBeginningAndEnd(), Throws.TypeOf<ArgumentOutOfRangeException>());

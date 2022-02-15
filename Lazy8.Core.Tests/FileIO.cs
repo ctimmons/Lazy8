@@ -104,13 +104,12 @@ namespace Lazy8.Core.Tests
     {
       static void action(FileSystemInfo fsi)
       {
-        if (fsi is DirectoryInfo)
+        if (fsi is DirectoryInfo di)
         {
-          (fsi as DirectoryInfo).DeleteIfEmpty();
+          di.DeleteIfEmpty();
         }
-        else if (fsi is FileInfo)
+        else if (fsi is FileInfo fi)
         {
-          var fi = (fsi as FileInfo);
           if (fi.Name == "hello_world.txt")
             fi.Delete();
         }
@@ -142,9 +141,8 @@ namespace Lazy8.Core.Tests
 
       void action(FileSystemInfo fsi)
       {
-        if (fsi is DirectoryInfo)
+        if (fsi is DirectoryInfo di)
         {
-          var di = (fsi as DirectoryInfo);
           if (di.EnumerateFiles().Where(fi => fi.Name.Contains("dog")).Any())
             actual.Add(di.FullName);
         }
@@ -167,9 +165,8 @@ namespace Lazy8.Core.Tests
 
       void action(FileSystemInfo fsi)
       {
-        if (fsi is DirectoryInfo)
+        if (fsi is DirectoryInfo di)
         {
-          var di = (fsi as DirectoryInfo);
           if (Regex.Match(di.FullName, "le..l_1", RegexOptions.Singleline).Success)
             actual.Add(di.FullName);
         }
@@ -192,9 +189,8 @@ namespace Lazy8.Core.Tests
 
       void action(FileSystemInfo fsi)
       {
-        if (fsi is FileInfo)
+        if (fsi is FileInfo fi)
         {
-          var fi = (fsi as FileInfo);
           if (File.ReadAllText(fi.FullName).Contains("fox"))
             actual.Add(fi.FullName);
         }
@@ -217,9 +213,8 @@ namespace Lazy8.Core.Tests
 
       void action(FileSystemInfo fsi)
       {
-        if (fsi is FileInfo)
+        if (fsi is FileInfo fi)
         {
-          var fi = (fsi as FileInfo);
           if (Regex.Match(fi.FullName, "he..o", RegexOptions.Singleline).Success)
             actual.Add(fi.FullName);
         }
@@ -239,8 +234,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void SafelyCreateEmptyFileTest()
     {
-      String filename = null;
-      Assert.That(() => FileUtils.SafelyCreateEmptyFile(filename), Throws.TypeOf<ArgumentNullException>());
+      String? filename = null;
+      Assert.That(() => FileUtils.SafelyCreateEmptyFile(filename!), Throws.TypeOf<ArgumentNullException>());
 
       filename = "";
       Assert.That(() => FileUtils.SafelyCreateEmptyFile(filename), Throws.TypeOf<ArgumentException>());
@@ -257,8 +252,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void CreateEmptyFileTest()
     {
-      String filename = null;
-      Assert.That(() => FileUtils.CreateEmptyFile(filename, OverwriteFile.No), Throws.TypeOf<ArgumentNullException>());
+      String? filename = null;
+      Assert.That(() => FileUtils.CreateEmptyFile(filename!, OverwriteFile.No), Throws.TypeOf<ArgumentNullException>());
 
       filename = "";
       Assert.That(() => FileUtils.CreateEmptyFile(filename, OverwriteFile.No), Throws.TypeOf<ArgumentException>());
@@ -316,8 +311,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void DeleteEmptyDirectoriesTest()
     {
-      String rootDir = null;
-      Assert.That(() => FileUtils.DeleteEmptyDirectories(rootDir), Throws.TypeOf<ArgumentNullException>());
+      String? rootDir = null;
+      Assert.That(() => FileUtils.DeleteEmptyDirectories(rootDir!), Throws.TypeOf<ArgumentNullException>());
 
       rootDir = "";
       Assert.That(() => FileUtils.DeleteEmptyDirectories(rootDir), Throws.TypeOf<ArgumentException>());
@@ -356,8 +351,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void IsDirectoryEmptyTest()
     {
-      String rootDir = null;
-      Assert.That(() => FileUtils.IsDirectoryEmpty(rootDir), Throws.TypeOf<ArgumentNullException>());
+      String? rootDir = null;
+      Assert.That(() => FileUtils.IsDirectoryEmpty(rootDir!), Throws.TypeOf<ArgumentNullException>());
 
       rootDir = "";
       Assert.That(() => FileUtils.IsDirectoryEmpty(rootDir), Throws.TypeOf<ArgumentException>());
@@ -381,8 +376,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void DuplicateBackslashesTest()
     {
-      String directory = null;
-      Assert.That(() => directory.DuplicateBackslashes(), Throws.TypeOf<ArgumentNullException>());
+      String? directory = null;
+      Assert.That(() => directory!.DuplicateBackslashes(), Throws.TypeOf<ArgumentNullException>());
 
       directory = "";
       Assert.That(directory.DuplicateBackslashes() == "");
@@ -397,8 +392,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void AddTrailingSeparatorTest()
     {
-      String directory = null;
-      Assert.That(() => directory.AddTrailingSeparator(), Throws.TypeOf<ArgumentNullException>());
+      String? directory = null;
+      Assert.That(() => directory!.AddTrailingSeparator(), Throws.TypeOf<ArgumentNullException>());
 
       directory = @"c:\temp";
       Assert.That(directory.AddTrailingSeparator() == directory + Path.DirectorySeparatorChar);
@@ -410,8 +405,8 @@ namespace Lazy8.Core.Tests
     [Test]
     public void RemoveTrailingSeparatorTest()
     {
-      String directory = null;
-      Assert.That(() => directory.RemoveTrailingSeparator(), Throws.TypeOf<ArgumentNullException>());
+      String? directory = null;
+      Assert.That(() => directory!.RemoveTrailingSeparator(), Throws.TypeOf<ArgumentNullException>());
 
       directory = @"c:\temp";
       Assert.That((directory + Path.DirectorySeparatorChar).RemoveTrailingSeparator() == directory);

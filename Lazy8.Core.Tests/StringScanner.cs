@@ -15,7 +15,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void CreateInstanceTest()
     {
-      Assert.That(() => new StringScanner(null), Throws.TypeOf<ArgumentException>());
+      Assert.That(() => new StringScanner(null!), Throws.TypeOf<ArgumentException>());
       Assert.That(() => new StringScanner(""), Throws.Nothing);
       Assert.That(() => new StringScanner("012"), Throws.Nothing);
     }

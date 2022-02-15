@@ -169,7 +169,7 @@ namespace Lazy8.Core
     /// Returns true if value is in the set "1,Y,T,TRUE,YES" (case insensitive).
     /// <para>Any other value, including if value is null or empty, will return false.</para>
     /// </summary>
-    public static Boolean AsBoolean(this String value) =>
+    public static Boolean AsBoolean(this String? value) =>
       (!String.IsNullOrEmpty(value)) &&
       ContainsCI(Properties.Resources.StringUtils_BooleanTruthLiterals, value.Trim());
 

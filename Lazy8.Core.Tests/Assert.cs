@@ -40,8 +40,8 @@ namespace Lazy8.Core.Tests
       Assert.That(() => s.Name(nameof(s)).NotNull(), Throws.Nothing);
 
       s = null;
-      Assert.That(() => s.NotNull(), Throws.TypeOf<ArgumentNullException>());
-      Assert.That(() => s.Name(nameof(s)).NotNull(), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => s!.NotNull(), Throws.TypeOf<ArgumentNullException>());
+      Assert.That(() => s!.Name(nameof(s)).NotNull(), Throws.TypeOf<ArgumentNullException>());
     }
 
     [Test]

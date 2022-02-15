@@ -80,7 +80,7 @@ namespace Lazy8.Core.Tests
 
       Assert.That(data.IsNullOrEmpty(), Is.False);
       Assert.That(emptyData.IsNullOrEmpty(), Is.True);
-      Assert.That(((IEnumerable<String>) null).IsNullOrEmpty(), Is.True);
+      Assert.That(((IEnumerable<String>) null!).IsNullOrEmpty(), Is.True);
     }
 
     [Test]
