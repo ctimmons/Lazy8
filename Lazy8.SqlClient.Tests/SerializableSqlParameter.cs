@@ -45,10 +45,10 @@ namespace Lazy8.SqlClient.Tests
           XmlSchemaCollectionOwningSchema = "XmlSchemaCollectionOwningSchema"
         };
 
-      this.RoundTripSqlParameter(expectedSqlParameter, this.CompareRoundTripPropertiesOtherThanValue);
+      RoundTripSqlParameter(expectedSqlParameter, this.CompareRoundTripPropertiesOtherThanValue);
     }
 
-    private void RoundTripSqlParameter(SqlParameter expectedSqlParameter, Action<SqlParameter, SqlParameter> comparisonPredicate)
+    private static void RoundTripSqlParameter(SqlParameter expectedSqlParameter, Action<SqlParameter, SqlParameter> comparisonPredicate)
     {
       var expectedSerializedSqlParameter = new SerializableSqlParameter(expectedSqlParameter);
 
@@ -213,7 +213,7 @@ namespace Lazy8.SqlClient.Tests
       foreach (var (value, predicate) in valueTestCases)
       {
         var expectedSqlParameter = new SqlParameter() { Value = value };
-        this.RoundTripSqlParameter(expectedSqlParameter, this.CompareRoundTripValueProperty);
+        RoundTripSqlParameter(expectedSqlParameter, this.CompareRoundTripValueProperty);
       }
     }
   }

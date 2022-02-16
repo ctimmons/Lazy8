@@ -189,7 +189,13 @@ namespace Lazy8.SqlClient
     /// <returns></returns>
     public static SqlXml GetSqlXml(this XElement xElement, XmlSchemaSet xmlSchemaSet)
     {
-      xElement.Validate(xElement.GetSchemaInfo().SchemaElement, xmlSchemaSet, null /* Throw exceptions on validation error. */);
+      var schemaInfo = xElement.GetSchemaInfo();
+      if (schemaInfo != null)
+      {
+        var schemaElement = schemaInfo.SchemaElement;
+        if (schemaElement != null)
+          xElement.Validate(schemaElement, xmlSchemaSet, null /* Throw exceptions on validation error. */);
+      }
 
       return xElement.GetSqlXml();
     }
@@ -244,7 +250,7 @@ namespace Lazy8.SqlClient
         return new SqlXml(xmlTextReader);
     }
 
-    public static T GetValueOrDefault<T>(this DbDataReader dbDataReader, String columnName) =>
+    public static T? GetValueOrDefault<T>(this DbDataReader dbDataReader, String columnName) =>
       dbDataReader.GetValueOrDefault<T>(dbDataReader.GetOrdinal(columnName));
 
     /// <summary>
@@ -256,7 +262,7 @@ namespace Lazy8.SqlClient
     /// <returns></returns>
     /// <exception cref="System.InvalidCastException">Thrown when the data returned by dbDataReader is NULL, and T is not a nullable type.</exception>
     /// <exception cref="System.IndexOutOfRangeException">Thrown when columnIndex is out of range.</exception>
-    public static T GetValueOrDefault<T>(this DbDataReader dbDataReader, Int32 columnIndex)
+    public static T? GetValueOrDefault<T>(this DbDataReader dbDataReader, Int32 columnIndex)
     {
       /* If T is not a nullable type, and dbDataReader returns a null value,
          throw an InvalidCastException.
@@ -269,7 +275,7 @@ namespace Lazy8.SqlClient
       var isNullValue = dbDataReader.IsDBNull(columnIndex);
 
       if (isNullableType)
-        return isNullValue ? default : (T) Convert.ChangeType(dbDataReader[columnIndex], Nullable.GetUnderlyingType(type));
+        return isNullValue ? default : (T) Convert.ChangeType(dbDataReader[columnIndex], Nullable.GetUnderlyingType(type)!);
       else if (!isNullValue)
         return (T) Convert.ChangeType(dbDataReader[columnIndex], type);
       else
