@@ -64,7 +64,7 @@ namespace Lazy8.SqlClient.Tests
 
       var json = JsonConvert.SerializeObject(expectedSerializedSqlParameter, settings);
       var actualSerializedSqlParameter = JsonConvert.DeserializeObject<SerializableSqlParameter>(json, settings);
-      var actualSqlParameter = actualSerializedSqlParameter.GetSqlParameter();
+      var actualSqlParameter = actualSerializedSqlParameter!.GetSqlParameter();
       comparisonPredicate(expectedSqlParameter, actualSqlParameter);
 
       /* System.Text.Json */
@@ -73,14 +73,14 @@ namespace Lazy8.SqlClient.Tests
 
       json = System.Text.Json.JsonSerializer.Serialize(expectedSerializedSqlParameter, options);
       actualSerializedSqlParameter = System.Text.Json.JsonSerializer.Deserialize<SerializableSqlParameter>(json, options);
-      actualSqlParameter = actualSerializedSqlParameter.GetSqlParameter();
+      actualSqlParameter = actualSerializedSqlParameter!.GetSqlParameter();
       comparisonPredicate(expectedSqlParameter, actualSqlParameter);
 
       /* XML */
 
       json = XmlUtils.SerializeObjectToXmlString(expectedSerializedSqlParameter);
       actualSerializedSqlParameter = XmlUtils.DeserializeObjectFromXmlString<SerializableSqlParameter>(json);
-      actualSqlParameter = actualSerializedSqlParameter.GetSqlParameter();
+      actualSqlParameter = actualSerializedSqlParameter!.GetSqlParameter();
       comparisonPredicate(expectedSqlParameter, actualSqlParameter);
     }
 
