@@ -9,6 +9,32 @@ using System.Collections.Generic;
 
 namespace Lazy8.Core
 {
+  /// <summary>
+  /// Simplifies creating an Exception with a message created via String.Format().
+  /// <para>Instead of calling 'throw new Exception(String.Format("", ...))', this class's
+  /// constructor eliminates the need to call String.Format(), i.e. 'throw new ExceptionFmt("", ...)'.</para>
+  /// </summary>
+  public class ExceptionFmt : Exception
+  {
+    public ExceptionFmt(String message, params Object?[] args)
+      : base(String.Format(message, args))
+    {
+    }
+  }
+
+  /// <summary>
+  /// Simplifies creating an NotImplementedException with a message created via String.Format().
+  /// <para>Instead of calling 'throw new NotImplementedException(String.Format("", ...))', this class's
+  /// constructor eliminates the need to call String.Format(), i.e. 'throw new NotImplementedExceptionFmt("", ...)'.</para>
+  /// </summary>
+  public class NotImplementedExceptionFmt : ExceptionFmt
+  {
+    public NotImplementedExceptionFmt(String message, params Object?[] args)
+      : base(message, args)
+    {
+    }
+  }
+
   public class ItemNotFoundException : Exception
   {
     public ItemNotFoundException(String message)
