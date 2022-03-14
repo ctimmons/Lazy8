@@ -27,10 +27,23 @@ namespace Lazy8.Core
   /// <para>Instead of calling 'throw new NotImplementedException(String.Format("", ...))', this class's
   /// constructor eliminates the need to call String.Format(), i.e. 'throw new NotImplementedExceptionFmt("", ...)'.</para>
   /// </summary>
-  public class NotImplementedExceptionFmt : ExceptionFmt
+  public class ArgumentExceptionFmt : ArgumentException
+  {
+    public ArgumentExceptionFmt(String message, params Object?[] args)
+      : base(String.Format(message, args))
+    {
+    }
+  }
+
+  /// <summary>
+  /// Simplifies creating an NotImplementedException with a message created via String.Format().
+  /// <para>Instead of calling 'throw new NotImplementedException(String.Format("", ...))', this class's
+  /// constructor eliminates the need to call String.Format(), i.e. 'throw new NotImplementedExceptionFmt("", ...)'.</para>
+  /// </summary>
+  public class NotImplementedExceptionFmt : NotImplementedException
   {
     public NotImplementedExceptionFmt(String message, params Object?[] args)
-      : base(message, args)
+      : base(String.Format(message, args))
     {
     }
   }

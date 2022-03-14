@@ -40,8 +40,9 @@ namespace Lazy8.Core
     */
 
     /// <summary>
-    /// Adds the specified element to a set, only if the predicate specified in the constructor returns true.
+    /// Adds the specified element to a set, only if the element is not already present in the set and
     /// <para>If the element is already in the set, or the predicate returns false, then this method returns false.</para>
+    /// the predicate specified in the constructor returns true.
     /// </summary>
     /// <param name="item">An item of type T</param>
     /// <returns>True if the predicate returns true, and the element is not already present in the set.  False otherwise.</returns>
