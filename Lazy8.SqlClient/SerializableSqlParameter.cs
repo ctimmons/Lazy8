@@ -136,27 +136,27 @@ namespace Lazy8.SqlClient
     
        The setters must be public for serialization to work. */
     
-    public String? CompareInfo { get; set; }
-    public String? Direction { get; set; }
-    public String? ForceColumnEncryption { get; set; }
-    public String? IsNullable { get; set; }
-    public String? LocaleId { get; set; }
-    public String? Offset { get; set; }
-    public String? ParameterName { get; set; }
-    public String? Precision { get; set; }
-    public String? Scale { get; set; }
-    public String? Size { get; set; }
+    public String CompareInfo { get; set; }
+    public String Direction { get; set; }
+    public String ForceColumnEncryption { get; set; }
+    public String IsNullable { get; set; }
+    public String LocaleId { get; set; }
+    public String Offset { get; set; }
+    public String ParameterName { get; set; }
+    public String Precision { get; set; }
+    public String Scale { get; set; }
+    public String Size { get; set; }
     public String SourceColumn { get; set; } = "";
-    public String? SourceColumnNullMapping { get; set; }
-    public String? SourceVersion { get; set; }
-    public String? SqlDbType { get; set; }
-    public String? TypeName { get; set; }
-    public String? UdtTypeName { get; set; }
-    public String? Value { get; set; }
-    public String? ValueType { get; set; }
-    public String? XmlSchemaCollectionDatabase { get; set; }
-    public String? XmlSchemaCollectionName { get; set; }
-    public String? XmlSchemaCollectionOwningSchema { get; set; }
+    public String SourceColumnNullMapping { get; set; }
+    public String SourceVersion { get; set; }
+    public String SqlDbType { get; set; }
+    public String TypeName { get; set; }
+    public String UdtTypeName { get; set; }
+    public String Value { get; set; }
+    public String ValueType { get; set; }
+    public String XmlSchemaCollectionDatabase { get; set; }
+    public String XmlSchemaCollectionName { get; set; }
+    public String XmlSchemaCollectionOwningSchema { get; set; }
 
     /* Standard types that can be referenced by the Value property. */
 

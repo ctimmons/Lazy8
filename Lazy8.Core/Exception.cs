@@ -16,7 +16,7 @@ namespace Lazy8.Core
   /// </summary>
   public class ExceptionFmt : Exception
   {
-    public ExceptionFmt(String message, params Object?[] args)
+    public ExceptionFmt(String message, params Object[] args)
       : base(String.Format(message, args))
     {
     }
@@ -29,7 +29,7 @@ namespace Lazy8.Core
   /// </summary>
   public class ArgumentExceptionFmt : ArgumentException
   {
-    public ArgumentExceptionFmt(String message, params Object?[] args)
+    public ArgumentExceptionFmt(String message, params Object[] args)
       : base(String.Format(message, args))
     {
     }
@@ -42,7 +42,7 @@ namespace Lazy8.Core
   /// </summary>
   public class NotImplementedExceptionFmt : NotImplementedException
   {
-    public NotImplementedExceptionFmt(String message, params Object?[] args)
+    public NotImplementedExceptionFmt(String message, params Object[] args)
       : base(String.Format(message, args))
     {
     }

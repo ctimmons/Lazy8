@@ -285,7 +285,7 @@ namespace Lazy8.Core
       if (errorHandler == null)
         errorHandler = (s, e) => { };
 
-      DirectoryInfo? di = null;
+      DirectoryInfo di = null;
       try
       {
         di = new DirectoryInfo(path);
@@ -303,7 +303,7 @@ namespace Lazy8.Core
       {
         yield return di;
 
-        IEnumerable<FileSystemInfo>? diEnumerator = null;
+        IEnumerable<FileSystemInfo> diEnumerator = null;
         try
         {
           diEnumerator = di.EnumerateFileSystemInfos(filemask);

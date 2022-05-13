@@ -19,7 +19,7 @@ namespace Lazy8.Core
   /// </summary>
   public class StringScanner
   {
-    private readonly String? _s;
+    private readonly String _s;
     private readonly Int32 _length;
     
     /* _index is the current linear position of the scanner (i.e. treating _s as a one-dimensional vector).

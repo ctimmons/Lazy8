@@ -22,7 +22,7 @@ namespace Lazy8.Core.Tests
 Multi-line comment.
 Another line.
 ")]
-    public String? StringProperty1 { get; set; }
+    public String StringProperty1 { get; set; }
 
     [XmlComment(@"Single-line comment.")]
     public Int32 Int32Property1 { get; set; }
@@ -31,9 +31,9 @@ Another line.
 Multi-line comment.
 Another line.
 ")]
-    public List<Int32>? ListInt32Property1 { get; set; }
+    public List<Int32> ListInt32Property1 { get; set; }
 
-    public TestClass? TestClassInstance { get; set; }
+    public TestClass TestClassInstance { get; set; }
 
     public static TestClass GetInstance()
     {

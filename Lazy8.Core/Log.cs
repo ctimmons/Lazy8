@@ -37,7 +37,7 @@ namespace Lazy8.Core
 
   public class Log
   {
-    private readonly TextWriter? _writer;
+    private readonly TextWriter _writer;
 
     private Log()
       : base()

@@ -234,7 +234,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void SafelyCreateEmptyFileTest()
     {
-      String? filename = null;
+      String filename = null;
       Assert.That(() => FileUtils.SafelyCreateEmptyFile(filename!), Throws.TypeOf<ArgumentNullException>());
 
       filename = "";
@@ -252,7 +252,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void CreateEmptyFileTest()
     {
-      String? filename = null;
+      String filename = null;
       Assert.That(() => FileUtils.CreateEmptyFile(filename!, OverwriteFile.No), Throws.TypeOf<ArgumentNullException>());
 
       filename = "";
@@ -311,7 +311,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void DeleteEmptyDirectoriesTest()
     {
-      String? rootDir = null;
+      String rootDir = null;
       Assert.That(() => FileUtils.DeleteEmptyDirectories(rootDir!), Throws.TypeOf<ArgumentNullException>());
 
       rootDir = "";
@@ -351,7 +351,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void IsDirectoryEmptyTest()
     {
-      String? rootDir = null;
+      String rootDir = null;
       Assert.That(() => FileUtils.IsDirectoryEmpty(rootDir!), Throws.TypeOf<ArgumentNullException>());
 
       rootDir = "";
@@ -376,7 +376,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void DuplicateBackslashesTest()
     {
-      String? directory = null;
+      String directory = null;
       Assert.That(() => directory!.DuplicateBackslashes(), Throws.TypeOf<ArgumentNullException>());
 
       directory = "";
@@ -392,7 +392,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void AddTrailingSeparatorTest()
     {
-      String? directory = null;
+      String directory = null;
       Assert.That(() => directory!.AddTrailingSeparator(), Throws.TypeOf<ArgumentNullException>());
 
       directory = @"c:\temp";
@@ -405,7 +405,7 @@ namespace Lazy8.Core.Tests
     [Test]
     public void RemoveTrailingSeparatorTest()
     {
-      String? directory = null;
+      String directory = null;
       Assert.That(() => directory!.RemoveTrailingSeparator(), Throws.TypeOf<ArgumentNullException>());
 
       directory = @"c:\temp";

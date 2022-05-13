@@ -23,13 +23,13 @@ namespace Lazy8.Core
 
     public GuardedHashSet(IEnumerable<T> collection, Predicate<T> predicate) : base(collection) => this._predicate = predicate;
 
-    public GuardedHashSet(IEqualityComparer<T>? comparer, Predicate<T> predicate) : base(comparer) => this._predicate = predicate;
+    public GuardedHashSet(IEqualityComparer<T> comparer, Predicate<T> predicate) : base(comparer) => this._predicate = predicate;
 
-    public GuardedHashSet(IEnumerable<T> collection, IEqualityComparer<T>? comparer, Predicate<T> predicate) : base(collection, comparer) => this._predicate = predicate;
+    public GuardedHashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer, Predicate<T> predicate) : base(collection, comparer) => this._predicate = predicate;
 
     public GuardedHashSet(Int32 capacity, Predicate<T> predicate) : base(capacity) => this._predicate = predicate;
 
-    public GuardedHashSet(Int32 capacity, IEqualityComparer<T>? comparer, Predicate<T> predicate) : base(capacity, comparer) => this._predicate = predicate;
+    public GuardedHashSet(Int32 capacity, IEqualityComparer<T> comparer, Predicate<T> predicate) : base(capacity, comparer) => this._predicate = predicate;
 
     /* GuardedHashSet<T>(SerializationInfo, StreamingContext, predicate) constructor is not implemented.
        
