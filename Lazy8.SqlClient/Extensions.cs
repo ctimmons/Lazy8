@@ -250,7 +250,14 @@ namespace Lazy8.SqlClient
         return new SqlXml(xmlTextReader);
     }
 
-    public static T? GetValueOrDefault<T>(this DbDataReader dbDataReader, String columnName) =>
+    /// <summary>
+    /// Generic method to get a value from a DbDataReader instance.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="dbDataReader">A descendent of <see cref="System.Data.Common.DbDataReader">DbDataReader</see>.</param>
+    /// <param name="columnName">A valid String name of one of <see cref="System.Data.Common.DbDataReader">DbDataReader</see>'s columns.</param>
+    /// <returns>Either a value or default value of type T.</returns>
+    public static T GetValueOrDefault<T>(this DbDataReader dbDataReader, String columnName) =>
       dbDataReader.GetValueOrDefault<T>(dbDataReader.GetOrdinal(columnName));
 
     /// <summary>
@@ -258,28 +265,20 @@ namespace Lazy8.SqlClient
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="dbDataReader">A descendent of <see cref="System.Data.Common.DbDataReader">DbDataReader</see>.</param>
-    /// <param name="columnIndex"></param>
-    /// <returns></returns>
-    /// <exception cref="System.InvalidCastException">Thrown when the data returned by dbDataReader is NULL, and T is not a nullable type.</exception>
+    /// <param name="columnIndex">A valid Int32 index of one of <see cref="System.Data.Common.DbDataReader">DbDataReader</see>'s columns.</param>
+    /// <returns>Either a value or default value of type T.</returns>
     /// <exception cref="System.IndexOutOfRangeException">Thrown when columnIndex is out of range.</exception>
-    public static T? GetValueOrDefault<T>(this DbDataReader dbDataReader, Int32 columnIndex)
+    public static T GetValueOrDefault<T>(this DbDataReader dbDataReader, Int32 columnIndex)
     {
-      /* If T is not a nullable type, and dbDataReader returns a null value,
-         throw an InvalidCastException.
-         (See
-           https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/nullable-types/how-to-identify-a-nullable-type
-         for info on how to correctly identify a nullable type in C#.) */
-
       var type = typeof(T);
-      var isNullableType = (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(Nullable<>)));
-      var isNullValue = dbDataReader.IsDBNull(columnIndex);
+      var underlyingType = Nullable.GetUnderlyingType(type);
+      var isNullableType = (underlyingType != null);
+      var value = dbDataReader[columnIndex];
 
-      if (isNullableType)
-        return isNullValue ? default : (T) Convert.ChangeType(dbDataReader[columnIndex], Nullable.GetUnderlyingType(type)!);
-      else if (!isNullValue)
-        return (T) Convert.ChangeType(dbDataReader[columnIndex], type);
-      else
-        throw new InvalidCastException(String.Format(Properties.Resources.NonNullableCast, type.FullName, dbDataReader.GetName(columnIndex), columnIndex));
+      return
+        Convert.IsDBNull(value)
+        ? default
+        : (T) Convert.ChangeType(value, isNullableType ? underlyingType : type);
     }
 
     public static void ExecuteUnderDatabaseInvariant(this SqlConnection connection, String database, Action action)
@@ -310,9 +309,9 @@ namespace Lazy8.SqlClient
       }
     }
 
-    public static SqlParameterCollection GetSqlParameters(this SqlConnection connection, String name)
+    public static SqlParameterCollection GetSqlParameters(this SqlConnection connection, String storedProcedureName)
     {
-      using (var sqlCommand = new SqlCommand(name, connection) { CommandType = CommandType.StoredProcedure })
+      using (var sqlCommand = new SqlCommand(storedProcedureName, connection) { CommandType = CommandType.StoredProcedure })
       {
         SqlCommandBuilder.DeriveParameters(sqlCommand);
         return sqlCommand.Parameters;
