@@ -149,14 +149,14 @@ namespace Lazy8.Core
     /// Returns the next available character but does not consume it.
     /// </summary>
     /// <returns>An integer representing the next character to be read, or -1 if at the end of the string.</returns>
-    public Int32 Peek() => this.IsEof ? -1 : this._s![this._index];
+    public Int32 Peek() => this.IsEof ? -1 : this._s[this._index];
 
     /// <summary>
     /// Returns the previously available character but does not consume it.
     /// </summary>
     /// <returns>Returns an integer representing the character immediately prior to the scanner's current position,
     /// or -1 if at the beginning of the string.</returns>
-    public Int32 ReversePeek() => this.IsBof ? -1 : this._s![this._index - 1];
+    public Int32 ReversePeek() => this.IsBof ? -1 : this._s[this._index - 1];
 
     /// <summary>
     /// Match zero or more characters as long as the <paramref name="predicate"/> returns true.

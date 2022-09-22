@@ -192,7 +192,7 @@ namespace Lazy8.Core
 
       var isMonday = date.DayOfWeek == DayOfWeek.Monday;
       var isThursday = date.DayOfWeek == DayOfWeek.Thursday;
-      var isLastMondayInMay = isMonday && date.AddDays(7).Month == 6;
+      var isLastMondayInMay = isMonday && (date.AddDays(7).Month == 6);
 
       return
         (date.Month == 1 && date.Day == 1) ||                                              // January 1

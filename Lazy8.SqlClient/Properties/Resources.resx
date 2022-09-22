@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="IllegalCommandType" xml:space="preserve">
+    <value>The only legal values for the '{0}' parameter are 'StoredProcedure' or 'Text'.  The given value of '{1}' is not allowed.</value>
+  </data>
   <data name="NonNullableCast" xml:space="preserve">
     <value>Cannot cast DBNull.Value to type '{0}'. Please use a nullable type.  Column name = '{1}', column index = {2}.</value>
   </data>

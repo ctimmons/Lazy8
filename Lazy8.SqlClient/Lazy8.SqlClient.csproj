@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <Deterministic>True</Deterministic>
-    <AssemblyVersion>1.0.62.0</AssemblyVersion>
+    <AssemblyVersion>1.0.102.0</AssemblyVersion>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <IsPublishable>False</IsPublishable>
     <Nullable>disable</Nullable>

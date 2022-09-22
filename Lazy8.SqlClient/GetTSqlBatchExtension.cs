@@ -74,7 +74,7 @@ namespace Lazy8.SqlClient
     /// <param name="tsql"></param>
     public static void ExecuteTSqlBatches(this SqlConnection connection, String tsql)
     {
-      using (var command = new SqlCommand() { Connection = connection, CommandType = CommandType.Text })
+      using (var command = new SqlCommand() { CommandTimeout = 0, Connection = connection, CommandType = CommandType.Text })
       {
         foreach (var batch in GetTSqlBatches(tsql))
         {
@@ -89,7 +89,8 @@ namespace Lazy8.SqlClient
     /// </summary>
     /// <param name="connection"></param>
     /// <param name="filename"></param>
-    public static void ExecuteTSqlFileBatches(this SqlConnection connection, String filename) => connection.ExecuteTSqlBatches(File.ReadAllText(filename));
+    public static void ExecuteTSqlFileBatches(this SqlConnection connection, String filename) =>
+      connection.ExecuteTSqlBatches(File.ReadAllText(filename));
 
     private static String GetBatch(String batch, Int32 goMultiplier)
     {
@@ -130,7 +131,7 @@ END;
     private static Int32 MatchGo(StringScanner scanner)
     {
       /* The logic required to match a GO statement within a T-SQL script is non-trivial.
-      
+
          T-SQL has a free-form syntax.  Its language constructs have little structure, and can appear pretty much anywhere
          the programmer wants to put them.
 

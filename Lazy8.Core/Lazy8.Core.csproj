@@ -12,7 +12,7 @@
     <PackageTags>general purpose library</PackageTags>
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <Deterministic>True</Deterministic>
-    <AssemblyVersion>1.0.77.0</AssemblyVersion>
+    <AssemblyVersion>1.0.117.0</AssemblyVersion>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <Nullable>disable</Nullable>
   </PropertyGroup>
