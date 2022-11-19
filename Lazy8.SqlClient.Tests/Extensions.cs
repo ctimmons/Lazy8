@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Configuration;
 using System.Data;
 
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 using NUnit.Framework;
 
@@ -38,7 +38,13 @@ GO
     [SetUp]
     public void Init()
     {
-      _connection = new SqlConnection(ConfigurationManager.ConnectionStrings["lazy8connectionstring"].ConnectionString);
+      IConfiguration config =
+        new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json")
+        .Build();
+
+      var connectionString = config.GetConnectionString("lazy8connectionstring");
+      _connection = new SqlConnection(connectionString);
       _connection.Open();
       _connection.ExecuteTSqlBatches($"{_dropLazy8TestDatabaseSql}\n{_createLazy8TestDatabaseSql}\n{_dataSet.GetTSqlDdl()}");
     }
