@@ -1,4 +1,9 @@
-﻿using System;
+﻿/* Unless otherwise noted, this source code is licensed
+   under the GNU Public License V3.
+
+   See the LICENSE file in the root folder for details. */
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;

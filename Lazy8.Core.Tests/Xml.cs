@@ -13,121 +13,121 @@ using System.Xml;
 
 using NUnit.Framework;
 
-namespace Lazy8.Core.Tests
+namespace Lazy8.Core.Tests;
+
+[Serializable]
+public class TestClass
 {
-  [Serializable]
-  public class TestClass
+  [XmlComment(@"
+Multi-line comment.
+Another line.
+")]
+  public String StringProperty1 { get; set; }
+
+  [XmlComment(@"Single-line comment.")]
+  public Int32 Int32Property1 { get; set; }
+
+  [XmlComment(@"
+Multi-line comment.
+Another line.
+")]
+  public List<Int32> ListInt32Property1 { get; set; }
+
+  public TestClass TestClassInstance { get; set; }
+
+  public static TestClass GetInstance()
   {
-    [XmlComment(@"
-Multi-line comment.
-Another line.
-")]
-    public String StringProperty1 { get; set; }
+    var testClass =
+      new TestClass()
+      {
+        StringProperty1 = "Hello, world!",
+        Int32Property1 = 42,
+        ListInt32Property1 = new List<Int32>() { 1, 2, 3 },
+        TestClassInstance =
+          new TestClass()
+          {
+            StringProperty1 = "foo bar baz quux",
+            Int32Property1 = 138,
+            ListInt32Property1 = new List<Int32>() { 4, 5, 6 },
+            TestClassInstance = null
+          }
+      };
 
-    [XmlComment(@"Single-line comment.")]
-    public Int32 Int32Property1 { get; set; }
+    return testClass;
+  }
 
-    [XmlComment(@"
-Multi-line comment.
-Another line.
-")]
-    public List<Int32> ListInt32Property1 { get; set; }
+  public static Boolean AreTestClassInstancesEqual(TestClass expected, TestClass actual)
+  {
+    return
+      (expected.StringProperty1 == actual.StringProperty1) &&
+      (expected.Int32Property1 == actual.Int32Property1) &&
+      (expected.ListInt32Property1.Count == actual.ListInt32Property1.Count) &&
+      Enumerable.SequenceEqual(expected.ListInt32Property1, actual.ListInt32Property1) &&
+      (((expected.TestClassInstance != null) && (actual.TestClassInstance != null))
+        ? AreTestClassInstancesEqual(expected.TestClassInstance, actual.TestClassInstance)
+        : true);
+  }
+}
 
-    public TestClass TestClassInstance { get; set; }
+[TestFixture]
+public class Xml
+{
+  public Xml() : base() { }
 
-    public static TestClass GetInstance()
+  [Test]
+  public void XmlFileToFromTest()
+  {
+    var filename = Path.GetTempFileName();
+
+    XmlUtils.SerializeObjectToXmlFile(TestClass.GetInstance(), filename);
+    try
     {
-      var testClass =
-        new TestClass()
-        {
-          StringProperty1 = "Hello, world!",
-          Int32Property1 = 42,
-          ListInt32Property1 = new List<Int32>() { 1, 2, 3 },
-          TestClassInstance =
-            new TestClass()
-            {
-              StringProperty1 = "foo bar baz quux",
-              Int32Property1 = 138,
-              ListInt32Property1 = new List<Int32>() { 4, 5, 6 },
-              TestClassInstance = null
-            }
-        };
-
-      return testClass;
+      var testClass = XmlUtils.DeserializeObjectFromXmlFile<TestClass>(filename);
+      Assert.That(TestClass.AreTestClassInstancesEqual(TestClass.GetInstance(), testClass), Is.True);
     }
-
-    public static Boolean AreTestClassInstancesEqual(TestClass expected, TestClass actual)
+    finally
     {
-      return
-        (expected.StringProperty1 == actual.StringProperty1) &&
-        (expected.Int32Property1 == actual.Int32Property1) &&
-        (expected.ListInt32Property1!.Count == actual.ListInt32Property1!.Count) &&
-        Enumerable.SequenceEqual(expected.ListInt32Property1, actual.ListInt32Property1) &&
-        (((expected.TestClassInstance != null) && (actual.TestClassInstance != null))
-          ? AreTestClassInstancesEqual(expected.TestClassInstance, actual.TestClassInstance)
-          : true);
+      File.Delete(filename);
     }
   }
 
-  [TestFixture]
-  public class Xml
+  [Test]
+  public void XDocumentToFromTest()
   {
-    public Xml() : base() { }
+    var xDocument = XmlUtils.SerializeObjectToXDocument(TestClass.GetInstance());
+    var testClass = XmlUtils.DeserializeObjectFromXDocument<TestClass>(xDocument);
+    Assert.That(TestClass.AreTestClassInstancesEqual(TestClass.GetInstance(), testClass), Is.True);
+  }
 
-    [Test]
-    public void XmlFileToFromTest()
-    {
-      var filename = Path.GetTempFileName();
+  [Test]
+  public void XmlStringToFromTest()
+  {
+    var s = XmlUtils.SerializeObjectToXmlString(TestClass.GetInstance());
+    var testClass = XmlUtils.DeserializeObjectFromXmlString<TestClass>(s);
+    Assert.That(TestClass.AreTestClassInstancesEqual(TestClass.GetInstance(), testClass), Is.True);
+  }
 
-      XmlUtils.SerializeObjectToXmlFile(TestClass.GetInstance(), filename);
-      try
-      {
-        var testClass = XmlUtils.DeserializeObjectFromXmlFile<TestClass>(filename);
-        Assert.That(TestClass.AreTestClassInstancesEqual(TestClass.GetInstance(), testClass!), Is.True);
-      }
-      finally
-      {
-        File.Delete(filename);
-      }
-    }
-
-    [Test]
-    public void XDocumentToFromTest()
-    {
-      var xDocument = XmlUtils.SerializeObjectToXDocument(TestClass.GetInstance());
-      var testClass = XmlUtils.DeserializeObjectFromXDocument<TestClass>(xDocument);
-      Assert.That(TestClass.AreTestClassInstancesEqual(TestClass.GetInstance(), testClass!), Is.True);
-    }
-
-    [Test]
-    public void XmlStringToFromTest()
-    {
-      var s = XmlUtils.SerializeObjectToXmlString(TestClass.GetInstance());
-      var testClass = XmlUtils.DeserializeObjectFromXmlString<TestClass>(s);
-      Assert.That(TestClass.AreTestClassInstancesEqual(TestClass.GetInstance(), testClass!), Is.True);
-    }
-
-    [Test]
-    public void GetFormattedXmlTest()
-    {
-      var input = @"<test><element>value 1</element><element>value 2</element><element>value 3</element></test>";
-      var expectedOutput =
+  [Test]
+  public void GetFormattedXmlTest()
+  {
+    var input = @"<test><element>value 1</element><element>value 2</element><element>value 3</element></test>";
+    var expectedOutput =
 @"<test>
   <element>value 1</element>
   <element>value 2</element>
   <element>value 3</element>
 </test>";
 
-      Assert.That(XmlUtils.GetFormattedXml(input).Replace("\r\n", "\n"), Is.EqualTo(expectedOutput));
-    }
+    Assert.That(XmlUtils.GetFormattedXml(input).Replace("\r\n", "\n"), Is.EqualTo(expectedOutput));
+  }
 
-    private readonly XmlWriterSettings _xmlWriterSettings = new() { Indent = true, IndentChars = "  ", NewLineOnAttributes = true };
+  private readonly XmlWriterSettings _xmlWriterSettings = new() { Indent = true, IndentChars = "  ", NewLineOnAttributes = true };
 
-    [Test]
-    public void WriteStartAndEndElementsTest()
-    {
-      var actual = new StringBuilder();
-      var expected = @"<?xml version=""1.0"" encoding=""utf-16""?>
+  [Test]
+  public void WriteStartAndEndElementsTest()
+  {
+    var actual = new StringBuilder();
+    var expected = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <Root>
   <Child>
     <Grandchild>text</Grandchild>
@@ -137,25 +137,25 @@ Another line.
   </Child>
 </Root>";
 
-      using (var writer = XmlWriter.Create(actual, this._xmlWriterSettings))
-      {
-        writer.WriteStartElements("Root", "Child", "Grandchild");
-        writer.WriteString("text");
-        writer.WriteEndElements(2);
-        writer.WriteStartElements("Child", "Grandchild");
-        writer.WriteString("text");
-        writer.WriteEndElements(3);
-        writer.Flush();
-
-        Assert.That(actual.ToString().Replace("\r\n", "\n"), Is.EqualTo(expected));
-      }
-    }
-
-    [Test]
-    public void WriteCDataElementTest()
+    using (var writer = XmlWriter.Create(actual, this._xmlWriterSettings))
     {
-      var actual = new StringBuilder();
-      var expected = @"<?xml version=""1.0"" encoding=""utf-16""?>
+      writer.WriteStartElements("Root", "Child", "Grandchild");
+      writer.WriteString("text");
+      writer.WriteEndElements(2);
+      writer.WriteStartElements("Child", "Grandchild");
+      writer.WriteString("text");
+      writer.WriteEndElements(3);
+      writer.Flush();
+
+      Assert.That(actual.ToString().Replace("\r\n", "\n"), Is.EqualTo(expected));
+    }
+  }
+
+  [Test]
+  public void WriteCDataElementTest()
+  {
+    var actual = new StringBuilder();
+    var expected = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <Root>
   <Child>
     <CDATA_Test
@@ -163,51 +163,51 @@ Another line.
   </Child>
 </Root>";
 
-      using (var writer = XmlWriter.Create(actual, this._xmlWriterSettings))
-      {
-        writer.WriteStartElements("Root", "Child");
-        writer.WriteCDataElement("CDATA_Test", "<script>alert('Hello, world!');</script>");
-        writer.WriteEndElements(2);
-        writer.Flush();
-
-        Assert.That(actual.ToString().Replace("\r\n", "\n"), Is.EqualTo(expected));
-      }
-    }
-
-    [Test]
-    public void GetLastChildsInnerTextTest()
+    using (var writer = XmlWriter.Create(actual, this._xmlWriterSettings))
     {
-      var xmlText = @"<?xml version=""1.0"" encoding=""utf-16""?>
+      writer.WriteStartElements("Root", "Child");
+      writer.WriteCDataElement("CDATA_Test", "<script>alert('Hello, world!');</script>");
+      writer.WriteEndElements(2);
+      writer.Flush();
+
+      Assert.That(actual.ToString().Replace("\r\n", "\n"), Is.EqualTo(expected));
+    }
+  }
+
+  [Test]
+  public void GetLastChildsInnerTextTest()
+  {
+    var xmlText = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <Root>
   <Child>first text</Child>
   <Child>middle text</Child>
   <Child>last text</Child>
 </Root>";
 
-      var xmlDoc = new XmlDocument();
-      xmlDoc.LoadXml(xmlText);
-      Assert.That(xmlDoc.GetLastChildsInnerText("/Root"), Is.EqualTo("last text"));
-    }
+    var xmlDoc = new XmlDocument();
+    xmlDoc.LoadXml(xmlText);
+    Assert.That(xmlDoc.GetLastChildsInnerText("/Root"), Is.EqualTo("last text"));
+  }
 
-    [Test]
-    public void GetNodesInnerTextTest()
-    {
-      var xmlText = @"<?xml version=""1.0"" encoding=""utf-16""?>
+  [Test]
+  public void GetNodesInnerTextTest()
+  {
+    var xmlText = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <Root>
   <Child>first text</Child>
   <Child>middle text</Child>
   <Child>last text</Child>
 </Root>";
 
-      var xmlDoc = new XmlDocument();
-      xmlDoc.LoadXml(xmlText);
-      Assert.That(xmlDoc.GetNodesInnerText("/Root/Child[2]"), Is.EqualTo("middle text"));
-    }
+    var xmlDoc = new XmlDocument();
+    xmlDoc.LoadXml(xmlText);
+    Assert.That(xmlDoc.GetNodesInnerText("/Root/Child[2]"), Is.EqualTo("middle text"));
+  }
 
-    [Test]
-    public void XmlCommentFormattingTest()
-    {
-      var expected = @"<TestClass xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  [Test]
+  public void XmlCommentFormattingTest()
+  {
+    var expected = @"<TestClass xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
   <!-- 
        Multi-line comment.
        Another line.
@@ -244,23 +244,23 @@ Another line.
   </TestClassInstance>
 </TestClass>";
 
-      var actual = XmlUtils.SerializeObjectToXmlString(TestClass.GetInstance());
+    var actual = XmlUtils.SerializeObjectToXmlString(TestClass.GetInstance());
 
-      /* The two XML strings, 'expected' and 'actual', cannot be directly compared like this:
-        
-           Assert.That(actual, Is.EqualTo(expected));
+    /* The two XML strings, 'expected' and 'actual', cannot be directly compared like this:
 
-         This is because the serialization process inserts XML namespace attributes
-         into the final XML string, and the order of the namespaces is not guaranteed
-         nor predictable.
+         Assert.That(actual, Is.EqualTo(expected));
 
-         Since all this test cares about are the XML comments, a regular expression
-         and some LINQ magic are used to pluck out the comments and compare them. */
+       This is because the serialization process inserts XML namespace attributes
+       into the final XML string, and the order of the namespaces is not guaranteed
+       nor predictable.
 
-      var xmlCommentRegex = new Regex(@"\<!--.*?--\>", RegexOptions.Singleline);
-      var expectedXmlComments = xmlCommentRegex.Matches(expected).Cast<Match>().Select(m => m.Value);
-      var actualXmlComments = xmlCommentRegex.Matches(actual).Cast<Match>().Select(m => m.Value.Replace("\r\n", "\n"));
-      Assert.That(expectedXmlComments.SequenceEqual(actualXmlComments), Is.True);
-    }
+       Since all this test cares about are the XML comments, a regular expression
+       and some LINQ magic are used to pluck out the comments and compare them. */
+
+    var xmlCommentRegex = new Regex(@"\<!--.*?--\>", RegexOptions.Singleline);
+    var expectedXmlComments = xmlCommentRegex.Matches(expected).Cast<Match>().Select(m => m.Value);
+    var actualXmlComments = xmlCommentRegex.Matches(actual).Cast<Match>().Select(m => m.Value.Replace("\r\n", "\n"));
+    Assert.That(expectedXmlComments.SequenceEqual(actualXmlComments), Is.True);
   }
 }
+
