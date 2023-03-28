@@ -138,5 +138,39 @@ public static class MathUtils
         _ => throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.MathUtils_BadRangeCheckValue, rangeCheck)),
       };
   }
+
+  /// <summary>
+  /// The Single type can contain larger values than the Decimal type.  This can cause an exception to be thrown when
+  /// converting a Single to a Decimal via System.Convert.ToDecimal().  This method prevents this exception from occurring
+  /// by forcing 'number' to be between Decimal.MinValue and Decimal.MaxValue.
+  /// </summary>
+  /// <param name="number">A Single number</param>
+  /// <returns>A Decimal value.</returns>
+  public static Decimal SafeConvertToDecimal(this Single number)
+  {
+    if (number >= Convert.ToSingle(Decimal.MaxValue))
+      return Decimal.MaxValue;
+    else if (number <= Convert.ToSingle(Decimal.MinValue))
+      return Decimal.MinValue;
+    else
+      return Convert.ToDecimal(number);
+  }
+
+  /// <summary>
+  /// The Double type can contain larger values than the Decimal type.  This can cause an exception to be thrown when
+  /// converting a Double to a Decimal via System.Convert.ToDecimal().  This method prevents this exception from occurring
+  /// by forcing 'number' to be between Decimal.MinValue and Decimal.MaxValue.
+  /// </summary>
+  /// <param name="number">A Double number</param>
+  /// <returns>A Decimal value.</returns>
+  public static Decimal SafeConvertToDecimal(this Double number)
+  {
+    if (number >= Convert.ToDouble(Decimal.MaxValue))
+      return Decimal.MaxValue;
+    else if (number <= Convert.ToDouble(Decimal.MinValue))
+      return Decimal.MinValue;
+    else
+      return Convert.ToDecimal(number);
+  }
 }
 

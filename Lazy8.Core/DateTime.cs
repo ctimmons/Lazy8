@@ -171,11 +171,12 @@ public static class DateTimeUtils
   }
 
   /// <summary>
-  /// Return an <see cref="System.Int32"/> indicating the "day rank" of the given date within its month.  E.g. the first Tuesday, third Friday, etc.
+  /// Return an <see cref="System.Int32"/> indicating the "day rank" of the given date within its month.
+  /// E.g. "1" for the first Tuesday, "3" for the third Friday, etc.
   /// </summary>
   /// <param name="date">A <see cref="System.DateTime"/>.</param>
   /// <returns>An <see cref="System.Int32"/>.</returns>
-  public static Int32 NthDayInMonth(this DateTime date) => (Int32) Math.Ceiling(date.Day / 7.0d); // First Monday, third Thursday, etc.
+  public static Int32 NthDayInMonth(this DateTime date) => (Int32) Math.Ceiling(date.Day / 7.0d);
 
   /// <summary>
   /// Return a <see cref="System.Boolean"/> indicating if the given date is a U.S. Federal holiday.
@@ -209,8 +210,9 @@ public static class DateTimeUtils
   }
 
   /// <summary>
-  /// If a U.S. Federal holiday falls on a Saturday or Sunday, the holiday is observed
-  /// on the preceding Friday (for Saturday holidays), or the following Monday (for Sunday holidays).
+  /// If a U.S. Federal holiday falls on a Saturday, the holiday is observed
+  /// on the preceding Friday.  Likewise, if the holiday falls on a Sunday, the holiday
+  /// is observed on the following Monday.
   /// </summary>
   /// <param name="date">A <see cref="System.DateTime"/>.</param>
   /// <returns>A <see cref="System.Boolean"/>.</returns>

@@ -10,18 +10,53 @@ using System.Reflection;
 
 namespace Lazy8.Core;
 
-public class ReflectionUtils
+public static class ReflectionUtils
 {
-  public static T GetPropertyValue<T>(Object obj, String propName) where T : class
+  /* Code for both GetPropValue methods is from StackOverflow answer https://stackoverflow.com/a/1197004/116198
+     posted by user Ed S. (https://stackoverflow.com/users/1053/ed-s).
+
+     Modifications:
+
+       I made the non-generic GetPropValue method private.
+       Added an 'else' clause to one of the 'if' statements.
+
+     Both GetPropValue methods, and my modifications to those methods, are licensed
+     under CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/)
+     See https://stackoverflow.com/help/licensing for more info. */
+
+  private static Object GetPropValue(Object obj, String name)
   {
-    obj.Name(nameof(obj)).NotNull();
-    propName.Name(nameof(propName)).NotNullEmptyOrOnlyWhitespace();
+    foreach (var part in name.Split('.'))
+    {
+      if (obj == null)
+        return null;
 
-    var pi = obj.GetType().GetProperty(propName);
-    if (pi == null)
-      throw new Exception(String.Format(Properties.Resources.Reflection_PropertyNotFound, propName));
+      Type type = obj.GetType();
+      PropertyInfo info = type.GetProperty(part);
+      if (info == null)
+        return null;
 
-    return (T) pi.GetValue(obj, null);
+      obj = info.GetValue(obj, null);
+    }
+
+    return obj;
+  }
+
+  /// <summary>
+  /// Generic method to get an object's property value.
+  /// </summary>
+  /// <typeparam name="T">The property's type.</typeparam>
+  /// <param name="obj">A System.Object.</param>
+  /// <param name="name">The property's name.</param>
+  /// <returns></returns>
+  public static T GetPropValue<T>(this Object obj, String name)
+  {
+    Object retval = GetPropValue(obj, name);
+    if (retval == null)
+      return default;
+    else
+      /* Throws an InvalidCastException if types are incompatible. */
+      return (T) retval;
   }
 
   /// <summary>
@@ -54,7 +89,7 @@ public class ReflectionUtils
   /// <returns>A <see cref="String"/>.</returns>
   public static String GetPublicPropertyValues<T>(Object source) where T : class =>
     GetPublicPropertyNames<T>()
-    .Select(propertyName => new { Name = propertyName, Value = GetPropertyValue<T>(source, propertyName) })
+    .Select(propertyName => new { Name = propertyName, Value = GetPropValue<T>(source, propertyName) })
     .Select(propertyNameValuePair => propertyNameValuePair.Name + " = " + ((propertyNameValuePair.Value == null) ? "NULL" : propertyNameValuePair.Value))
     .Join("\n");
 

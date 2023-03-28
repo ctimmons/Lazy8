@@ -97,5 +97,37 @@ public class MathUtilsTests
     Assert.That(HIGH.IsInRange(LOW, HIGH, RangeCheck.Inclusive), Is.True);
     Assert.That(HIGH.IsInRange(LOW, HIGH, RangeCheck.Exclusive), Is.False);
   }
+
+  [Test]
+  public void SafeConvertSingleToDecimalTest()
+  {
+    Assert.That(Single.MinValue.SafeConvertToDecimal(), Is.EqualTo(Convert.ToSingle(Decimal.MinValue)));
+    Assert.That((Convert.ToSingle(Decimal.MinValue) - 1).SafeConvertToDecimal(), Is.EqualTo(Convert.ToSingle(Decimal.MinValue)));
+    Assert.That(Convert.ToSingle(Decimal.MinValue).SafeConvertToDecimal(), Is.EqualTo(Convert.ToSingle(Decimal.MinValue)));
+    Assert.That((Convert.ToSingle(Decimal.MinValue) + 1).SafeConvertToDecimal(), Is.EqualTo(Convert.ToSingle(Decimal.MinValue) + 1));
+
+    Assert.That(Convert.ToSingle(69).SafeConvertToDecimal(), Is.EqualTo(69.0));
+
+    Assert.That((Convert.ToSingle(Decimal.MaxValue) - 1).SafeConvertToDecimal(), Is.EqualTo(Convert.ToSingle(Decimal.MaxValue) - 1));
+    Assert.That(Convert.ToSingle(Decimal.MaxValue).SafeConvertToDecimal(), Is.EqualTo(Convert.ToSingle(Decimal.MaxValue)));
+    Assert.That((Convert.ToSingle(Decimal.MaxValue) + 1).SafeConvertToDecimal(), Is.EqualTo(Convert.ToSingle(Decimal.MaxValue)));
+    Assert.That(Single.MaxValue.SafeConvertToDecimal(), Is.EqualTo(Convert.ToSingle(Decimal.MaxValue)));
+  }
+
+  [Test]
+  public void SafeConvertDoubleToDecimalTest()
+  {
+    Assert.That(Double.MinValue.SafeConvertToDecimal(), Is.EqualTo(Convert.ToSingle(Decimal.MinValue)));
+    Assert.That((Convert.ToDouble(Decimal.MinValue) - 1).SafeConvertToDecimal(), Is.EqualTo(Convert.ToDouble(Decimal.MinValue)));
+    Assert.That(Convert.ToDouble(Decimal.MinValue).SafeConvertToDecimal(), Is.EqualTo(Convert.ToDouble(Decimal.MinValue)));
+    Assert.That((Convert.ToDouble(Decimal.MinValue) + 1).SafeConvertToDecimal(), Is.EqualTo(Convert.ToDouble(Decimal.MinValue) + 1));
+
+    Assert.That(Convert.ToDouble(69).SafeConvertToDecimal(), Is.EqualTo(69.0));
+
+    Assert.That((Convert.ToDouble(Decimal.MaxValue) - 1).SafeConvertToDecimal(), Is.EqualTo(Convert.ToDouble(Decimal.MaxValue) - 1));
+    Assert.That(Convert.ToDouble(Decimal.MaxValue).SafeConvertToDecimal(), Is.EqualTo(Convert.ToDouble(Decimal.MaxValue)));
+    Assert.That((Convert.ToDouble(Decimal.MaxValue) + 1).SafeConvertToDecimal(), Is.EqualTo(Convert.ToDouble(Decimal.MaxValue)));
+    Assert.That(Double.MaxValue.SafeConvertToDecimal(), Is.EqualTo(Convert.ToSingle(Decimal.MaxValue)));
+  }
 }
 

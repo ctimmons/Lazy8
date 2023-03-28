@@ -55,7 +55,11 @@ GO
     _connection = new SqlConnection(connectionString);
     _connection.Open();
 
-    var sql = $"{_dropLazy8TestDatabaseSql}\n{_createLazy8TestDatabaseSql}\n{_dataSet.GetTSqlDdl()}";
+    var sql = $@"
+{_dropLazy8TestDatabaseSql}
+{_createLazy8TestDatabaseSql}
+{_dataSet.GetTSqlDdl()}";
+
     _connection.ExecuteTSqlBatches(sql);
   }
 

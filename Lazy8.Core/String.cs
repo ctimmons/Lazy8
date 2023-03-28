@@ -208,10 +208,11 @@ public static class StringUtils
     value.Name(nameof(value)).NotNull();
     count.Name(nameof(count)).GreaterThanOrEqualTo(0);
 
-    /* This method may be called frequently.
+    /* This method may be called frequently with the same parameters.
 
-       To reduce garbage collection pressure, memoize the generated strings.
-       This avoids creating a new StringBuilder() instance unless it's absolutely necessary.
+       Use the parameters to memoize the generated strings in a concurrent dictionary.
+       This will reduce garbage collection pressure by not creating a new StringBuilder()
+       instance unless it's absolutely necessary.
 
        Use the lambda overload of GetOrAdd() to ensure a new StringBuilder is only
        created when the requested string isn't found in the dictionary. */

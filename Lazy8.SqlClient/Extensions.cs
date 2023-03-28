@@ -17,6 +17,7 @@ using System.Xml.Schema;
 using Microsoft.Data.SqlClient;
 
 using Lazy8.Core;
+using System.Threading.Tasks;
 
 namespace Lazy8.SqlClient;
 
@@ -142,9 +143,9 @@ public static class SqlServerExtensionMethods
   /// <param name="connection"><see cref="Microsoft.Data.SqlClient.SqlConnection">SqlConnection</see> the sql is sent to.  The connection must be opened before calling this method.</param>
   /// <param name="sql"><see cref="System.String">String</see> containing sql to execute.</param>
   /// <returns></returns>
-  public static DataSet GetDataSet(this SqlConnection connection, String sql)
+  public static DataSet GetDataSet(this SqlConnection connection, String sql, Int32 commandTimeout = 0)
   {
-    using (var command = new SqlCommand() { Connection = connection, CommandType = CommandType.Text, CommandText = sql })
+    using (var command = new SqlCommand() { Connection = connection, CommandTimeout = commandTimeout, CommandType = CommandType.Text, CommandText = sql })
       return GetDataSet(command);
   }
 
@@ -216,11 +217,23 @@ public static class SqlServerExtensionMethods
   /// </summary>
   /// <param name="connection">A valid SqlConnection.</param>
   /// <param name="sql">A string containing T-SQL code.</param>
-  /// <returns>An Int32 reflecting the number of rows affected.</returns>
-  public static Int32 ExecuteNonQuery(this SqlConnection connection, String sql)
+  /// <returns>An Int32 indicating the number of rows affected.</returns>
+  public static Int32 ExecuteNonQuery(this SqlConnection connection, String sql, Int32 commandTimeout = 0)
   {
-    using (var command = new SqlCommand() { Connection = connection, CommandType = CommandType.Text, CommandText = sql })
+    using (var command = new SqlCommand() { Connection = connection, CommandTimeout = commandTimeout, CommandType = CommandType.Text, CommandText = sql })
       return command.ExecuteNonQuery();
+  }
+
+  /// <summary>
+  /// Given an SqlConnection, asynchronously execute the T-SQL in the sql parameter on that connection.
+  /// </summary>
+  /// <param name="connection">A valid SqlConnection.</param>
+  /// <param name="sql">A string containing T-SQL code.</param>
+  /// <returns>A Task&lt;Int32&gt; indicating the number of rows affected.</returns>
+  public static async Task<Int32> ExecuteNonQueryAsync(this SqlConnection connection, String sql, Int32 commandTimeout = 0)
+  {
+    using (var command = new SqlCommand() { Connection = connection, CommandTimeout = commandTimeout, CommandType = CommandType.Text, CommandText = sql })
+      return await command.ExecuteNonQueryAsync().ConfigureAwait(false);
   }
 
   /// <summary>
@@ -328,8 +341,8 @@ public static class SqlServerExtensionMethods
   public static SqlXml GetSqlXml(this String xml, XmlReaderSettings xmlReaderSettings)
   {
     using (var stringReader = new StringReader(xml))
-    using (var xmlReader = XmlReader.Create(stringReader, xmlReaderSettings))
-      return new SqlXml(xmlReader);
+      using (var xmlReader = XmlReader.Create(stringReader, xmlReaderSettings))
+        return new SqlXml(xmlReader);
   }
 
   /// <summary>
