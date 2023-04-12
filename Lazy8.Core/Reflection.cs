@@ -5,9 +5,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Data;
 using System.Linq;
 using System.Reflection;
-
 namespace Lazy8.Core;
 
 public static class ReflectionUtils
@@ -57,6 +58,73 @@ public static class ReflectionUtils
     else
       /* Throws an InvalidCastException if types are incompatible. */
       return (T) retval;
+  }
+
+  /// <summary>
+  /// Copy the data from the IEnumerable sources into the DataTable target.
+  /// <para>
+  /// One way to understand this method is to visualize the 'target' pulling data from 'sources'.
+  /// If there's a converter available for the target column, the converter pulls and modifies
+  /// the source data before inserting it into the target.Otherwise a simple 1-1 mapping is done.
+  /// </para>
+  /// </summary>
+  /// <typeparam name="Source"></typeparam>
+  /// <param name="sources"></param>
+  /// <param name="target"></param>
+  /// <param name="converters"></param>
+  public static void PopulateDataTable<Source>(IEnumerable<Source> sources, DataTable target, Dictionary<String, Action<Source, DataRow>> converters = null)
+  {
+    void addRowToTarget(Source source)
+    {
+      /* GetProperties() returns a PropertyInfo[].  An array is only searchable by its numeric
+         index.  However, this code needs to search the array by the property's name.
+         Create a dictionary to allow searching by the property name. */
+      var sourcePropertyInfos = typeof(Source).GetProperties().ToImmutableDictionary(pi => pi.Name, pi => pi);
+      var targetRow = target.NewRow();
+
+      foreach (DataColumn targetColumn in target.Columns)
+      {
+        if ((converters != null) && converters.TryGetValue(targetColumn.ColumnName, out var converter))
+          converter(source, targetRow);
+        else
+          targetRow[targetColumn.ColumnName] = sourcePropertyInfos[targetColumn.ColumnName].GetValue(source) ?? DBNull.Value;
+      }
+
+      target.Rows.Add(targetRow);
+    }
+
+    foreach (var source in sources)
+      addRowToTarget(source);
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <typeparam name="Source"></typeparam>
+  /// <typeparam name="Target"></typeparam>
+  /// <param name="source"></param>
+  /// <param name="converters"></param>
+  /// <returns></returns>
+  public static Target GetTargetFromSource<Source, Target>(Source source, Dictionary<String, Action<Source, Target>> converters = null)
+    where Source : class
+    where Target : class, new()
+  {
+    var target = new Target();
+
+    /* GetProperties() returns a PropertyInfo[].  An array is only searchable by its numeric
+       index.  However, this code needs to search the array by the property's name.
+       Create a dictionary to allow searching by the property name. */
+    var sourcePropertyInfos = typeof(Source).GetProperties().ToImmutableDictionary(pi => pi.Name, pi => pi);
+
+    foreach (var targetPropertyInfo in typeof(Target).GetProperties())
+    {
+      if ((converters != null) && converters.TryGetValue(targetPropertyInfo.Name, out var converter))
+        converter(source, target);
+      else
+        targetPropertyInfo.SetValue(target, sourcePropertyInfos[targetPropertyInfo.Name].GetValue(source));
+    }
+
+    return target;
   }
 
   /// <summary>

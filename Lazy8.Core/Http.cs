@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Lazy8.Core;
 
-public class Http
+public partial class Http
 {
   public static readonly HttpClient HttpClientInstance = new();
 
@@ -23,7 +23,8 @@ public class Http
 
   */
 
-  private static readonly Regex _filenameRegex = new(@"attachment;\s+filename=(?<filename>.*$)");
+  [GeneratedRegex(@"attachment;\s+filename=(?<filename>.*$)")]
+  private static partial Regex FilenameRegex();
 
   private static String GetFilenameFromHttpResponseMessage(HttpResponseMessage responseMessage)
   {
@@ -32,7 +33,7 @@ public class Http
 
     foreach (var value in values)
     {
-      var match = _filenameRegex.Match(value.Trim());
+      var match = FilenameRegex().Match(value.Trim());
       if (match.Success)
       {
         var filename = match.Groups["filename"].Value.Trim();

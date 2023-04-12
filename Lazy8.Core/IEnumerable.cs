@@ -14,7 +14,7 @@ namespace Lazy8.Core;
 
 public enum UseOxfordComma { No, Yes }
 
-public static class IEnumerableUtils
+public static partial class IEnumerableUtils
 {
   /// <summary>
   /// A case-insensitive version of the <see cref="Enumerable.Contains"/> method for use on <see cref="IEnumerable&lt;String&gt;"/> values.
@@ -206,7 +206,8 @@ public static class IEnumerableUtils
     return list;
   }
 
-  private static readonly Regex _digits = new(@"\d+");
+  [GeneratedRegex(@"\d+")]
+  private static partial Regex DigitsRegex();
 
   /* Code for OrderByNatural<T> is from StackOverflow answer https://stackoverflow.com/a/22323356/116198
      posted by Michael Parker (https://stackoverflow.com/users/1554346/michael-parker).
@@ -219,12 +220,12 @@ public static class IEnumerableUtils
   {
     var maxDigits =
       items
-      .SelectMany(i => _digits.Matches(selector(i)).Cast<Match>().Select(digitChunk => (Int32?) digitChunk.Value.Length))
+      .SelectMany(i => DigitsRegex().Matches(selector(i)).Cast<Match>().Select(digitChunk => (Int32?) digitChunk.Value.Length))
       .Max() ?? 0;
 
     return
       items
-      .OrderBy(i => _digits.Replace(selector(i), match => match.Value.PadLeft(maxDigits, '0')), stringComparer ?? StringComparer.CurrentCulture);
+      .OrderBy(i => DigitsRegex().Replace(selector(i), match => match.Value.PadLeft(maxDigits, '0')), stringComparer ?? StringComparer.CurrentCulture);
   }
 
   /// <summary>

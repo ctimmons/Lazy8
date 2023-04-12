@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 
 namespace Lazy8.Core;
 
-public static class StringUtils
+public static partial class StringUtils
 {
   /// <summary>
   /// Convert value to a MemoryStream, using a default Unicode encoding.
@@ -215,7 +215,7 @@ public static class StringUtils
        instance unless it's absolutely necessary.
 
        Use the lambda overload of GetOrAdd() to ensure a new StringBuilder is only
-       created when the requested string isn't found in the dictionary. */
+       created when this call's parameter values aren't found in the dictionary. */
 
     if (count == 0)
       return "";
@@ -394,7 +394,8 @@ public static class StringUtils
     return value.EndsWith("/") ? value : value + "/";
   }
 
-  private static readonly Regex _stripHtmlRegex = new("<[^>]+?>", RegexOptions.Singleline);
+  [GeneratedRegex("<[^>]+?>", RegexOptions.Singleline)]
+  private static partial Regex StripHtmlRegex();
 
   /// <summary>
   /// Remove anything that resembles an HTML or XML tag from <paramref name="value"/> and return the modified string.
@@ -406,10 +407,11 @@ public static class StringUtils
   {
     value.Name(nameof(value)).NotNull();
 
-    return _stripHtmlRegex.Replace(value, "");
+    return StripHtmlRegex().Replace(value, "");
   }
 
-  private static readonly Regex _whitespaceRegex = new(@"[\p{Z}\p{C}]" /* All Unicode whitespace (Z) and control characters (C). */, RegexOptions.Singleline);
+  [GeneratedRegex(@"[\p{Z}\p{C}]" /* All Unicode whitespace (Z) and control characters (C). */, RegexOptions.Singleline)]
+  private static partial Regex WhitespaceRegex();
 
   /// <summary>
   /// Remove all Unicode whitespace and control characters from <paramref name="value"/> and return the modified string.
@@ -421,7 +423,7 @@ public static class StringUtils
   {
     value.Name(nameof(value)).NotNull();
 
-    return _whitespaceRegex.Replace(value, "");
+    return WhitespaceRegex().Replace(value, "");
   }
 
   /// <summary>
@@ -461,7 +463,8 @@ public static class StringUtils
     return values.Any(s => s.IsNullOrWhiteSpace());
   }
 
-  private static readonly Regex _indentTextRegex = new("(\r\n|\n)");
+  [GeneratedRegex("(\r\n|\n)")]
+  private static partial Regex IndentTextRegex();
 
   /// <summary>
   /// Treat <paramref name="value"/> as a multiline string, where each string is separated either by
@@ -482,7 +485,7 @@ public static class StringUtils
 
     if (indent > 0)
     {
-      return indentString + _indentTextRegex.Replace(value, "$1" + indentString);
+      return indentString + IndentTextRegex().Replace(value, "$1" + indentString);
     }
     else /* if (indent < 0) */
     {
@@ -492,7 +495,7 @@ public static class StringUtils
          will be included in the results returned by the Regex.Split() method.  See the Regex.Split() MSDN documentation at:
          https://docs.microsoft.com/en-us/dotnet/api/system.text.regularexpressions.regex.split?view=net-5.0#System_Text_RegularExpressions_Regex_Split_System_String_ */
       return
-        _indentTextRegex
+        IndentTextRegex()
         .Split(value)
         .Select(line => line.StartsWith(indentString) ? line[indent..] : line)
         .Join();

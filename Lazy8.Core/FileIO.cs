@@ -18,7 +18,7 @@ public enum DirectoryWalkerErrorHandling { ContinueAndAccumulateExceptions, Stop
 public enum FileSystemTypes { Files = 1, Directories = 2, All = Files | Directories }
 public enum OverwriteFile { Yes, No }
 
-public static class FileUtils
+public static partial class FileUtils
 {
   public static readonly Char[] DirectorySeparators = new Char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
 
@@ -488,14 +488,15 @@ public static class FileUtils
   /// <returns>A <see cref="String"/> containing the directory of the currently executing assembly.</returns>
   public static String GetExecutablePath() => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location).AddTrailingSeparator();
 
-  private static readonly Regex _multipleBackslashes = new(@"\\+", RegexOptions.Singleline);
+  [GeneratedRegex(@"\\+", RegexOptions.Singleline)]
+  private static partial Regex MultipleBackslashesRegex();
 
   /// <summary>
   /// Given a string that contains backslash characters, return the same string but with those backslash characters duplicated.
   /// </summary>
   /// <param name="directory"></param>
   /// <returns>A <see cref="String"/> containing a copy of the modified original string.</returns>
-  public static String DuplicateBackslashes(this String directory) => _multipleBackslashes.Replace(directory, @"\\");
+  public static String DuplicateBackslashes(this String directory) => MultipleBackslashesRegex().Replace(directory, @"\\");
 
   /// <summary>
   /// Return a new unique directory path located under the system's temporary folder.  This method does NOT create the directory.
