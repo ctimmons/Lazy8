@@ -13,8 +13,24 @@ using System.Xml.Serialization;
 
 namespace Lazy8.Core;
 
+public readonly record struct XmlNamespace(String Name, String Prefix);
+
 public static class XmlUtils
 {
+  /// <summary>
+  /// Retrieve a list of XML namespaces and their prefixes from a given XDocument.
+  /// </summary>
+  /// <param name="xdoc">An XDocument instance.</param>
+  /// <returns>An IEnumerable&lt;XmlNamespace&gt;.</returns>
+  public static IEnumerable<XmlNamespace> GetXmlNamespaces(this XDocument xdoc) =>
+    xdoc
+    .Root
+    .DescendantsAndSelf()
+    .Attributes()
+    .Where(attribute => attribute.IsNamespaceDeclaration)
+    .GroupBy(attribute => attribute.Name.Namespace == XNamespace.None ? "default" : attribute.Name.LocalName, a => XNamespace.Get(a.Value).NamespaceName)
+    .Select(g => new XmlNamespace(Name: g.First(), Prefix: g.Key));
+
   /// <summary>
   /// Given a <see cref="String"/> containing an XML document, return a string containing a formatted version of the input XML document string.
   /// </summary>

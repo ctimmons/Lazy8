@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.Linq;
 
 using NUnit.Framework;
 
@@ -73,6 +74,50 @@ Another line.
 public class Xml
 {
   public Xml() : base() { }
+
+  [Test]
+  public void GetXmlNamespacesTest()
+  {
+    var xml = @"
+<?xml version=""1.0"" encoding=""utf-8""?>
+<xbrl
+  xmlns=""http://www.xbrl.org/2003/instance""
+  xmlns:dei=""http://xbrl.sec.gov/dei/2022""
+  xmlns:xbrldi=""http://xbrl.org/2006/xbrldi"">
+    <context id=""ibd1b0ecc6f554fd1a6cb7e4b9f834c12_D20230101-20230331"">
+        <entity>
+            <identifier scheme=""http://www.sec.gov/CIK"">0001004980</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension=""dei:LegalEntityAxis"">pcg:PacificGasElectricCoMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2023-01-01</startDate>
+            <endDate>2023-03-31</endDate>
+        </period>
+    </context>
+    <context id=""i914970c514674463b93d82e995e8edc6_D20230101-20230331"">
+        <entity>
+            <identifier scheme=""http://www.sec.gov/CIK"">0001004980</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension=""us-gaap:StatementClassOfStockAxis"">pcg:CommonStockNoParValueMember</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension=""dei:EntityListingsExchangeAxis"">exch:XNYS</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2023-01-01</startDate>
+            <endDate>2023-03-31</endDate>
+        </period>
+    </context>
+</xbrl>
+".Trim();
+
+    var xmlNamespaces = XDocument.Parse(xml).GetXmlNamespaces();
+    Assert.That(xmlNamespaces.Count(), Is.EqualTo(3));
+    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => (xmlNamespace.Prefix == "default") && (xmlNamespace.Name == "http://www.xbrl.org/2003/instance")));
+    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => (xmlNamespace.Prefix == "dei") && (xmlNamespace.Name == "http://xbrl.sec.gov/dei/2022")));
+    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => (xmlNamespace.Prefix == "xbrldi") && (xmlNamespace.Name == "http://xbrl.org/2006/xbrldi")));
+  }
 
   [Test]
   public void XmlFileToFromTest()
