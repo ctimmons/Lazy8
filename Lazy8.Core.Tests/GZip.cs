@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Lazy8.Core.Tests;
 
 [TestFixture]
-public class ZipTests
+public class GZipTests
 {
   private static readonly String _source = "Hello, world! åäö";
 

@@ -62,7 +62,7 @@ public static class GetTSqlBatchExtension
     }
 
     if (batch.Length > 0)
-      batches.Add(GetBatch(batch.ToString(), 1));
+      batches.Add(GetBatch(batch.ToString(), goMultiplier: 1));
 
     return batches.Where(b => b.Trim().Any());
   }
