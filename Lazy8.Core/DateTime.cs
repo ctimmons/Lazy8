@@ -13,12 +13,14 @@ namespace Lazy8.Core;
 public static class DateTimeUtils
 {
   /// <summary>
-  /// Returns the week number for the given <see cref="DateTime"/>'s month.
+  /// Return the 1-based week number within the given <see cref="DateTime"/>'s month.
   /// Assumes that Sunday is the start of the week.
+  /// <para>For example, April 2, 2017 falls in the second week of that month, so this method
+  /// will return 2 for that date.</para>
   /// </summary>
   /// <param name="date">A <see cref="DateTime"/>.</param>
   /// <returns>A 1-based integer.</returns>
-  public static Int32 WeekNumberOfMonth(this DateTime date)
+  public static Int32 WeekNumberInMonth(this DateTime date)
   {
     static Int32 getWeekNumberOfYear(DateTime d) =>
       CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(d, CalendarWeekRule.FirstDay, DayOfWeek.Sunday);

@@ -121,8 +121,8 @@ public static partial class AssertUtils
   public static AssertionContext<T> GreaterThan<T>(this AssertionContext<T> source, T value)
     where T : IComparable<T> =>
     source.Value.CompareTo(value) > 0
-      ? source
-      : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_NotGreaterThan, source.Name, source.Value, value));
+    ? source
+    : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_NotGreaterThan, source.Name, source.Value, value));
 
   public static AssertionContext<T> GreaterThanOrEqualTo<T>(this T source, T value)
     where T : IComparable<T> =>
@@ -131,8 +131,8 @@ public static partial class AssertUtils
   public static AssertionContext<T> GreaterThanOrEqualTo<T>(this AssertionContext<T> source, T value)
     where T : IComparable<T> =>
     source.Value.CompareTo(value) >= 0
-      ? source
-      : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_NotGreaterThanOrEqualTo, source.Name, source.Value, value));
+    ? source
+    : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_NotGreaterThanOrEqualTo, source.Name, source.Value, value));
 
   public static AssertionContext<T> LessThan<T>(this T source, T value)
     where T : IComparable<T> =>
@@ -141,8 +141,8 @@ public static partial class AssertUtils
   public static AssertionContext<T> LessThan<T>(this AssertionContext<T> source, T value)
     where T : IComparable<T> =>
     source.Value.CompareTo(value) < 0
-      ? source
-      : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_NotLessThan, source.Name, source.Value, value));
+    ? source
+    : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_NotLessThan, source.Name, source.Value, value));
 
   public static AssertionContext<T> LessThanOrEqualTo<T>(this T source, T value)
     where T : IComparable<T> =>
@@ -151,8 +151,8 @@ public static partial class AssertUtils
   public static AssertionContext<T> LessThanOrEqualTo<T>(this AssertionContext<T> source, T value)
     where T : IComparable<T> =>
     source.Value.CompareTo(value) <= 0
-      ? source
-      : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_NotLessThanOrEqualTo, source.Name, source.Value, value));
+    ? source
+    : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_NotLessThanOrEqualTo, source.Name, source.Value, value));
 
   public static AssertionContext<T> EqualTo<T>(this T source, T value)
     where T : IComparable<T> =>
@@ -161,8 +161,8 @@ public static partial class AssertUtils
   public static AssertionContext<T> EqualTo<T>(this AssertionContext<T> source, T value)
     where T : IComparable<T> =>
     source.Value.CompareTo(value) == 0
-      ? source
-      : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_NotEqualTo, source.Name, source.Value, value));
+    ? source
+    : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_NotEqualTo, source.Name, source.Value, value));
 
   public static AssertionContext<T> NotEqualTo<T>(this T source, T value)
     where T : IComparable<T> =>
@@ -171,8 +171,8 @@ public static partial class AssertUtils
   public static AssertionContext<T> NotEqualTo<T>(this AssertionContext<T> source, T value)
     where T : IComparable<T> =>
     source.Value.CompareTo(value) != 0
-      ? source
-      : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_EqualTo, source.Name, source.Value, value));
+    ? source
+    : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_EqualTo, source.Name, source.Value, value));
 
   public static AssertionContext<T> BetweenInclusive<T>(this T source, T lowerBound, T upperBound)
     where T : IComparable<T> =>
@@ -181,8 +181,8 @@ public static partial class AssertUtils
   public static AssertionContext<T> BetweenInclusive<T>(this AssertionContext<T> source, T lowerBound, T upperBound)
     where T : IComparable<T> =>
     (source.Value.CompareTo(lowerBound) >= 0) && (source.Value.CompareTo(upperBound) <= 0)
-      ? source
-      : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_BetweenInclusive, source.Name, source.Value, lowerBound, upperBound));
+    ? source
+    : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_BetweenInclusive, source.Name, source.Value, lowerBound, upperBound));
 
   public static AssertionContext<T> BetweenExclusive<T>(this T source, T lowerBound, T upperBound)
     where T : IComparable<T> =>
@@ -191,22 +191,22 @@ public static partial class AssertUtils
   public static AssertionContext<T> BetweenExclusive<T>(this AssertionContext<T> source, T lowerBound, T upperBound)
     where T : IComparable<T> =>
     (source.Value.CompareTo(lowerBound) > 0) && (source.Value.CompareTo(upperBound) < 0)
-      ? source
-      : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_BetweenExclusive, source.Name, source.Value, lowerBound, upperBound));
+    ? source
+    : throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Assert_BetweenExclusive, source.Name, source.Value, lowerBound, upperBound));
 
   public static AssertionContext<String> DirectoryExists(this String source) => (new AssertionContext<String>(source)).DirectoryExists();
 
   public static AssertionContext<String> DirectoryExists(this AssertionContext<String> source) =>
     Directory.Exists(source.Value)
-      ? source
-      : throw new ArgumentException(String.Format(Properties.Resources.Assert_DirectoryExists, source.Name, source.Value));
+    ? source
+    : throw new ArgumentException(String.Format(Properties.Resources.Assert_DirectoryExists, source.Name, source.Value));
 
   public static AssertionContext<String> FileExists(this String source) => (new AssertionContext<String>(source)).FileExists();
 
   public static AssertionContext<String> FileExists(this AssertionContext<String> source) =>
     File.Exists(source.Value)
-      ? source
-      : throw new ArgumentException(String.Format(Properties.Resources.Assert_FileExists, source.Name, source.Value));
+    ? source
+    : throw new ArgumentException(String.Format(Properties.Resources.Assert_FileExists, source.Name, source.Value));
 }
 
 /// <summary>

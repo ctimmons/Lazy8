@@ -10,7 +10,7 @@ namespace Lazy8.Core;
 
 /// <summary>
 /// A descendent of HashSet<T> that requires it be constructed with
-/// a Predicate<T> callback.The callback is executed before an item T
+/// a Predicate<T> callback.  The callback is executed before an item T
 /// is added with the Add(T) method.  If the predicate returns false, the
 /// item is not added and Add(T) returns false. This prevents any unwanted
 /// items from being added to the hashset.

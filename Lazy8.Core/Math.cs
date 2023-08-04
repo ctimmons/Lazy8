@@ -52,7 +52,7 @@ public static class MathUtils
   {
     CheckBase(@base);
 
-    var digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".Substring(0, @base);
+    var digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[..@base];
     var result = "";
 
     while (number > 0)

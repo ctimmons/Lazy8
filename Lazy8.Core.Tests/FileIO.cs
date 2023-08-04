@@ -15,7 +15,7 @@ using NUnit.Framework;
 namespace Lazy8.Core.Tests;
 
 [TestFixture]
-public class FileUtilsTests
+public partial class FileUtilsTests
 {
   private static readonly String _testFilesPath = FileUtils.GetTemporarySubfolder();
   private static readonly String _testStringsFile = _testFilesPath + "test_strings.txt";
@@ -34,10 +34,7 @@ public class FileUtilsTests
   {
   }
 
-  private String GetTestFilename()
-  {
-    return Path.Combine(_testFilesPath, Path.GetRandomFileName());
-  }
+  private static String GetTestFilename() => Path.Combine(_testFilesPath, Path.GetRandomFileName());
 
   [SetUp]
   public void Init()
@@ -62,7 +59,7 @@ public class FileUtilsTests
   public void Cleanup()
   {
     if (Directory.Exists(_testFilesPath))
-      Directory.Delete(_testFilesPath, true /* Delete all files and subdirectories also. */);
+      Directory.Delete(_testFilesPath, recursive: true);
   }
 
   [Test]
@@ -84,7 +81,7 @@ public class FileUtilsTests
     Assert.That(Directory.Exists(rootDir), Is.False);
   }
 
-  private void DirectoryWalkerHarness(Action<FileSystemInfo> action, List<String> expected, List<String> actual)
+  private static void DirectoryWalkerHarness(Action<FileSystemInfo> action, List<String> expected, List<String> actual)
   {
     var exceptions = FileUtils.DirectoryWalker(_testFilesPath, action, FileSystemTypes.All, DirectoryWalkerErrorHandling.ContinueAndAccumulateExceptions);
 
@@ -94,9 +91,7 @@ public class FileUtilsTests
       throw new Exception(messages);
     }
     else
-    {
       Assert.That(expected.Except(actual).Any(), Is.False);
-    }
   }
 
   [Test]
@@ -105,14 +100,10 @@ public class FileUtilsTests
     static void action(FileSystemInfo fsi)
     {
       if (fsi is DirectoryInfo di)
-      {
         di.DeleteIfEmpty();
-      }
       else if (fsi is FileInfo fi)
-      {
         if (fi.Name == "hello_world.txt")
           fi.Delete();
-      }
     }
 
     var exceptions = FileUtils.DirectoryWalker(_testFilesPath, action, FileSystemTypes.All, DirectoryWalkerErrorHandling.ContinueAndAccumulateExceptions);
@@ -142,21 +133,22 @@ public class FileUtilsTests
     void action(FileSystemInfo fsi)
     {
       if (fsi is DirectoryInfo di)
-      {
         if (di.EnumerateFiles().Where(fi => fi.Name.Contains("dog")).Any())
           actual.Add(di.FullName);
-      }
     }
 
     var expected =
       new List<String>()
       {
-          _level_1_1,
-          _level_3_1
+        _level_1_1,
+        _level_3_1
       };
 
-    this.DirectoryWalkerHarness(action, expected, actual);
+    DirectoryWalkerHarness(action, expected, actual);
   }
+
+  [GeneratedRegex("le..l_1", RegexOptions.Singleline)]
+  private static partial Regex _levelNameRegex();
 
   [Test]
   public void DirectoryWalkerTest_GetDirectoryNamesBasedOnRegex()
@@ -166,10 +158,8 @@ public class FileUtilsTests
     void action(FileSystemInfo fsi)
     {
       if (fsi is DirectoryInfo di)
-      {
-        if (Regex.Match(di.FullName, "le..l_1", RegexOptions.Singleline).Success)
+        if (_levelNameRegex().Match(di.FullName).Success)
           actual.Add(di.FullName);
-      }
     }
 
     var expected =
@@ -179,7 +169,7 @@ public class FileUtilsTests
           _level_1_2
       };
 
-    this.DirectoryWalkerHarness(action, expected, actual);
+    DirectoryWalkerHarness(action, expected, actual);
   }
 
   [Test]
@@ -190,10 +180,8 @@ public class FileUtilsTests
     void action(FileSystemInfo fsi)
     {
       if (fsi is FileInfo fi)
-      {
         if (File.ReadAllText(fi.FullName).Contains("fox"))
           actual.Add(fi.FullName);
-      }
     }
 
     var expected =
@@ -203,8 +191,11 @@ public class FileUtilsTests
           Path.Combine(_level_3_1, "fox_and_dog.txt")
       };
 
-    this.DirectoryWalkerHarness(action, expected, actual);
+    DirectoryWalkerHarness(action, expected, actual);
   }
+
+  [GeneratedRegex("he..o", RegexOptions.Singleline)]
+  private static partial Regex _helloRegex();
 
   [Test]
   public void DirectoryWalkerTest_GetFilenamesBasedOnRegex()
@@ -214,10 +205,8 @@ public class FileUtilsTests
     void action(FileSystemInfo fsi)
     {
       if (fsi is FileInfo fi)
-      {
-        if (Regex.Match(fi.FullName, "he..o", RegexOptions.Singleline).Success)
+        if (_helloRegex().Match(fi.FullName).Success)
           actual.Add(fi.FullName);
-      }
     }
 
     var expected =
@@ -228,7 +217,7 @@ public class FileUtilsTests
           Path.Combine(_level_1_2, "hello_world.txt")
       };
 
-    this.DirectoryWalkerHarness(action, expected, actual);
+    DirectoryWalkerHarness(action, expected, actual);
   }
 
   [Test]
@@ -267,9 +256,9 @@ public class FileUtilsTests
     Assert.That(File.Exists(filename), Is.True);
 
     File.WriteAllText(filename, _testStringFoxAndDog);
-    Assert.That((new FileInfo(filename)).Length > 0, Is.True);
+    Assert.That(new FileInfo(filename).Length > 0, Is.True);
     FileUtils.CreateEmptyFile(filename, OverwriteFile.No);
-    Assert.That((new FileInfo(filename)).Length > 0, Is.True);
+    Assert.That(new FileInfo(filename).Length > 0, Is.True);
   }
 
   [Test]
@@ -296,7 +285,7 @@ public class FileUtilsTests
   [Test]
   public void WriteMemoryStreamToFileTest()
   {
-    var filename = this.GetTestFilename();
+    var filename = GetTestFilename();
 
     using (var ms = new MemoryStream())
     {

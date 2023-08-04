@@ -13,7 +13,7 @@ namespace Lazy8.Core.Tests;
 [TestFixture]
 public class DateTimeUtilsTests
 {
-  private Tuple<DateTime, DateTime>[] _quarterDateRanges =
+  private readonly Tuple<DateTime, DateTime>[] _quarterDateRanges =
     new Tuple<DateTime, DateTime>[4]
     {
         new Tuple<DateTime, DateTime>(new DateTime(2000, 1, 1), new DateTime(2000, 3, 31)),
@@ -39,27 +39,27 @@ public class DateTimeUtilsTests
   {
     /* April 2017 is spread over 6 numerical weeks. */
 
-    Assert.That(new DateTime(2017, 4, 1).WeekNumberOfMonth(), Is.EqualTo(1));
-    Assert.That(new DateTime(2017, 4, 2).WeekNumberOfMonth(), Is.EqualTo(2));
-    Assert.That(new DateTime(2017, 4, 9).WeekNumberOfMonth(), Is.EqualTo(3));
-    Assert.That(new DateTime(2017, 4, 16).WeekNumberOfMonth(), Is.EqualTo(4));
-    Assert.That(new DateTime(2017, 4, 23).WeekNumberOfMonth(), Is.EqualTo(5));
-    Assert.That(new DateTime(2017, 4, 30).WeekNumberOfMonth(), Is.EqualTo(6));
+    Assert.That(new DateTime(2017, 4, 1).WeekNumberInMonth(), Is.EqualTo(1));
+    Assert.That(new DateTime(2017, 4, 2).WeekNumberInMonth(), Is.EqualTo(2));
+    Assert.That(new DateTime(2017, 4, 9).WeekNumberInMonth(), Is.EqualTo(3));
+    Assert.That(new DateTime(2017, 4, 16).WeekNumberInMonth(), Is.EqualTo(4));
+    Assert.That(new DateTime(2017, 4, 23).WeekNumberInMonth(), Is.EqualTo(5));
+    Assert.That(new DateTime(2017, 4, 30).WeekNumberInMonth(), Is.EqualTo(6));
 
     /* Like the vast majority of months, September 2021 has 5 numerical weeks. */
 
-    Assert.That(new DateTime(2021, 9, 1).WeekNumberOfMonth(), Is.EqualTo(1));
-    Assert.That(new DateTime(2021, 9, 8).WeekNumberOfMonth(), Is.EqualTo(2));
-    Assert.That(new DateTime(2021, 9, 15).WeekNumberOfMonth(), Is.EqualTo(3));
-    Assert.That(new DateTime(2021, 9, 22).WeekNumberOfMonth(), Is.EqualTo(4));
-    Assert.That(new DateTime(2021, 9, 29).WeekNumberOfMonth(), Is.EqualTo(5));
+    Assert.That(new DateTime(2021, 9, 1).WeekNumberInMonth(), Is.EqualTo(1));
+    Assert.That(new DateTime(2021, 9, 8).WeekNumberInMonth(), Is.EqualTo(2));
+    Assert.That(new DateTime(2021, 9, 15).WeekNumberInMonth(), Is.EqualTo(3));
+    Assert.That(new DateTime(2021, 9, 22).WeekNumberInMonth(), Is.EqualTo(4));
+    Assert.That(new DateTime(2021, 9, 29).WeekNumberInMonth(), Is.EqualTo(5));
 
     /* February occasionally starts on a Sunday (e.g. 2015), and in that case has 4 numerical weeks. */
 
-    Assert.That(new DateTime(2015, 2, 1).WeekNumberOfMonth(), Is.EqualTo(1));
-    Assert.That(new DateTime(2015, 2, 8).WeekNumberOfMonth(), Is.EqualTo(2));
-    Assert.That(new DateTime(2015, 2, 15).WeekNumberOfMonth(), Is.EqualTo(3));
-    Assert.That(new DateTime(2015, 2, 28).WeekNumberOfMonth(), Is.EqualTo(4));
+    Assert.That(new DateTime(2015, 2, 1).WeekNumberInMonth(), Is.EqualTo(1));
+    Assert.That(new DateTime(2015, 2, 8).WeekNumberInMonth(), Is.EqualTo(2));
+    Assert.That(new DateTime(2015, 2, 15).WeekNumberInMonth(), Is.EqualTo(3));
+    Assert.That(new DateTime(2015, 2, 28).WeekNumberInMonth(), Is.EqualTo(4));
   }
 
   [Test]

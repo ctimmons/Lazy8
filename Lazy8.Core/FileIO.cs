@@ -45,7 +45,7 @@ public static partial class FileUtils
     foreach (var subdirectory in directoryInfo.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
       DeleteDirectory(subdirectory);
 
-    directoryInfo.Delete(false /* Not recursive delete. */);
+    directoryInfo.Delete(recursive: false);
   }
 
   /// <summary>

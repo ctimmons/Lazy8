@@ -148,17 +148,12 @@ public static class GeneralUtils
     if (sf == null)
       throw new Exception(String.Format(Properties.Resources.Utils_NoStackFrameExists, stackFrameLevel));
 
-    var mb = sf.GetMethod();
-
     /* GetMethod() may return null.  This can happen in release builds where the actual
        method call has been optimized away. */
-    if (mb == null)
-      throw new Exception(String.Format(Properties.Resources.Utils_NoMethodFoundOnStackFrame, stackFrameLevel));
+    var mb = sf.GetMethod() ?? throw new Exception(String.Format(Properties.Resources.Utils_NoMethodFoundOnStackFrame, stackFrameLevel));
 
-    var declaringType = mb.DeclaringType;
-
-    /* Like GetMethod(), DeclaringType can be optimized away in release builds. */
-    if (declaringType == null)
+    /* Like GetMethod(), mbDeclaringType can be optimized away in release builds. */
+    if (mb.DeclaringType == null)
       throw new Exception(String.Format(Properties.Resources.Utils_NoDeclaringTypeFoundOnStackFrame, stackFrameLevel));
   }
 
@@ -209,11 +204,11 @@ public static class GeneralUtils
   }
 
   /// <summary>
-  ///
+  /// Get the first instance of (T : Attribute) in the given assembly.
   /// </summary>
-  /// <typeparam name="T"></typeparam>
-  /// <param name="assembly"></param>
-  /// <returns></returns>
+  /// <typeparam name="T">A type that descends from System.Attribute.</typeparam>
+  /// <param name="assembly">An assembly.</param>
+  /// <returns>An instance of T : Attribute.</returns>
   public static T GetAssemblyAttribute<T>(this Assembly assembly)
     where T : Attribute
   {

@@ -187,8 +187,6 @@ public static partial class IEnumerableUtils
     return items.GroupBy(x => i++ % numOfParts);
   }
 
-  private static readonly Random _random = new();
-
   /// <summary>
   /// Randomize (swap the elements) of <paramref name="list"/> in place.
   /// </summary>
@@ -199,7 +197,7 @@ public static partial class IEnumerableUtils
   {
     for (var currentIndex = list.Count - 1; currentIndex >= 1; currentIndex--)
     {
-      var randomIndex = _random.Next(currentIndex + 1);
+      var randomIndex = Random.Shared.Next(currentIndex + 1);
       (list[currentIndex], list[randomIndex]) = (list[randomIndex], list[currentIndex]);
     }
 

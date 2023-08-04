@@ -17,17 +17,13 @@ public enum LetterCaseMix
 
 public static class RandomUtils
 {
-  private static readonly Random _random = new();
-  private static readonly Object _semaphore = new(); /* System.Random instance methods are not thread safe. */
-
   /// <summary>
   /// Returns true approximately 50% of the time, false the other 50% percent.
   /// </summary>
   /// <returns>A <see cref="Boolean"/> value.</returns>
   public static Boolean GetCoinFlip()
   {
-    lock (_semaphore)
-      return (_random.Next(2) == 0);
+    return (Random.Shared.Next(2) == 0);
   }
 
   /// <summary>
@@ -41,8 +37,7 @@ public static class RandomUtils
     if ((probability <= 0.0) || (probability >= 1.0))
       throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Random_ProbabilityNotInRange, probability));
     else
-      lock (_semaphore)
-        return (_random.NextDouble() < probability);
+      return (Random.Shared.NextDouble() < probability);
   }
 
   /// <summary>
@@ -88,8 +83,7 @@ public static class RandomUtils
     if (low >= high)
       throw new ArgumentOutOfRangeException(String.Format(Properties.Resources.Random_LowGreaterThanHigh, low, high));
     else
-      lock (_semaphore)
-        return (low + (_random.NextDouble() * (high - low)));
+      return (low + (Random.Shared.NextDouble() * (high - low)));
   }
 
   /// <summary>
@@ -144,8 +138,7 @@ public static class RandomUtils
 
     for (Int32 idx = 0; idx < count; idx++)
     {
-      lock (_semaphore)
-        randomChar = (Char) _random.Next(lowChar, highChar + 1);
+      randomChar = (Char) Random.Shared.Next(lowChar, highChar + 1);
 
       switch (letterCaseMix)
       {
