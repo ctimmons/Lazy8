@@ -296,7 +296,17 @@ GO
   [Test]
   public void CheckConnectionStringTest()
   {
+    /* Both well-formed and valid connection string. */
+    Assert.That(() => _connection.ConnectionString.CheckConnectionString(), Throws.Nothing);
 
+    /* Well-formed, but not valid. */
+    SqlConnectionStringBuilder builder = new(_connection.ConnectionString) { DataSource = "database that does not exist" };
+    Assert.That(() => builder.ConnectionString.CheckConnectionString(), Throws.TypeOf<SqlException>());
+
+    /* Ill-formed. */
+    Assert.That(() => "random text that can't possibly be a connection string".CheckConnectionString(), Throws.TypeOf<ArgumentException>());
+
+    /* There is no test for both ill-formed and invalid. */
   }
 
   [Test]
