@@ -24,6 +24,9 @@ namespace Lazy8.SqlClient.Tests;
 [TestFixture]
 public class SerializableSqlParameterTests
 {
+  /* Testing SqlParameter's Value property is non-trivial.  Therefore two separate tests
+     are implemented - one to test Value, and one to test all of SqlParameter's other properties. */
+
   [Test]
   public void RoundTripPropertiesOtherThanValueTest()
   {
@@ -53,6 +56,65 @@ public class SerializableSqlParameterTests
     RoundTripSqlParameter(expectedSqlParameter, this.CompareRoundTripPropertiesOtherThanValue);
   }
 
+  [Test]
+  public void RoundTripValuePropertyTest()
+  {
+    var byteArray = new Byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+    var xmlString = "<root><el1>Something</el1></root>";
+    var xmlDocument = new XmlDocument();
+    xmlDocument.LoadXml(xmlString);
+
+    var valueTestCases =
+      new List<(Object value, Func<Object, Object, Boolean> predicate)>()
+      {
+        (true, Equals),
+        ((Byte) 42, Equals),
+        (byteArray, (p1, p2) => ((Byte[]) p1).SequenceEqual((Byte[]) p2)),
+
+        /* SqlParameter.Value coerces a character to a string. */
+        ('X', Equals),
+
+        /* SqlParameter.Value coerces a character array to a string. */
+        ("foo".ToCharArray(), Equals),
+
+        (DateTime.Now, Equals),
+        (DateTimeOffset.Now, Equals),
+        (DBNull.Value, (p1, p2) => Convert.IsDBNull(p1) && Convert.IsDBNull(p2)),
+        ((Decimal) 42.69, Equals),
+        ((Double) 42.69, Equals),
+        (Guid.NewGuid(), (p1, p2) => ((Guid) p1).Equals((Guid) p2)),
+        ((Int16) 42, Equals),
+        ((Int32) 42, Equals),
+        ((Int64) 42, Equals),
+        ((Single) 42.69, Equals),
+        ("foo", Equals),
+        (TimeSpan.FromDays(69), Equals),
+        (new SqlBinary(byteArray), (p1, p2) => ((SqlBinary) p1).Value.SequenceEqual(((SqlBinary) p2).Value)),
+        (new SqlBoolean(true), (p1, p2) => ((SqlBoolean) p1).Value == ((SqlBoolean) p2).Value),
+        (new SqlByte(42), (p1, p2) => ((SqlByte) p1).Value == ((SqlByte) p2).Value),
+        (new SqlBytes(byteArray), (p1, p2) => ((SqlBytes) p1).Value.SequenceEqual(((SqlBytes) p2).Value)),
+        (new SqlChars("foo".ToCharArray()), (p1, p2) => ((SqlChars) p1).Value.SequenceEqual(((SqlChars) p2).Value)),
+        (new SqlDateTime(DateTime.Now), (p1, p2) => ((SqlDateTime) p1).Value == ((SqlDateTime) p2).Value),
+        (new SqlDecimal(42), (p1, p2) => ((SqlDecimal) p1).Value == ((SqlDecimal) p2).Value),
+        (new SqlDouble(42.69), (p1, p2) => ((SqlDouble) p1).Value == ((SqlDouble) p2).Value),
+        (new SqlGuid(Guid.NewGuid()), (p1, p2) => ((SqlGuid) p1).Value.Equals(((SqlGuid) p2).Value)),
+        (new SqlInt16(42), (p1, p2) => ((SqlInt16) p1).Value == ((SqlInt16) p2).Value),
+        (new SqlInt32(42), (p1, p2) => ((SqlInt32) p1).Value == ((SqlInt32) p2).Value),
+        (new SqlInt64(42), (p1, p2) => ((SqlInt64) p1).Value == ((SqlInt64) p2).Value),
+        (new SqlMoney(42.69), (p1, p2) => ((SqlMoney) p1).Value == ((SqlMoney) p2).Value),
+        (new SqlSingle(42.69), (p1, p2) => ((SqlSingle) p1).Value == ((SqlSingle) p2).Value),
+        (new SqlString("foo"), (p1, p2) => ((SqlString) p1).Value == ((SqlString) p2).Value),
+        (new SqlXml(new XmlTextReader(xmlString, XmlNodeType.Document, null)), (p1, p2) => ((SqlXml) p1).Value == ((SqlXml) p2).Value)
+      };
+
+    foreach (var (value, predicate) in valueTestCases)
+    {
+      var expectedSqlParameter = new SqlParameter() { Value = value };
+      RoundTripSqlParameter(expectedSqlParameter, this.CompareRoundTripValueProperty);
+    }
+  }
+
   private static void RoundTripSqlParameter(SqlParameter expectedSqlParameter, Action<SqlParameter, SqlParameter> comparisonPredicate)
   {
     var expectedSerializedSqlParameter = new SerializableSqlParameter(expectedSqlParameter);
@@ -62,13 +124,10 @@ public class SerializableSqlParameterTests
 
     /* Newtonsoft JSON.Net */
 
-    var settings = new JsonSerializerSettings
-    {
-      Formatting = Newtonsoft.Json.Formatting.Indented
-    };
+    JsonSerializerSettings settings = new() { Formatting = Newtonsoft.Json.Formatting.Indented };
 
-    var json = JsonConvert.SerializeObject(expectedSerializedSqlParameter, settings);
-    var actualSerializedSqlParameter = JsonConvert.DeserializeObject<SerializableSqlParameter>(json, settings);
+    var newtonSoftJsonString = JsonConvert.SerializeObject(expectedSerializedSqlParameter, settings);
+    var actualSerializedSqlParameter = JsonConvert.DeserializeObject<SerializableSqlParameter>(newtonSoftJsonString, settings);
     var actualSqlParameter = actualSerializedSqlParameter.GetSqlParameter();
     comparisonPredicate(expectedSqlParameter, actualSqlParameter);
 
@@ -76,15 +135,18 @@ public class SerializableSqlParameterTests
 
     JsonSerializerOptions options = new() { WriteIndented = true };
 
-    json = System.Text.Json.JsonSerializer.Serialize(expectedSerializedSqlParameter, options);
-    actualSerializedSqlParameter = System.Text.Json.JsonSerializer.Deserialize<SerializableSqlParameter>(json, options);
+    /* Have to use the fully qualified System.Text.Json.JsonSerializer name, otherwise
+       JsonSerializer it would conflict with the JsonSerializer class in Newtonsoft's namespace. */
+
+    var dotNetJsonString = System.Text.Json.JsonSerializer.Serialize(expectedSerializedSqlParameter, options);
+    actualSerializedSqlParameter = System.Text.Json.JsonSerializer.Deserialize<SerializableSqlParameter>(dotNetJsonString, options);
     actualSqlParameter = actualSerializedSqlParameter.GetSqlParameter();
     comparisonPredicate(expectedSqlParameter, actualSqlParameter);
 
     /* XML */
 
-    json = XmlUtils.SerializeObjectToXmlString(expectedSerializedSqlParameter);
-    actualSerializedSqlParameter = XmlUtils.DeserializeObjectFromXmlString<SerializableSqlParameter>(json);
+    var xmlString = XmlUtils.SerializeObjectToXmlString(expectedSerializedSqlParameter);
+    actualSerializedSqlParameter = XmlUtils.DeserializeObjectFromXmlString<SerializableSqlParameter>(xmlString);
     actualSqlParameter = actualSerializedSqlParameter.GetSqlParameter();
     comparisonPredicate(expectedSqlParameter, actualSqlParameter);
   }
@@ -132,7 +194,7 @@ public class SerializableSqlParameterTests
     else if ((expectedSqlParameter.Value is DateTimeOffset expectedDatetimeOffset) && (actualSqlParameter.Value is DateTimeOffset actualDatetimeOffset))
       Assert.That(expectedDatetimeOffset, Is.EqualTo(actualDatetimeOffset), "(DateTimeOffset) Value");
     else if ((expectedSqlParameter.Value is DBNull) && (actualSqlParameter.Value is DBNull))
-      /* If both the expected and actual Value properties are DBNull, they are by definition equal. */
+      /* If both the expected and actual Value properties are DBNull, they are - for the purposes of this test - equal. */
       return;
     else if ((expectedSqlParameter.Value is Decimal expectedDecimal) && (actualSqlParameter.Value is Decimal actualDecimal))
       Assert.That(expectedDecimal, Is.EqualTo(actualDecimal), "(Decimal) Value");
@@ -161,65 +223,6 @@ public class SerializableSqlParameterTests
     else
       /* For all other types, use the type's Equal method.  Most of the Sql* types override their Equals method. */
       Assert.That(expectedSqlParameter.Value, Is.EqualTo(actualSqlParameter.Value), "Default Equal() method.");
-  }
-
-  [Test]
-  public void RoundTripValuePropertyTest()
-  {
-    var byteArray = new Byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
-
-    var xml = "<root><el1>Something</el1></root>";
-    var xmlDocument = new XmlDocument();
-    xmlDocument.LoadXml(xml);
-
-    var valueTestCases =
-      new List<(Object value, Func<Object, Object, Boolean> predicate)>()
-      {
-        (true, Equals),
-        ((Byte) 42, Equals),
-        (byteArray, (p1, p2) => ((Byte[]) p1).SequenceEqual((Byte[]) p2)),
-
-        /* SqlParameter.Value coerces a character to a string. */
-        ('X', Equals),
-
-        /* SqlParameter.Value coerces a character array to a string. */
-        ("foo".ToCharArray(), Equals),
-
-        (DateTime.Now, Equals),
-        (DateTimeOffset.Now, Equals),
-        (DBNull.Value, (p1, p2) => Convert.IsDBNull(p1) && Convert.IsDBNull(p2)),
-        ((Decimal) 42.69, Equals),
-        ((Double) 42.69, Equals),
-        (Guid.NewGuid(), (p1, p2) => ((Guid) p1).Equals((Guid) p2)),
-        ((Int16) 42, Equals),
-        ((Int32) 42, Equals),
-        ((Int64) 42, Equals),
-        ((Single) 42.69, Equals),
-        ("foo", Equals),
-        (TimeSpan.FromDays(69), Equals),
-        (new SqlBinary(byteArray), (p1, p2) => ((SqlBinary) p1).Value.SequenceEqual(((SqlBinary) p2).Value)),
-        (new SqlBoolean(true), (p1, p2) => ((SqlBoolean) p1).Value == ((SqlBoolean) p2).Value),
-        (new SqlByte(42), (p1, p2) => ((SqlByte) p1).Value == ((SqlByte) p2).Value),
-        (new SqlBytes(byteArray), (p1, p2) => ((SqlBytes) p1).Value.SequenceEqual(((SqlBytes) p2).Value)),
-        (new SqlChars("foo".ToCharArray()), (p1, p2) => ((SqlChars) p1).Value.SequenceEqual(((SqlChars) p2).Value)),
-        (new SqlDateTime(DateTime.Now), (p1, p2) => ((SqlDateTime) p1).Value == ((SqlDateTime) p2).Value),
-        (new SqlDecimal(42), (p1, p2) => ((SqlDecimal) p1).Value == ((SqlDecimal) p2).Value),
-        (new SqlDouble(42.69), (p1, p2) => ((SqlDouble) p1).Value == ((SqlDouble) p2).Value),
-        (new SqlGuid(Guid.NewGuid()), (p1, p2) => ((SqlGuid) p1).Value.Equals(((SqlGuid) p2).Value)),
-        (new SqlInt16(42), (p1, p2) => ((SqlInt16) p1).Value == ((SqlInt16) p2).Value),
-        (new SqlInt32(42), (p1, p2) => ((SqlInt32) p1).Value == ((SqlInt32) p2).Value),
-        (new SqlInt64(42), (p1, p2) => ((SqlInt64) p1).Value == ((SqlInt64) p2).Value),
-        (new SqlMoney(42.69), (p1, p2) => ((SqlMoney) p1).Value == ((SqlMoney) p2).Value),
-        (new SqlSingle(42.69), (p1, p2) => ((SqlSingle) p1).Value == ((SqlSingle) p2).Value),
-        (new SqlString("foo"), (p1, p2) => ((SqlString) p1).Value == ((SqlString) p2).Value),
-        (new SqlXml(new XmlTextReader(xml, XmlNodeType.Document, null)), (p1, p2) => ((SqlXml) p1).Value == ((SqlXml) p2).Value)
-      };
-
-    foreach (var (value, predicate) in valueTestCases)
-    {
-      var expectedSqlParameter = new SqlParameter() { Value = value };
-      RoundTripSqlParameter(expectedSqlParameter, this.CompareRoundTripValueProperty);
-    }
   }
 }
 

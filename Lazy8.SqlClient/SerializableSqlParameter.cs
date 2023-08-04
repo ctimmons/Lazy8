@@ -108,8 +108,7 @@ public class SerializableSqlParameter
          - When either Value or SqlValue is set, both DbType and SqlDbType are also set
            (if possible - see below).
          - Setting Value to a Char or Char[] value will silently convert Value to a string.
-         - When either Value or SqlValue is set to an Sql* value, they both refer to
-           that value.
+         - When either Value or SqlValue is set to an Sql* value, they both refer to that value.
          - When either Value or SqlValue is set to a non-Sql* value that maps to an
            Sql* value, Value will contain the non-Sql* value, and SqlValue will contain the
            Sql* value.  For example, setting Value to an ordinary string causes SqlValue to be set
@@ -128,8 +127,8 @@ public class SerializableSqlParameter
            than setting those properties to DbNull.Value. (See the "Remarks" section for
            either of those two properties for an explanation.)
 
-           https://docs.microsoft.com/en-us/dotnet/api/microsoft.data.sqlclient.sqlparameter.sqlvalue?view=sqlclient-dotnet-standard-4.0
-           https://docs.microsoft.com/en-us/dotnet/api/microsoft.data.sqlclient.sqlparameter.value?view=sqlclient-dotnet-standard-4.0    
+           https://docs.microsoft.com/en-us/dotnet/api/microsoft.data.sqlclient.sqlparameter.sqlvalue
+           https://docs.microsoft.com/en-us/dotnet/api/microsoft.data.sqlclient.sqlparameter.value
 
        Given all of this, the easiest path is to ignore DbType and SqlValue.  Both are set
        by other properties to correct values, and neither adds any real functionality,
@@ -297,13 +296,13 @@ public class SerializableSqlParameter
     }
     else if (sqlParameter.Value is DateTime datetime)
     {
-      /* Prepending a tilde to prevent Newtonsoft's JSON.Net from screwing things up. */
+      /* Prepending a tilde to prevent Newtonsoft's JSON.Net from screwing things up during deserialization. */
       this.Value = "~" + datetime.ToString("O", CultureInfo.InvariantCulture);
       this.ValueType = _datetime;
     }
     else if (sqlParameter.Value is DateTimeOffset datetimeOffset)
     {
-      /* Prepending a tilde to prevent Newtonsoft's JSON.Net from screwing things up. */
+      /* Prepending a tilde to prevent Newtonsoft's JSON.Net from screwing things up during deserialization. */
       this.Value = "~" + datetimeOffset.ToString("O", CultureInfo.InvariantCulture);
       this.ValueType = _datetimeOffset;
     }
@@ -354,7 +353,7 @@ public class SerializableSqlParameter
     }
     else if (sqlParameter.Value is TimeSpan timespan)
     {
-      /* Prepending a tilde to prevent Newtonsoft's JSON.Net from screwing things up. */
+      /* Prepending a tilde to prevent Newtonsoft's JSON.Net from screwing things up during deserialization. */
       this.Value = "~" + timespan.ToString("c", CultureInfo.InvariantCulture);
       this.ValueType = _timespan;
     }
@@ -385,7 +384,7 @@ public class SerializableSqlParameter
     }
     else if (sqlParameter.Value is SqlDateTime sqlDateTime)
     {
-      /* Prepending a tilde to prevent Newtonsoft's JSON.Net from screwing things up. */
+      /* Prepending a tilde to prevent Newtonsoft's JSON.Net from screwing things up during deserialization. */
       this.Value = "~" + sqlDateTime.Value.ToString("O", CultureInfo.InvariantCulture);
       this.ValueType = _sqlDateTime;
     }
@@ -470,30 +469,31 @@ public class SerializableSqlParameter
     /* After deserializing a SerializableSqlParameter, call this
        method to get the underlying SqlParameter. */
 
-    SqlParameter result = new();
+    SqlParameter result = new()
+    {
+      /* Note that SqlParameter's DbType and SqlValue properties are not serialized.
+         See the comments at the beginning of this class as to why these two
+         properties can and should be ignored. */
 
-    /* Note that SqlParameter's DbType and SqlValue properties are not serialized.
-       See the comments at the beginning of this class as to why these two
-       properties can and should be ignored. */
-
-    result.CompareInfo = (SqlCompareOptions) Enum.Parse(typeof(SqlCompareOptions), this.CompareInfo, ignoreCase: true);
-    result.Direction = (ParameterDirection) Enum.Parse(typeof(ParameterDirection), this.Direction, ignoreCase: true);
-    result.ForceColumnEncryption = Boolean.Parse(this.ForceColumnEncryption);
-    result.IsNullable = Boolean.Parse(this.IsNullable);
-    result.LocaleId = Convert.ToInt32(this.LocaleId);
-    result.Offset = Convert.ToInt32(this.Offset);
-    result.ParameterName = this.ParameterName;
-    result.Precision = Convert.ToByte(this.Precision);
-    result.Scale = Convert.ToByte(this.Scale);
-    result.Size = Convert.ToInt32(this.Size);
-    result.SourceColumn = this.SourceColumn;
-    result.SourceColumnNullMapping = Boolean.Parse(this.SourceColumnNullMapping);
-    result.SourceVersion = (DataRowVersion) Enum.Parse(typeof(DataRowVersion), this.SourceVersion, ignoreCase: true);
-    result.TypeName = this.TypeName;
-    result.UdtTypeName = this.UdtTypeName;
-    result.XmlSchemaCollectionDatabase = this.XmlSchemaCollectionDatabase;
-    result.XmlSchemaCollectionName = this.XmlSchemaCollectionName;
-    result.XmlSchemaCollectionOwningSchema = this.XmlSchemaCollectionOwningSchema;
+      CompareInfo = (SqlCompareOptions) Enum.Parse(typeof(SqlCompareOptions), this.CompareInfo, ignoreCase: true),
+      Direction = (ParameterDirection) Enum.Parse(typeof(ParameterDirection), this.Direction, ignoreCase: true),
+      ForceColumnEncryption = Boolean.Parse(this.ForceColumnEncryption),
+      IsNullable = Boolean.Parse(this.IsNullable),
+      LocaleId = Convert.ToInt32(this.LocaleId),
+      Offset = Convert.ToInt32(this.Offset),
+      ParameterName = this.ParameterName,
+      Precision = Convert.ToByte(this.Precision),
+      Scale = Convert.ToByte(this.Scale),
+      Size = Convert.ToInt32(this.Size),
+      SourceColumn = this.SourceColumn,
+      SourceColumnNullMapping = Boolean.Parse(this.SourceColumnNullMapping),
+      SourceVersion = (DataRowVersion) Enum.Parse(typeof(DataRowVersion), this.SourceVersion, ignoreCase: true),
+      TypeName = this.TypeName,
+      UdtTypeName = this.UdtTypeName,
+      XmlSchemaCollectionDatabase = this.XmlSchemaCollectionDatabase,
+      XmlSchemaCollectionName = this.XmlSchemaCollectionName,
+      XmlSchemaCollectionOwningSchema = this.XmlSchemaCollectionOwningSchema
+    };
 
     switch (this.ValueType)
     {
@@ -516,11 +516,13 @@ public class SerializableSqlParameter
         result.Value = this.Value.ToCharArray();
         break;
       case _datetime:
-        /* Stripping the tilde added during serialization to prevent Newtonsoft's JSON.Net from screwing things up. */
+        /* Strip off the leading tilde added during serialization. The tilde
+           was added to prevent Newtonsoft's JSON.Net from screwing things up. */
         result.Value = DateTime.ParseExact(this.Value[1..], "O", CultureInfo.InvariantCulture);
         break;
       case _datetimeOffset:
-        /* Stripping the tilde added during serialization to prevent Newtonsoft's JSON.Net from screwing things up. */
+        /* Strip off the leading tilde added during serialization. The tilde
+           was added to prevent Newtonsoft's JSON.Net from screwing things up. */
         result.Value = DateTimeOffset.ParseExact(this.Value[1..], "O", CultureInfo.InvariantCulture);
         break;
       case _dbnull:
@@ -551,7 +553,8 @@ public class SerializableSqlParameter
         result.Value = this.Value;
         break;
       case _timespan:
-        /* Stripping the tilde added during serialization to prevent Newtonsoft's JSON.Net from screwing things up. */
+        /* Strip off the leading tilde added during serialization. The tilde
+           was added to prevent Newtonsoft's JSON.Net from screwing things up. */
         result.Value = TimeSpan.ParseExact(this.Value[1..], "c", CultureInfo.InvariantCulture);
         break;
       case _sqlBinary:
@@ -570,7 +573,8 @@ public class SerializableSqlParameter
         result.Value = new SqlChars(this.Value.ToCharArray());
         break;
       case _sqlDateTime:
-        /* Stripping the tilde added during serialization to prevent Newtonsoft's JSON.Net from screwing things up. */
+        /* Strip off the leading tilde added during serialization. The tilde
+           was added to prevent Newtonsoft's JSON.Net from screwing things up. */
         result.Value = new SqlDateTime(DateTime.ParseExact(this.Value[1..], "O", CultureInfo.InvariantCulture));
         break;
       case _sqlDecimal:
@@ -616,6 +620,7 @@ public class SerializableSqlParameter
        It's possible the owner of the deserialized SqlParameter instance chose a different value for
        SqlDbType.  Let the owner's choice override the calculated SqlDbType value by assigning
        SqlDbType *after* setting Value. */
+
     result.SqlDbType = (SqlDbType) Enum.Parse(typeof(SqlDbType), this.SqlDbType, ignoreCase: true);
 
     return result;

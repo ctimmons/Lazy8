@@ -294,6 +294,12 @@ GO
   }
 
   [Test]
+  public void CheckConnectionStringTest()
+  {
+
+  }
+
+  [Test]
   public void GetSchemaTablesTest()
   {
   }

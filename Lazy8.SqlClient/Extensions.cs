@@ -92,17 +92,25 @@ public static class SqlServerExtensionMethods
   /// <returns>An SqlConnection instance.</returns>
   public static SqlConnection GetClone(this SqlConnection originalConnection)
   {
+    /* Why clone the connection?  Why not just create a new connection like this:
+    
+         return new SqlConnection(originalConnection.ConnectionString);
+    
+       Because using this approach won't copy any of originalConnection's modified properties,
+       whereas cloning will (with exceptions noted below). */
+
     var clonedConnection = (SqlConnection) ((ICloneable) originalConnection).Clone();
 
     /* clonedConnection will always start out with a State of 'Closed', regardless of what
-       originalConnection's State is. */
+       originalConnection's State is.  Ensure clonedConnection's State property correctly
+       reflects originalConnection's State property. */
 
     if ((originalConnection.State == ConnectionState.Connecting) || (originalConnection.State == ConnectionState.Open))
       clonedConnection.Open();
 
     /* BUG WORKAROUND
 
-       The current help entries for both the .NetFx and .Net Core libraries for SqlConnection.Clone() state:
+       The current (August 2023) help entries for both the .NetFx and .Net Core libraries for SqlConnection.Clone() state:
 
          "This member is only supported by the .NET Compact Framework."
 
@@ -130,7 +138,10 @@ public static class SqlServerExtensionMethods
 
     if (clonedConnection.Database != originalConnection.Database)
       /* Don't check to see if clonedConnection is open.  Just let ChangeDatabase()
-         throw an InvalidOperationException if clonedConnection isn't open. */
+         throw an InvalidOperationException if clonedConnection isn't open.
+
+         (clonedConnection's State *should* be open (see the previous line of code), but ADO.Net's implementation
+         has so many corner cases it's possible that clonedConnection is closed at this point). */
       clonedConnection.ChangeDatabase(originalConnection.Database);
 
     return clonedConnection;
