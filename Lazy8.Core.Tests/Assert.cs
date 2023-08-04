@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 using NUnit.Framework;
 
@@ -182,6 +183,46 @@ public class AssertTests
     value = 42;
     Assert.That(() => value.BetweenExclusive(lowerBound, upperBound), Throws.TypeOf<ArgumentOutOfRangeException>());
     Assert.That(() => value.Name(nameof(value)).BetweenExclusive(lowerBound, upperBound), Throws.TypeOf<ArgumentOutOfRangeException>());
+  }
+
+  [Test]
+  public void DirectoryExistsTest()
+  {
+    var nameOfDirectoryThatExists = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+    var nameOfDirectoryThatDoesNotExist = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+    Directory.CreateDirectory(nameOfDirectoryThatExists);
+    try
+    {
+      Assert.That(() => nameOfDirectoryThatExists.DirectoryExists(), Throws.Nothing);
+      Assert.That(() => nameOfDirectoryThatExists.Name(nameof(nameOfDirectoryThatExists)).DirectoryExists(), Throws.Nothing);
+
+      Assert.That(() => nameOfDirectoryThatDoesNotExist.DirectoryExists(), Throws.TypeOf<ArgumentException>());
+      Assert.That(() => nameOfDirectoryThatDoesNotExist.Name(nameof(nameOfDirectoryThatExists)).DirectoryExists(), Throws.TypeOf<ArgumentException>());
+    }
+    finally
+    {
+      Directory.Delete(nameOfDirectoryThatExists);
+    }
+  }
+
+  [Test]
+  public void FileExistsTest()
+  {
+    var nameOfFileThatExists = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+    var nameOfFileThatDoesNotExist = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+    FileUtils.CreateEmptyFile(nameOfFileThatExists, OverwriteFile.Yes);
+    try
+    {
+      Assert.That(() => nameOfFileThatExists.FileExists(), Throws.Nothing);
+      Assert.That(() => nameOfFileThatExists.Name(nameof(nameOfFileThatExists)).FileExists(), Throws.Nothing);
+
+      Assert.That(() => nameOfFileThatDoesNotExist.FileExists(), Throws.TypeOf<ArgumentException>());
+      Assert.That(() => nameOfFileThatDoesNotExist.Name(nameof(nameOfFileThatExists)).FileExists(), Throws.TypeOf<ArgumentException>());
+    }
+    finally
+    {
+      File.Delete(nameOfFileThatExists);
+    }
   }
 }
 
