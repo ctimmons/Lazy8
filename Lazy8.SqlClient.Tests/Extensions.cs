@@ -5,6 +5,7 @@
 
 using System;
 using System.Data;
+using System.Linq;
 
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -312,6 +313,31 @@ GO
   [Test]
   public void GetSchemaTablesTest()
   {
+    var sql = @"
+CREATE PROCEDURE dbo.Foo(@bar INT, @baz DATETIME)
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  SELECT 'Foo', @bar;
+  SELECT @baz;
+END;";
+
+    SqlParameter[] parameters =
+      new[]
+      {
+        new SqlParameter() { ParameterName = "@bar", SqlDbType = SqlDbType.Int, Value = 42 },
+        new SqlParameter() { ParameterName = "@baz", SqlDbType = SqlDbType.DateTime, Value = new DateTime(1999, 1, 1) }
+      };
+
+    _connection.ExecuteNonQuery(sql);
+    var schemaTables = _connection.GetSchemaTables(CommandType.StoredProcedure, "dbo.Foo", parameters);
+
+    /* All that really needs to be tested is how many schema tables were returned.
+       Testing the contents and structure of the returned schema tables would just be 
+       duplicating Microsoft.Data.SqlClient's unit tests. */
+
+    Assert.That(schemaTables.Count() == 2);
   }
 }
 

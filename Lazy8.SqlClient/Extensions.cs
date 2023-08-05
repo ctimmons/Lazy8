@@ -39,6 +39,12 @@ public static class SqlServerExtensionMethods
       connection.Open();
   }
 
+  public static IEnumerable<DataTable> GetSchemaTables(this SqlConnection originalConnection, CommandType commandType, String commandText, SqlParameterCollection parameters = null) =>
+    /* If parameters are provided, they have to be cloned because
+       an SqlParameter cannot be a member of multiple SqlParameterCollections. */
+    GetSchemaTables(originalConnection, commandType, commandText,
+      (parameters == null) ? Array.Empty<SqlParameter>() : parameters.Cast<ICloneable>().Select(p => (SqlParameter) p.Clone()).ToArray());
+  
   /// <summary>
   /// Return one or more schema tables for the given commandText. commandText may return more than one result set, and each result set
   /// has a corresponding schema table describing the result set's structure.
@@ -48,9 +54,9 @@ public static class SqlServerExtensionMethods
   /// <param name="originalConnection">A valid SqlConnection instance.</param>
   /// <param name="commandType">A CommandType of StoredProcedure or Text.  Any other value will throw an ArgumentException.</param>
   /// <param name="commandText">A stored procedure name (for commandType == CommandType.StoredProcedure), or a valid T-SQL query (for commandType == CommandType.Text). Both are allowed to return multiple result sets.</param>
-  /// <param name="parameters">Defaults to null. If provided, the parameters are cloned and the clones assigned to this method's internal SqlConnection instance.</param>
+  /// <param name="parameters">Defaults to null. If provided, the parameters are cloned and the clones assigned to this method's internal SqlCommand instance.</param>
   /// <returns>An IEnumerable&lt;DataTable&gt; containing one or more schema tables.</returns>
-  public static IEnumerable<DataTable> GetSchemaTables(this SqlConnection originalConnection, CommandType commandType, String commandText, SqlParameterCollection parameters = null)
+  public static IEnumerable<DataTable> GetSchemaTables(this SqlConnection originalConnection, CommandType commandType, String commandText, params SqlParameter[] parameters)
   {
     originalConnection.Name(nameof(originalConnection)).NotNull();
     commandText.Name(nameof(commandText)).NotNullEmptyOrOnlyWhitespace();
@@ -65,10 +71,8 @@ public static class SqlServerExtensionMethods
 
       using (var command = new SqlCommand() { Connection = clonedConnection, CommandType = commandType, CommandText = commandText })
       {
-        /* If parameters are provided, they have to be cloned because
-           an SqlParameter cannot be a member of multiple SqlParameterCollections. */
-        if (parameters != null)
-          command.Parameters.AddRange(parameters.Cast<ICloneable>().Select(p => (SqlParameter) p.Clone()).ToArray());
+        if (parameters is not null)
+          command.Parameters.AddRange(parameters);
 
         using (var reader = command.ExecuteReader(CommandBehavior.SchemaOnly | CommandBehavior.KeyInfo))
         {
