@@ -455,13 +455,20 @@ GO")
   /// <returns>A String as described in the summary.</returns>
   public static String GetTSqlDdl(this DataSet dataSet)
   {
+    var schemaSqlTemplate = @"
+IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = '{0}')
+BEGIN
+  CREATE SCHEMA [{0}];
+END;
+GO
+";
     var tables = dataSet.Tables.Cast<DataTable>();
     var createSchemasDdl =
       tables
       .Where(t => t.ExtendedProperties.Contains("schema"))
       .Select(t => t.ExtendedProperties["schema"].ToString())
       .Distinct()
-      .Select(s => $"CREATE SCHEMA [{s}];\nGO")
+      .Select(schemaName => String.Format(schemaSqlTemplate, schemaName))
       .Join("\n");
     var createTablesDdl = tables.Select(t => t.GetTSqlDdl()).Join("\n");
 
