@@ -171,18 +171,17 @@ public static class SqlServerExtensionMethods
   /// </summary>
   /// <param name="connection"><see cref="Microsoft.Data.SqlClient.SqlConnection">SqlConnection</see> the sql is sent to.  The connection must be opened before calling this method.</param>
   /// <param name="storedProcedureName">A valid stored procedure name.</param>
-  /// <param name="sqlParameters">An optional array of SqlParameters.  Defaults to null.</param>
+  /// <param name="parameters">An optional array of SqlParameters.  Defaults to null.</param>
   /// <returns>A DataSet.</returns>
-  public static DataSet GetDataSetFromStoredProcedure(this SqlConnection connection, String storedProcedureName, SqlParameter[] sqlParameters = null)
+  public static DataSet GetDataSetFromStoredProcedure(this SqlConnection connection, String storedProcedureName, params SqlParameter[] parameters)
   {
-    sqlParameters.Name(nameof(sqlParameters)).NotNull();
-
-    /* There's no need to check sqlParameters for emptiness because parameters in a stored procedure are optional. */
+    storedProcedureName.Name(nameof(storedProcedureName)).NotNullEmptyOrOnlyWhitespace();
 
     using (var command = new SqlCommand() { Connection = connection, CommandType = CommandType.StoredProcedure, CommandText = storedProcedureName })
     {
       command.Parameters.Clear();
-      command.Parameters.AddRange(sqlParameters);
+      if (parameters is not null)
+        command.Parameters.AddRange(parameters);
 
       return GetDataSet(command);
     }

@@ -18,7 +18,7 @@ public class GetTSqlBatchExtensionTests
 {
   private static (String testCase, IEnumerable<String> expectedResults) GetTestCaseData(String filename)
   {
-    /* Test cases are divided into sections, with a sequence of '--~' indicating the border between sections.
+    /* Test cases are divided into sections, with a sequence of '--~' acting as a separator between sections.
        The first section contains the T-SQL test case.  Subsequent sections contain the expected results
        (one or more T-SQL batches) after the test case has been split on its GO statements. */
 

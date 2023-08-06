@@ -9,7 +9,7 @@
           [Author's Note:  I hated having to write this code at all.  Microsoft already knows about some of the
           <a href="https://feedback.azure.com/forums/908035-sql-server/suggestions/32901208--go-in-2nd-half-of-nested-block-comments-breaks-b">GO-related bugs</a>
           in the possible solutions listed below.  But they refuse to fix them or, in the alternative, open source
-          the relevant source code so I can fix them.  It makes a person gaze longingly at Linux and PostgreSQL.]
+          the relevant source code so I can fix them.]
         </para>
         <para>
           Executing a T-SQL batch file that contains multiple batches (separated by GO statements) isn't easy.
@@ -44,7 +44,7 @@
           when they hit a GO statement. At least three "out of the box" solutions are available.
         </para>
         <para>
-          The existent solutions are:
+          The extant solutions are:
           <list type="bullet">
             <item>
               <description>
@@ -86,7 +86,7 @@
           <h3>Solution</h3>
         <para>
           The only bug-free solution I could think of was to create this class.  It uses a lexical scanner to perform a single pass
-          of the T-SQL code, identifying and ignoring any comments it comes across.  All other text is copied to a string.
+          of the T-SQL code, identifying and ignoring any comments it encounters.  All other text is copied to a string.
           When the scanner encounters a GO statement, the number of GO repetitions is determined (i.e. is the statement
           "GO &lt;count&gt;", or just "GO"?).  If 'count' is greater than one, the T-SQL fragement is wrapped in a WHILE loop so it will
           be executed 'count' times.  If 'count' is one, or isn't present at all, the T-SQL fragement is simply added to the

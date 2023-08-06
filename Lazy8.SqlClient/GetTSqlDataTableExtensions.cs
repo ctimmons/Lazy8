@@ -16,11 +16,13 @@ namespace Lazy8.SqlClient;
 
 public enum StringColumnType { Char, NChar, VarChar, NVarChar }
 
-/// <summary>
-/// 
-/// </summary>
 public static class GetTSqlDataTableExtensions
 {
+  /* The AreDataTableContentsEqual() method below needs to sort the rows in
+     both of its DataTable parameters before comparing them.  This method
+     calculates how to most efficiently sort the DataTable, then returns a
+     comma separated string of the given DataTable's column names to sort on. */
+
   private static String GetColumnNamesForSorting(DataTable table)
   {
     var columns = table.Columns.Cast<DataColumn>();
@@ -38,7 +40,7 @@ public static class GetTSqlDataTableExtensions
     else if ((table.PrimaryKey != null) && table.PrimaryKey.Any())
       return table.PrimaryKey.Select(pk => pk.ColumnName).Join(",");
 
-    /* If there's no primary key, or none of the columns are unique,
+    /* If none of the columns are unique, or there's no primary key, then
        get a list of all of the columns and use them for sorting the table. */
 
     else
@@ -46,19 +48,31 @@ public static class GetTSqlDataTableExtensions
   }
 
   /// <summary>
-  /// 
+  /// Given two DataTables, return a Boolean indicating if their contents are equal.
+  /// Assumes the columns in both DataTables are in the same order.
   /// </summary>
-  /// <param name="table1"></param>
-  /// <param name="table2"></param>
-  /// <returns></returns>
-  public static Boolean AreTablesEqual(this DataTable table1, DataTable table2)
+  /// <param name="table1">A DataTable.</param>
+  /// <param name="table2">A DataTable.</param>
+  /// <returns>A Boolean.</returns>
+  public static Boolean AreDataTableContentsEqual(this DataTable table1, DataTable table2)
   {
-    if (table1.Rows.Count != table2.Rows.Count)
+    table1.Name(nameof(table1)).NotNull();
+    table2.Name(nameof(table2)).NotNull();
+
+    if (table1 == table2)
+      throw new ArgumentException(String.Format(Properties.Resources.ReferencingTheSameDataTable, nameof(table1), nameof(table2)));
+    else if ((table1.Rows.Count == 0) && (table2.Rows.Count == 0))
+      return true;
+    else if (table1.Rows.Count != table2.Rows.Count)
+      return false;
+    else if ((table1.Columns.Count == 0) && (table2.Columns.Count == 0))
+      return true;
+    else if (table1.Columns.Count != table2.Columns.Count)
       return false;
 
     /* Create views for both tables.  This allows for sorting the views without altering
-       the state of the underlying tables, resulting in much better performance (O(table1))
-       as opposed to comparing two unsorted tables (O(table1 * table2)). */
+       the state of the underlying tables, resulting in much better performance (O(table1.Rows.Count))
+       as opposed to comparing two unsorted tables (O(table1.Rows.Count * table2.Rows.Count)). */
 
     var view1 = new DataView(table1) { Sort = GetColumnNamesForSorting(table1) };
     var view2 = new DataView(table2) { Sort = GetColumnNamesForSorting(table2) };
@@ -128,6 +142,11 @@ public static class GetTSqlDataTableExtensions
     return $"[{schema}].[{table.TableName}]";
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="table"></param>
+  /// <returns></returns>
   public static String GetTSqlDml(this DataTable table)
   {
     var columns =
@@ -394,15 +413,22 @@ GO")
   /// <para>
   /// The recognized metadata keys (case sensitive) for DataColumns are:
   /// </para>
-  /// <list type="bullet">
+  /// <list type="table">
+  ///   <listheader>
+  ///     <term>Key</term>
+  ///     <description>Valid Values</description>
+  ///   </listheader>
   ///   <item>
-  ///     <description>excluded</description>
+  ///     <term>excluded</term>
+  ///     <description>Applicable for both DataTable and DataColumn.  No value necessary.  The presence of this key will omit the table or column from code generation.</description>
   ///   </item>
   ///   <item>
-  ///     <description>primary key direction</description>
+  ///     <term>primary key direction</term>
+  ///     <description>DataColumn only.  Valid values are "asc" and "desc" (case sensitive).</description>
   ///   </item>
   ///   <item>
-  ///     <description>type</description>
+  ///     <term>type</term>
+  ///     <description></description>
   ///   </item>
   /// </list>
   /// <example>
