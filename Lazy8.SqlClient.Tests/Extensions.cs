@@ -44,6 +44,8 @@ USE Lazy8TestDB;
 GO
 ";
 
+  private const String _createLazy8TestDmlSql = $@"";
+
   [SetUp]
   public void Init()
   {
@@ -59,7 +61,7 @@ GO
     var sql = $@"
 {_dropLazy8TestDatabaseSql}
 {_createLazy8TestDatabaseSql}
-{_dataSet.GetTSqlDdl()}";
+{_createLazy8TestDmlSql}";
 
     _connection.ExecuteTSqlBatches(sql);
   }
