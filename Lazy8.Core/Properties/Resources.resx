@@ -244,6 +244,12 @@
   <data name="StringUtils_RegexFilemask" xml:space="preserve">
     <value>'{0}' does not contain either the * or ? characters.</value>
   </data>
+  <data name="Utils_CannotAssignNullToProperty" xml:space="preserve">
+    <value>A null value cannot be assigned to the '{0}' property.</value>
+  </data>
+  <data name="Utils_CannotAssignValueLessThanNegativeOne" xml:space="preserve">
+    <value>A value of less than -1 cannot be assigned to the TimeoutInSeconds property.</value>
+  </data>
   <data name="Utils_NoDeclaringTypeFoundOnStackFrame" xml:space="preserve">
     <value>No declaring type could be found for stack frame {0}.</value>
   </data>
@@ -256,7 +262,7 @@
   <data name="Utils_ProcessCouldNotBeStarted" xml:space="preserve">
     <value>A call to Process.Start() returned null.  The command '{0}' could not be executed.  It may be a URL, or there's already a process running that command.</value>
   </data>
-  <data name="Utils_UnknownRunProcessType" xml:space="preserve">
-    <value>Unknown RunProcessType value ({0}).</value>
+  <data name="Utils_ProcessTimedOut" xml:space="preserve">
+    <value>The call to '{0}' did not complete within the timeout period of {1} seconds.</value>
   </data>
 </root>

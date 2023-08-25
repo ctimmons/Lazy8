@@ -9,41 +9,208 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 
 namespace Lazy8.Core;
 
-/* A collection of miscellaneous code that doesn't really fit anywhere else. */
+/// <summary>
+/// A class passed to the GeneralUtils.RunProcess() method whose properties direct that method's behavior.
+/// </summary>
+public class RunProcessInfo
+{
+  /// <summary>
+  /// The command that is to be executed.  Do not include arguments in this command string - use the Arguments property for that.
+  /// <para>There is no default for this property.  If this property is null, contains only
+  /// an empty string, or a string consisting entirely of whitespace, then an exception will be thrown
+  /// when the RunProcess() method is executed.</para>
+  /// </summary>
+  public String Command { get; set; }
 
-public enum RunProcessType { IgnoreResult, ReturnResult }
+  private String _arguments = "";
+  /// <summary>
+  /// Contains the arguments that should be passed to Command when it is executed.
+  /// <para>Defaults to an empty string.  Upon assignment, the beginning and end of this property is trimmed.
+  /// Attempting to assign null will throw an ArgumentException.</para>
+  /// </summary>
+  public String Arguments
+  {
+    get
+    {
+      return this._arguments;
+    }
+    set
+    {
+      if (value is null)
+        throw new ArgumentException(String.Format(Properties.Resources.Utils_CannotAssignNullToProperty, nameof(this.Arguments)));
+      else
+        this._arguments = value.Trim();
+    }
+  }
 
+  private Int32 _timeoutInSeconds = Timeout.Infinite;
+  /// <summary>
+  /// The maximum allowed time (in seconds) the Command is allowed to run before timing out.
+  /// <para>The default value is Timeout.Infinite (-1).  A value of zero specifies an immediate return
+  /// (in general, that's usually not the desired behavior).
+  /// Attempting to assign a value of less than -1 will throw an ArgumentException.</para>
+  /// </summary>
+  public Int32 TimeoutInSeconds
+  {
+    get
+    {
+      return this._timeoutInSeconds;
+    }
+    set
+    {
+      if (value < Timeout.Infinite)
+        throw new ArgumentException(Properties.Resources.Utils_CannotAssignValueLessThanNegativeOne);
+      else
+        this._timeoutInSeconds = value;
+    }
+  }
+
+  /// <summary>
+  /// Readonly property indicating the process's timeout in milliseconds.
+  /// <para>This property is calculated from TimeoutInSeconds's value, and is only meaningful for TimeoutInSeconds
+  /// values of zero or greater.  If TimeoutInSeconds is set to Timeout.Infinite (-1), this property will also be set to -1.</para>
+  /// </summary>
+  public Int32 TimeoutInMilliseconds => Math.Max(this.TimeoutInSeconds * 1000, Timeout.Infinite);
+
+  private Predicate<String> _stdOutPredicate = line => true;
+  /// <summary>
+  /// A Predicate that takes a String and returns a Boolean value.
+  /// <para>The data Command sends to stdout is line oriented.  This predicate is applied to each line of that ouput.
+  /// If the predicate returns true, the line is included in the result returned by the RunProcess() method.  Likewise, if the
+  /// predicate returns false, the line of text is not included in RunProcess()'s return value.</para>
+  /// <para>This property defaults to the simple lambda '(String line) => true'.  The property may be set to a different
+  /// lambda, but may not be set to null.  Attempting to assign null will throw an ArgumentException.</para>
+  /// </summary>
+  public Predicate<String> StdOutPredicate
+  {
+    get
+    {
+      return this._stdOutPredicate;
+    }
+    set
+    {
+      if (value is null)
+        throw new ArgumentException(String.Format(Properties.Resources.Utils_CannotAssignNullToProperty, nameof(this.StdOutPredicate)));
+      else
+        this._stdOutPredicate = value;
+    }
+  }
+
+  private Predicate<String> _stdErrPredicate = line => true;
+  /// <summary>
+  /// A Predicate that takes a String and returns a Boolean value.
+  /// <para>The data Command sends to stderr is line oriented.  This predicate is applied to each line of that ouput.
+  /// If the predicate returns true, the line is included in the result returned by the RunProcess() method.  Likewise, if the
+  /// predicate returns false, the line of text is not included in RunProcess()'s return value.</para>
+  /// <para>This property defaults to the simple lambda '(String line) => true'.  The property may be set to a different
+  /// lambda, but may not be set to null.  Attempting to assign null will throw an ArgumentException.</para>
+  /// </summary>
+  public Predicate<String> StdErrPredicate
+  {
+    get
+    {
+      return this._stdErrPredicate;
+    }
+    set
+    {
+      if (value is null)
+        throw new ArgumentException(String.Format(Properties.Resources.Utils_CannotAssignNullToProperty, nameof(this.StdErrPredicate)));
+      else
+        this._stdErrPredicate = value;
+    }
+  }
+}
+
+/// <summary>
+/// A record struct returned by the RunProcess() method upon successful completion.
+/// </summary>
+/// <param name="ExitCode">An Int32 containing the exit code of the executed process.</param>
+/// <param name="StdOutput">A String containing the filtered output of the executed process's stdout stream.
+/// (See RunProcessInfo.StdOutPredicate for a description of the filter lambda that can be applied.  The default
+/// captures all of the process's stdout data.)</param>
+/// <param name="StdError">A String containing the filtered output of the executed process's stderr stream.
+/// (See RunProcessInfo.StdErrPredicate for a description of the filter lambda that can be applied.  The default
+/// captures all of the process's stdout data.)</param>
+public readonly record struct RunProcessOutput(Int32 ExitCode, String StdOutput, String StdError);
+
+/// <summary>
+/// A collection of methods that don't seem to fit anywhere else in this library.
+/// </summary>
 public static class GeneralUtils
 {
   /// <summary>
-  /// Executes <paramref name="command"/> (plus any <paramref name="arguments"/>) in a system <see cref="Process"/>.  The process's output can be ignored or returned
-  /// depending on the value of <paramref name="runProcessType"/>.
-  /// <para>By default, the process will wait for an infinite amount of time to complete the operation.
-  /// This behavior can be changed by passing a postive value in <paramref name="timeoutInMilliseconds"/>.</para>
+  /// Executes <paramref name="command"/> in a system <see cref="Process"/>.
+  /// <para>By default, the process will wait for an infinite amount of time to complete the operation.</para>
   /// </summary>
   /// <param name="command">A <see cref="String"/> containing the command to execute.</param>
-  /// <param name="arguments">An optional list of arguments to pass to <paramref name="command"/>.</param>
-  /// <param name="runProcessType">A <see cref="RunProcessType"/> enumeration value indicating whether to ignore or return the result created by the process.</param>
-  /// <returns>If the result is to be ignored, null is returned.  Otherwise, a <see cref="String"/> containing the result created by the process is returned.</returns>
-  public static (Int32 ExitCode, String Output) RunProcess(String command, String arguments, RunProcessType runProcessType, Int32 timeoutInMilliseconds = Timeout.Infinite)
+  /// <returns>A RunProcessOutput struct containing the process's exit code, standard output, and standard error output.</returns>
+  public static RunProcessOutput RunProcess(String command) =>
+    RunProcess(new RunProcessInfo() { Command = command });
+
+  /// <summary>
+  /// Executes <paramref name="command"/> in a system <see cref="Process"/>.
+  /// <para>By default, the process will wait for an infinite amount of time to complete the operation.
+  /// This behavior can be changed by passing a postive value in <paramref name="timeoutInSeconds"/>.</para>
+  /// </summary>
+  /// <param name="command">A <see cref="String"/> containing the command to execute.</param>
+  /// <param name="timeoutInSeconds">An Int32 indicating the timeout in seconds.  Values less than Timeout.Infinite (-1) raise an exception.</param>
+  /// <returns>A RunProcessOutput struct containing the process's exit code, standard output, and standard error output.</returns>
+  public static RunProcessOutput RunProcess(String command, Int32 timeoutInSeconds = Timeout.Infinite) =>
+    RunProcess(new RunProcessInfo() { Command = command, TimeoutInSeconds = timeoutInSeconds });
+
+  /// <summary>
+  /// Executes <paramref name="command"/> (plus any <paramref name="arguments"/>) in a system <see cref="Process"/>.
+  /// <para>By default, the process will wait for an infinite amount of time to complete the operation.
+  /// This behavior can be changed by passing a postive value in <paramref name="timeoutInSeconds"/>.</para>
+  /// </summary>
+  /// <param name="command">A <see cref="String"/> containing the command to execute.</param>
+  /// <param name="arguments">An optional String of arguments to pass to <paramref name="command"/> (can be null or an empty string).</param>
+  /// <param name="timeoutInSeconds">An Int32 indicating the timeout in seconds.  Values less than Timeout.Infinite (-1) raise an exception.</param>
+  /// <returns>A RunProcessOutput struct containing the process's exit code, standard output, and standard error output.</returns>
+  public static RunProcessOutput RunProcess(String command, String arguments, Int32 timeoutInSeconds = Timeout.Infinite) =>
+    RunProcess(new RunProcessInfo() { Command = command, Arguments = arguments, TimeoutInSeconds = timeoutInSeconds });
+
+  /// <summary>
+  /// Executes <paramref name="runProcessInfo.Command"/> (plus any <paramref name="runProcessInfo.Arguments"/>) in a system <see cref="Process"/>.
+  /// <para>By default, the process will wait for an infinite amount of time to complete the operation.
+  /// This behavior can be changed by passing a postive value in <paramref name="runProcessInfo.TimeoutInSeconds"/>.</para>
+  /// <para>runProcessInfo also provides two Boolean predicates that allow for the filtering of the stdout and stderr
+  /// results generated by the program.</para>
+  /// </summary>
+  /// <param name="runProcessInfo">An instance of RunProcessInfo.  The instance's Command property must be provided, and a TimeoutInSeconds
+  /// value greater than or equal to Timeout.Infinite (-1).  The other properties are optional.</param>
+  /// <returns>A RunProcessOutput struct containing the process's exit code, standard output, and standard error output.</returns>
+  public static RunProcessOutput RunProcess(RunProcessInfo runProcessInfo)
   {
-    command.Name(nameof(command)).NotNull().NotNullEmptyOrOnlyWhitespace().FileExists();
-    timeoutInMilliseconds.Name(nameof(timeoutInMilliseconds)).GreaterThanOrEqualTo(Timeout.Infinite);
+    runProcessInfo.Command.Name(nameof(runProcessInfo.Command)).NotNullEmptyOrOnlyWhitespace();
 
-    command = Path.GetFullPath(command);
-    arguments ??= "";
+    /* RunProcess() is a synchronous method.  To run an external process in an ASYNCHRONOUS manner is non-trivial.
+       Below are links to some code and discussions about how to do that.
+    
+       I'm not going to bother implementing an asynchronous version of this method until I reeeeeaaaaallly need to.
+       There are way too many ways subtle bugs can get introduced into such an algorithm.  A quick-n-dirty way to run this
+       method asynchronously is to wrap it in a Task.Run() call - the drawback being that it won't
+       be cancellable after the work is started.
+    
+       https://gist.github.com/AlexMAS/276eed492bc989e13dcce7c78b9e179d
+       https://gist.github.com/georg-jung/3a8703946075d56423e418ea76212745
+       https://stackoverflow.com/questions/470256/process-waitforexit-asynchronously */
 
-    // todo: expand to read stderr, include in output tuple (or struct/class). add param to allow combining stdout and stderr into Output member.
-    var psi =
-      new ProcessStartInfo()
+    StringBuilder stdout = new();
+    StringBuilder stderr = new();
+
+    ProcessStartInfo psi =
+      new()
       {
-        FileName = command,
-        Arguments = arguments,
-        RedirectStandardOutput = (runProcessType == RunProcessType.ReturnResult),
+        FileName = runProcessInfo.Command,
+        Arguments = runProcessInfo.Arguments,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
         UseShellExecute = false,
         CreateNoWindow = true
       };
@@ -51,35 +218,54 @@ public static class GeneralUtils
     using (var process = Process.Start(psi))
     {
       if (process == null)
-        throw new ArgumentException(String.Format(Properties.Resources.Utils_ProcessCouldNotBeStarted, $"{command} {arguments}".Trim()));
+        throw new Exception(String.Format(Properties.Resources.Utils_ProcessCouldNotBeStarted, $"{runProcessInfo.Command} {runProcessInfo.Arguments}".Trim()));
 
-      switch (runProcessType)
+      /* Use StringBuilder's Append(), not AppendLine(), method to add data to the stdout and stderr accumulators.
+         AppendLine() adds an Environment.NewLine to the end of the line, which is not something generated by the
+         program being called.  Append() has no such side-effects. */
+
+      process.OutputDataReceived += (_, e) => { if ((e.Data != null) && runProcessInfo.StdOutPredicate(e.Data)) stdout.Append(e.Data); };
+      process.BeginOutputReadLine();
+
+      process.ErrorDataReceived += (_, e) => { if ((e.Data != null) && runProcessInfo.StdErrPredicate(e.Data)) stderr.Append(e.Data); };
+      process.BeginErrorReadLine();
+
+      if (process.WaitForExit(runProcessInfo.TimeoutInMilliseconds))
       {
-        case RunProcessType.IgnoreResult:
-          process.WaitForExit(timeoutInMilliseconds);
-          process.WaitForExit();
-          return (process.ExitCode, null);
-        case RunProcessType.ReturnResult:
-          /* Avoid deadlocks by reading the entire standard output stream and
-             then waiting for the process to exit.  See the "Remarks" section
-             in the MSDN documentation:
-               https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput
-          */
-          var output = process.StandardOutput.ReadToEnd();
-          process.WaitForExit(timeoutInMilliseconds);
-          process.WaitForExit();
-          return (process.ExitCode, output);
-        default:
-          throw new ArgumentException(String.Format(Properties.Resources.Utils_UnknownRunProcessType, runProcessType));
+        /* This code might look a bit weird - why is WaitForExit() being
+           called immediately after a successful call to WaitForExit(timeoutInMilliseconds)?
+
+           It's because the ErrorDataReceived and OutputDataReceived event handlers
+           are asynchronous.  They are asychronous because they were redirected
+           via the asychronous methods BeginErrorReadLine() and BeginOutputReadLine().
+
+           From the "Remarks" section for WaitForExit():
+
+             "This overload ensures that all processing has been completed, including the handling
+             of asynchronous events for redirected standard output. You should use this overload
+             after a call to the WaitForExit(Int32) overload when standard output has been
+             redirected to asynchronous event handlers."
+
+           https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process.waitforexit
+        */
+
+        process.WaitForExit();
+
+        return new RunProcessOutput(process.ExitCode, stdout.ToString(), stderr.ToString());
+      }
+      else
+      {
+        throw new Exception(String.Format(Properties.Resources.Utils_ProcessTimedOut, $"{runProcessInfo.Command} {runProcessInfo.Arguments}".Trim(), runProcessInfo.TimeoutInSeconds));
       }
     }
   }
 
   /* See the Remarks section for Assembly.GetCallingAssembly() as to why
      MethodImplAttribute is needed.
-       (https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getcallingassembly?view=netframework-4.8#remarks)
+       
+       https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getcallingassembly
 
-     Tip: To get the correct name of an embedded resource, use ILSpy (http://www.ilspy.net/).
+     Tip: To get the correct name of an embedded resource, load the assembly into ILSpy (http://www.ilspy.net/).
           Look in the assembly's "Resources" folder. */
 
   /// <summary>

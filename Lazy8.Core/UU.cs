@@ -128,7 +128,7 @@ public partial class UU
     ms.Flush();
   }
 
-  [GeneratedRegex(@"^begin\s+\d+\s+(?<filename>.+?)$", RegexOptions.Singleline)]
+  [GeneratedRegex(@"^begin\s+\d+\s+(?<filename>.+?)\r?$", RegexOptions.Singleline)]
   private static partial Regex UuBeginHeaderRegex();
 
   private static String GetFilename(String line)

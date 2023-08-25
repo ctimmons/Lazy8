@@ -39,6 +39,17 @@ public static class SqlServerExtensionMethods
       connection.Open();
   }
 
+  /// <summary>
+  /// Return one or more schema tables for the given commandText. commandText may return more than one result set, and each result set
+  /// has a corresponding schema table describing the result set's structure.
+  /// <para>The format of the returned schema tables is described in the help entry for the
+  /// <a href="https://docs.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqldatareader.getschematable">SqlDataReader.GetSchemaTable()</a> method.</para>
+  /// </summary>
+  /// <param name="originalConnection">A valid SqlConnection instance.</param>
+  /// <param name="commandType">A CommandType of StoredProcedure or Text.  Any other value will throw an ArgumentException.</param>
+  /// <param name="commandText">A stored procedure name (for commandType == CommandType.StoredProcedure), or a valid T-SQL query (for commandType == CommandType.Text). Both are allowed to return multiple result sets.</param>
+  /// <param name="parameters">Defaults to null. If provided, the parameters are cloned and the clones assigned to this method's internal SqlCommand instance.</param>
+  /// <returns>An IEnumerable&lt;DataTable&gt; containing one or more schema tables.</returns>
   public static IEnumerable<DataTable> GetSchemaTables(this SqlConnection originalConnection, CommandType commandType, String commandText, SqlParameterCollection parameters = null) =>
     /* If parameters are provided, they have to be cloned because
        an SqlParameter cannot be a member of multiple SqlParameterCollections. */
@@ -54,7 +65,7 @@ public static class SqlServerExtensionMethods
   /// <param name="originalConnection">A valid SqlConnection instance.</param>
   /// <param name="commandType">A CommandType of StoredProcedure or Text.  Any other value will throw an ArgumentException.</param>
   /// <param name="commandText">A stored procedure name (for commandType == CommandType.StoredProcedure), or a valid T-SQL query (for commandType == CommandType.Text). Both are allowed to return multiple result sets.</param>
-  /// <param name="parameters">Defaults to null. If provided, the parameters are cloned and the clones assigned to this method's internal SqlCommand instance.</param>
+  /// <param name="parameters">Optional array of SqlParameter instances.</param>
   /// <returns>An IEnumerable&lt;DataTable&gt; containing one or more schema tables.</returns>
   public static IEnumerable<DataTable> GetSchemaTables(this SqlConnection originalConnection, CommandType commandType, String commandText, params SqlParameter[] parameters)
   {
@@ -439,24 +450,24 @@ public static class SqlServerExtensionMethods
     dbDataReader.GetValueOrDefault<T>(dbDataReader.GetOrdinal(columnName));
 
   /// <summary>
-  /// Generic method to get a value from a DbDataReader instance.
+  /// Generic method to get a value from a DbDataReader instance.  T must implement the IConvertible interface.
   /// </summary>
-  /// <typeparam name="T"></typeparam>
+  /// <typeparam name="T">T is a type that must implement the IConvertible interface.</typeparam>
   /// <param name="dbDataReader">A descendent of <see cref="System.Data.Common.DbDataReader">DbDataReader</see>.</param>
   /// <param name="columnIndex">A valid Int32 index of one of <see cref="System.Data.Common.DbDataReader">DbDataReader</see>'s columns.</param>
   /// <returns>Either a value or default value of type T.</returns>
   /// <exception cref="System.IndexOutOfRangeException">Thrown when columnIndex is out of range.</exception>
   public static T GetValueOrDefault<T>(this DbDataReader dbDataReader, Int32 columnIndex)
   {
+    if (dbDataReader.IsDBNull(columnIndex))
+      return default;
+
     var type = typeof(T);
     var underlyingType = Nullable.GetUnderlyingType(type);
     var isNullableType = (underlyingType != null);
     var value = dbDataReader[columnIndex];
 
-    return
-      Convert.IsDBNull(value)
-      ? default
-      : (T) Convert.ChangeType(value, isNullableType ? underlyingType : type);
+    return (T) Convert.ChangeType(value, isNullableType ? underlyingType : type);
   }
 
   /// <summary>

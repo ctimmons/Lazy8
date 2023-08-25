@@ -440,6 +440,24 @@ namespace Lazy8.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A null value cannot be assigned to the &apos;{0}&apos; property..
+        /// </summary>
+        public static string Utils_CannotAssignNullToProperty {
+            get {
+                return ResourceManager.GetString("Utils_CannotAssignNullToProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A value of less than -1 cannot be assigned to the TimeoutInSeconds property..
+        /// </summary>
+        public static string Utils_CannotAssignValueLessThanNegativeOne {
+            get {
+                return ResourceManager.GetString("Utils_CannotAssignValueLessThanNegativeOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No declaring type could be found for stack frame {0}..
         /// </summary>
         public static string Utils_NoDeclaringTypeFoundOnStackFrame {
@@ -476,11 +494,11 @@ namespace Lazy8.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unknown RunProcessType value ({0})..
+        ///   Looks up a localized string similar to The call to &apos;{0}&apos; did not complete within the timeout period of {1} seconds..
         /// </summary>
-        public static string Utils_UnknownRunProcessType {
+        public static string Utils_ProcessTimedOut {
             get {
-                return ResourceManager.GetString("Utils_UnknownRunProcessType", resourceCulture);
+                return ResourceManager.GetString("Utils_ProcessTimedOut", resourceCulture);
             }
         }
     }
