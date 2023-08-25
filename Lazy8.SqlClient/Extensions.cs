@@ -440,37 +440,6 @@ public static class SqlServerExtensionMethods
   }
 
   /// <summary>
-  /// Generic method to get a value from a DbDataReader instance.
-  /// </summary>
-  /// <typeparam name="T"></typeparam>
-  /// <param name="dbDataReader">A descendent of <see cref="System.Data.Common.DbDataReader">DbDataReader</see>.</param>
-  /// <param name="columnName">A valid String name of one of <see cref="System.Data.Common.DbDataReader">DbDataReader</see>'s columns.</param>
-  /// <returns>Either a value or default value of type T.</returns>
-  public static T GetValueOrDefault<T>(this DbDataReader dbDataReader, String columnName) =>
-    dbDataReader.GetValueOrDefault<T>(dbDataReader.GetOrdinal(columnName));
-
-  /// <summary>
-  /// Generic method to get a value from a DbDataReader instance.  T must implement the IConvertible interface.
-  /// </summary>
-  /// <typeparam name="T">T is a type that must implement the IConvertible interface.</typeparam>
-  /// <param name="dbDataReader">A descendent of <see cref="System.Data.Common.DbDataReader">DbDataReader</see>.</param>
-  /// <param name="columnIndex">A valid Int32 index of one of <see cref="System.Data.Common.DbDataReader">DbDataReader</see>'s columns.</param>
-  /// <returns>Either a value or default value of type T.</returns>
-  /// <exception cref="System.IndexOutOfRangeException">Thrown when columnIndex is out of range.</exception>
-  public static T GetValueOrDefault<T>(this DbDataReader dbDataReader, Int32 columnIndex)
-  {
-    if (dbDataReader.IsDBNull(columnIndex))
-      return default;
-
-    var type = typeof(T);
-    var underlyingType = Nullable.GetUnderlyingType(type);
-    var isNullableType = (underlyingType != null);
-    var value = dbDataReader[columnIndex];
-
-    return (T) Convert.ChangeType(value, isNullableType ? underlyingType : type);
-  }
-
-  /// <summary>
   /// Given an SqlConnection and a database name, switch the connection to that database (if necessary) and execute action.
   /// The method will switch the connection's database back to the database it originally pointed to before action was executed.
   /// </summary>
