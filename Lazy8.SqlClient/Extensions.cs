@@ -6,18 +6,17 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 
-using Microsoft.Data.SqlClient;
-
 using Lazy8.Core;
-using System.Threading.Tasks;
+
+using Microsoft.Data.SqlClient;
 
 namespace Lazy8.SqlClient;
 
@@ -37,67 +36,6 @@ public static class SqlServerExtensionMethods
        if the server rejects connectionString. */
     using (var connection = new SqlConnection(connectionString))
       connection.Open();
-  }
-
-  /// <summary>
-  /// Return one or more schema tables for the given commandText. commandText may return more than one result set, and each result set
-  /// has a corresponding schema table describing the result set's structure.
-  /// <para>The format of the returned schema tables is described in the help entry for the
-  /// <a href="https://docs.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqldatareader.getschematable">SqlDataReader.GetSchemaTable()</a> method.</para>
-  /// </summary>
-  /// <param name="originalConnection">A valid SqlConnection instance.</param>
-  /// <param name="commandType">A CommandType of StoredProcedure or Text.  Any other value will throw an ArgumentException.</param>
-  /// <param name="commandText">A stored procedure name (for commandType == CommandType.StoredProcedure), or a valid T-SQL query (for commandType == CommandType.Text). Both are allowed to return multiple result sets.</param>
-  /// <param name="parameters">Defaults to null. If provided, the parameters are cloned and the clones assigned to this method's internal SqlCommand instance.</param>
-  /// <returns>An IEnumerable&lt;DataTable&gt; containing one or more schema tables.</returns>
-  public static IEnumerable<DataTable> GetSchemaTables(this SqlConnection originalConnection, CommandType commandType, String commandText, SqlParameterCollection parameters = null) =>
-    /* If parameters are provided, they have to be cloned because
-       an SqlParameter cannot be a member of multiple SqlParameterCollections. */
-    GetSchemaTables(originalConnection, commandType, commandText,
-      (parameters == null) ? Array.Empty<SqlParameter>() : parameters.Cast<ICloneable>().Select(p => (SqlParameter) p.Clone()).ToArray());
-  
-  /// <summary>
-  /// Return one or more schema tables for the given commandText. commandText may return more than one result set, and each result set
-  /// has a corresponding schema table describing the result set's structure.
-  /// <para>The format of the returned schema tables is described in the help entry for the
-  /// <a href="https://docs.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqldatareader.getschematable">SqlDataReader.GetSchemaTable()</a> method.</para>
-  /// </summary>
-  /// <param name="originalConnection">A valid SqlConnection instance.</param>
-  /// <param name="commandType">A CommandType of StoredProcedure or Text.  Any other value will throw an ArgumentException.</param>
-  /// <param name="commandText">A stored procedure name (for commandType == CommandType.StoredProcedure), or a valid T-SQL query (for commandType == CommandType.Text). Both are allowed to return multiple result sets.</param>
-  /// <param name="parameters">Optional array of SqlParameter instances.</param>
-  /// <returns>An IEnumerable&lt;DataTable&gt; containing one or more schema tables.</returns>
-  public static IEnumerable<DataTable> GetSchemaTables(this SqlConnection originalConnection, CommandType commandType, String commandText, params SqlParameter[] parameters)
-  {
-    originalConnection.Name(nameof(originalConnection)).NotNull();
-    commandText.Name(nameof(commandText)).NotNullEmptyOrOnlyWhitespace();
-
-    if ((commandType != CommandType.StoredProcedure) && (commandType != CommandType.Text))
-      throw new ArgumentExceptionFmt(Properties.Resources.IllegalCommandType, nameof(commandType), commandType);
-
-    using (var clonedConnection = originalConnection.GetClone())
-    {
-      if (clonedConnection.State != ConnectionState.Open)
-        clonedConnection.Open();
-
-      using (var command = new SqlCommand() { Connection = clonedConnection, CommandType = commandType, CommandText = commandText })
-      {
-        if (parameters is not null)
-          command.Parameters.AddRange(parameters);
-
-        using (var reader = command.ExecuteReader(CommandBehavior.SchemaOnly | CommandBehavior.KeyInfo))
-        {
-          List<DataTable> result = new();
-
-          do
-          {
-            result.Add(reader.GetSchemaTable());
-          } while (reader.NextResult());
-
-          return result;
-        }
-      }
-    }
   }
 
   /// <summary>
