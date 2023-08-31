@@ -162,7 +162,7 @@ public static partial class IEnumerableUtils
   /// <typeparam name="T">Any type.</typeparam>
   /// <param name="items">An <see cref="IEnumerable&lt;T&gt;"/>.  It may be null.</param>
   /// <returns>A <see cref="Boolean"/> true if <paramref name="items"/> is either null or contains no items.  False otherwise.</returns>
-  public static Boolean IsNullOrEmpty<T>(this IEnumerable<T> items) => ((items == null) || !items.Any());
+  public static Boolean IsNullOrEmpty<T>(this IEnumerable<T> items) => ((items is null) || !items.Any());
 
   /// <summary>
   /// Computes the product of a sequence of <see cref="Int32"/> values.

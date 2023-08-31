@@ -264,7 +264,7 @@ public class SerializableSqlParameter
        is in an invalid state. */
     this.SqlDbType = sqlParameter.SqlDbType.ToString();
 
-    if (sqlParameter.Value == null)
+    if (sqlParameter.Value is null)
     {
       this.Value = "";
       this.ValueType = _null;

@@ -217,7 +217,7 @@ public static class GeneralUtils
 
     using (var process = Process.Start(psi))
     {
-      if (process == null)
+      if (process is null)
         throw new Exception(String.Format(Properties.Resources.Utils_ProcessCouldNotBeStarted, $"{runProcessInfo.Command} {runProcessInfo.Arguments}".Trim()));
 
       /* Use StringBuilder's Append(), not AppendLine(), method to add data to the stdout and stderr accumulators.
@@ -277,7 +277,7 @@ public static class GeneralUtils
   public static String GetEmbeddedTextResource(this String resourceName)
   {
     var resourceStream = Assembly.GetCallingAssembly().GetManifestResourceStream(resourceName);
-    if (resourceStream == null)
+    if (resourceStream is null)
       return "";
     else
       using (var sr = new StreamReader(resourceStream))
@@ -331,7 +331,7 @@ public static class GeneralUtils
     /* I know this looks weird - how can a constructor return null?
        Well, somehow it can.  It makes sense in that the requested stackFrameLevel does not exist.
        This can happen in a release build where the stack frame has been optimized away. */
-    if (sf == null)
+    if (sf is null)
       throw new Exception(String.Format(Properties.Resources.Utils_NoStackFrameExists, stackFrameLevel));
 
     /* GetMethod() may return null.  This can happen in release builds where the actual
@@ -339,7 +339,7 @@ public static class GeneralUtils
     var mb = sf.GetMethod() ?? throw new Exception(String.Format(Properties.Resources.Utils_NoMethodFoundOnStackFrame, stackFrameLevel));
 
     /* Like GetMethod(), mbDeclaringType can be optimized away in release builds. */
-    if (mb.DeclaringType == null)
+    if (mb.DeclaringType is null)
       throw new Exception(String.Format(Properties.Resources.Utils_NoDeclaringTypeFoundOnStackFrame, stackFrameLevel));
   }
 
@@ -401,7 +401,7 @@ public static class GeneralUtils
     var attributes = assembly.GetCustomAttributes(typeof(T), true);
 
     return
-      ((attributes == null) || (attributes.Length == 0))
+      ((attributes is null) || (attributes.Length == 0))
       ? null
       : (T) attributes[0];
   }

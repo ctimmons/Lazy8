@@ -30,12 +30,12 @@ public static class ReflectionUtils
   {
     foreach (var part in name.Split('.'))
     {
-      if (obj == null)
+      if (obj is null)
         return null;
 
       Type type = obj.GetType();
       PropertyInfo info = type.GetProperty(part);
-      if (info == null)
+      if (info is null)
         return null;
 
       obj = info.GetValue(obj, null);
@@ -54,7 +54,7 @@ public static class ReflectionUtils
   public static T GetPropValue<T>(this Object obj, String name)
   {
     Object retval = GetPropValue(obj, name);
-    if (retval == null)
+    if (retval is null)
       return default;
     else
       /* Throws an InvalidCastException if types are incompatible. */
@@ -159,7 +159,7 @@ public static class ReflectionUtils
   public static String GetPublicPropertyValues<T>(Object source) where T : class =>
     GetPublicPropertyNames<T>()
     .Select(propertyName => new { Name = propertyName, Value = GetPropValue<T>(source, propertyName) })
-    .Select(propertyNameValuePair => propertyNameValuePair.Name + " = " + ((propertyNameValuePair.Value == null) ? "NULL" : propertyNameValuePair.Value))
+    .Select(propertyNameValuePair => propertyNameValuePair.Name + " = " + ((propertyNameValuePair.Value is null) ? "NULL" : propertyNameValuePair.Value))
     .Join("\n");
 
   /// <summary>

@@ -29,7 +29,7 @@ public enum StringAssertion
 
     public String GetFileContents(String filename)
     {
-      if (filename == null)
+      if (filename is null)
         throw new ArgumentNullException("filename cannot be null.");
 
       if (filename.Trim().Length == 0)
@@ -87,7 +87,7 @@ public static partial class AssertUtils
 
   public static AssertionContext<T> NotNull<T>(this AssertionContext<T> source)
     where T : class =>
-    source.Value == null ? throw new ArgumentNullException(source.Name) : source;
+    source.Value is null ? throw new ArgumentNullException(source.Name) : source;
 
   public static AssertionContext<T> NotEmpty<T>(this T source)
     where T : IEnumerable =>
@@ -218,9 +218,7 @@ public class AssertionContext<T>
   public String Name { get; private set; }
   public T Value { get; private set; }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
   private AssertionContext()
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     : base()
   {
   }

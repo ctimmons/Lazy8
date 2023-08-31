@@ -294,7 +294,7 @@ public static partial class FileUtils
       errorHandler?.Invoke(path, ex);
     }
 
-    if (di == null)
+    if (di is null)
     {
       yield break;
     }
@@ -312,7 +312,7 @@ public static partial class FileUtils
         errorHandler?.Invoke(path, ex);
       }
 
-      if (diEnumerator == null)
+      if (diEnumerator is null)
       {
         yield break;
       }

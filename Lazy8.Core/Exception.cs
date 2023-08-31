@@ -71,7 +71,7 @@ public static class ExceptionUtils
 
     void rec(Exception currentException)
     {
-      if (currentException == null)
+      if (currentException is null)
         return;
 
       result.Add(currentException.Message);

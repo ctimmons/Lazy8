@@ -64,14 +64,12 @@ Another line.
       (expected.Int32Property1 == actual.Int32Property1) &&
       (expected.ListInt32Property1.Count == actual.ListInt32Property1.Count) &&
       Enumerable.SequenceEqual(expected.ListInt32Property1, actual.ListInt32Property1) &&
-      (((expected.TestClassInstance != null) && (actual.TestClassInstance != null))
-        ? AreTestClassInstancesEqual(expected.TestClassInstance, actual.TestClassInstance)
-        : true);
+      (expected.TestClassInstance == null || actual.TestClassInstance == null || AreTestClassInstancesEqual(expected.TestClassInstance, actual.TestClassInstance));
   }
 }
 
 [TestFixture]
-public class Xml
+public partial class Xml
 {
   public Xml() : base() { }
 
@@ -114,9 +112,9 @@ public class Xml
 
     var xmlNamespaces = XDocument.Parse(xml).GetXmlNamespaces();
     Assert.That(xmlNamespaces.Count(), Is.EqualTo(3));
-    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => (xmlNamespace.Prefix == "default") && (xmlNamespace.Name == "http://www.xbrl.org/2003/instance")));
-    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => (xmlNamespace.Prefix == "dei") && (xmlNamespace.Name == "http://xbrl.sec.gov/dei/2022")));
-    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => (xmlNamespace.Prefix == "xbrldi") && (xmlNamespace.Name == "http://xbrl.org/2006/xbrldi")));
+    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => xmlNamespace.Prefix == "default" && xmlNamespace.Name == "http://www.xbrl.org/2003/instance"));
+    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => xmlNamespace.Prefix == "dei" && xmlNamespace.Name == "http://xbrl.sec.gov/dei/2022"));
+    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => xmlNamespace.Prefix == "xbrldi" && xmlNamespace.Name == "http://xbrl.org/2006/xbrldi"));
   }
 
   [Test]
@@ -302,10 +300,12 @@ public class Xml
        Since all this test cares about are the XML comments, a regular expression
        and some LINQ magic are used to pluck out the comments and compare them. */
 
-    var xmlCommentRegex = new Regex(@"\<!--.*?--\>", RegexOptions.Singleline);
-    var expectedXmlComments = xmlCommentRegex.Matches(expected).Cast<Match>().Select(m => m.Value);
-    var actualXmlComments = xmlCommentRegex.Matches(actual).Cast<Match>().Select(m => m.Value.Replace("\r\n", "\n"));
+    var expectedXmlComments = XmlCommentRegex().Matches(expected).Cast<Match>().Select(m => m.Value);
+    var actualXmlComments = XmlCommentRegex().Matches(actual).Cast<Match>().Select(m => m.Value.Replace("\r\n", "\n"));
     Assert.That(expectedXmlComments.SequenceEqual(actualXmlComments), Is.True);
   }
+
+  [GeneratedRegex("\\<!--.*?--\\>", RegexOptions.Singleline)]
+  private static partial Regex XmlCommentRegex();
 }
 

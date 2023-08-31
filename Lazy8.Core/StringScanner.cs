@@ -181,7 +181,7 @@ public class StringScanner
   /// <returns>A Boolean indicating if the match was succesful.</returns>
   public Boolean MatchLiteral(String s)
   {
-    if ((s == null) || !s.Any() || ((this._index + s.Length) > this._length))
+    if ((s is null) || !s.Any() || ((this._index + s.Length) > this._length))
       return false;
 
     this.SavePosition();

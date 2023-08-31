@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 using NUnit.Framework;
@@ -16,9 +17,8 @@ public readonly record struct UUTestFilenames(String UnencodedDataFilename, Stri
 [TestFixture]
 public class UUTests
 {
-  /* A post-build event copies the "UU Test Data" folder to this assembly's folder,
-     so the relative path to "UU Test Data" works when the tests are run. */
-  private static readonly String _dataPath = "UU Test Data";
+  /* A post-build event copies the "UU Test Data" folder to this folder. */
+  private static readonly String _dataPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "UU Test Data");
 
   private static void TestTextFile(UUTestFilenames uuTestFilenames)
   {

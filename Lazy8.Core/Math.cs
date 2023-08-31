@@ -59,7 +59,7 @@ public static class MathUtils
     {
       var digitValue = (Int32) (number % (Double) @base);
       number /= @base;
-      result = digits.Substring(digitValue, 1) + result;
+      result = String.Concat(digits.AsSpan(digitValue, 1), result);
     }
 
     return result;
@@ -75,7 +75,7 @@ public static class MathUtils
   {
     CheckBase(@base);
 
-    var digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".Substring(0, @base);
+    var digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[..@base];
     var result = 0;
 
     number = number.ToUpper();

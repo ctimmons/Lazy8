@@ -55,7 +55,7 @@ public static partial class StringUtils
     /* Start with a fuly escaped string. */
     var escapedRegex = Regex.Escape(s);
 
-    if ((charsToUnescape == null) || (charsToUnescape.Length == 0))
+    if ((charsToUnescape is null) || (charsToUnescape.Length == 0))
     {
       return escapedRegex;
     }
@@ -366,7 +366,7 @@ public static partial class StringUtils
     if (!value.Any() || !suffix.Any())
       return value;
     else if (value.EndsWith(suffix, StringComparison.CurrentCulture))
-      return value.Substring(0, value.Length - suffix.Length);
+      return value[..^suffix.Length];
     else
       return value;
   }
@@ -586,7 +586,7 @@ public static partial class StringUtils
 
        However, this code runs about 10x faster than the regex. */
 
-    if (source == null)
+    if (source is null)
       return null;
 
     var result = new StringBuilder(source.Length);
@@ -705,9 +705,9 @@ public static partial class StringUtils
     }
 
     return
-      (n == source.Length - 1)      /* No chomping was done, */
-      ? source                      /* so just return the original string. O(1) performance. */
-      : source.Substring(0, n + 1); /* Otherwise return the appropriate substring. O(n) performance because of the Substring() call. */
+      (n == source.Length - 1) /* No chomping was done, */
+      ? source                 /* so just return the original string. O(1) performance. */
+      : source[..(n + 1)];     /* Otherwise return the appropriate substring. O(n) performance because of the Substring() call. */
   }
 
   /// <summary>

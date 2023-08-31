@@ -140,7 +140,7 @@ public static class XmlUtils
   private static void InsertXmlComments(Object obj, IEnumerable<XElement> xElements, Int32 level)
   {
     /* Base case. */
-    if ((obj == null) || !xElements.Any())
+    if ((obj is null) || !xElements.Any())
       return;
 
     XComment getXCommentWithIndentedText(XmlCommentAttribute xmlCommentAttribute)
@@ -225,7 +225,7 @@ public static class XmlUtils
   public static String GetLastChildsInnerText(this XmlNode node, String xpath)
   {
     var singleNode = node.SelectSingleNode(xpath);
-    if ((singleNode == null) || (singleNode.LastChild == null))
+    if ((singleNode is null) || (singleNode.LastChild is null))
       return "";
     else
       return singleNode.LastChild.InnerText;
@@ -240,7 +240,7 @@ public static class XmlUtils
   public static String GetNodesInnerText(this XmlNode node, String xpath)
   {
     var singleNode = node.SelectSingleNode(xpath);
-    return (singleNode == null) ? "" : singleNode.InnerText;
+    return (singleNode is null) ? "" : singleNode.InnerText;
   }
 }
 

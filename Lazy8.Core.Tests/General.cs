@@ -49,6 +49,7 @@ public partial class GeneralUtilsTests
 
     var tempFolder = Path.ChangeExtension(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()), null);
     Directory.CreateDirectory(tempFolder);
+    var oldCurrentDirectory = Directory.GetCurrentDirectory();
     Directory.SetCurrentDirectory(tempFolder);
 
     this.CreateTestAppSourceCode(tempFolder);
@@ -72,11 +73,14 @@ public partial class GeneralUtilsTests
     {
       if (Directory.Exists(tempFolder))
       {
-        /* Set the current directory to the parent of tempFolder before trying to delete tempFolder.
+        /* Reset the current directory before trying to delete tempFolder.
            If this isn't done, Windows won't allow tempFolder to be deleted because it's still
-           the current directory. */
+           the current directory.
+        
+           This also prevents failures in subsequent unit tests that expect
+           the current directory to be in a certain location. (see UU.cs). */
 
-        Directory.SetCurrentDirectory(Path.Combine(tempFolder, ".."));
+        Directory.SetCurrentDirectory(oldCurrentDirectory);
         Directory.Delete(tempFolder, recursive: true);
       }
     }
