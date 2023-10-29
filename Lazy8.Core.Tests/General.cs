@@ -33,23 +33,23 @@ public partial class GeneralUtilsTests
   private readonly String _expectedStdOut = "standard output";
   private readonly String _expectedStdErr = "standard error";
 
-  [GeneratedRegex("CS\\d{4}:")]
+  [GeneratedRegex(@"CS\d{4}:")]
   private static partial Regex CsWarningRegex();
 
   [Test]
   public void RunProcessTest()
   {
     /* Try to execute a program that does not exist.
-       (If this program actually exists as an executable on your system,
+       (If "alskdjasdzxcnvzljosfopcpfjouwerljasfjijafsdcxxce" actually exists as an executable on your system,
        you should start buying lottery tickets.) */
 
     Assert.Throws<Win32Exception>(() => GeneralUtils.RunProcess("alskdjasdzxcnvzljosfopcpfjouwerljasfjijafsdcxxce"));
 
-    /* Next create a small app in a temporary folder, compile and run it. */
+    /* Next create a small app in a temporary folder, compile, and run it. */
 
     var tempFolder = Path.ChangeExtension(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()), null);
     Directory.CreateDirectory(tempFolder);
-    var oldCurrentDirectory = Directory.GetCurrentDirectory();
+    var previousCurrentDirectory = Directory.GetCurrentDirectory();
     Directory.SetCurrentDirectory(tempFolder);
 
     this.CreateTestAppSourceCode(tempFolder);
@@ -59,7 +59,7 @@ public partial class GeneralUtilsTests
         new()
         {
           Command = "dotnet",
-          Arguments = "run",
+          Arguments = "run --nologo",
           StdOutPredicate = line => !CsWarningRegex().IsMatch(line)
         };
 
@@ -80,7 +80,7 @@ public partial class GeneralUtilsTests
            This also prevents failures in subsequent unit tests that expect
            the current directory to be in a certain location. (see UU.cs). */
 
-        Directory.SetCurrentDirectory(oldCurrentDirectory);
+        Directory.SetCurrentDirectory(previousCurrentDirectory);
         Directory.Delete(tempFolder, recursive: true);
       }
     }
@@ -88,10 +88,8 @@ public partial class GeneralUtilsTests
 
   private void CreateTestAppSourceCode(String folder)
   {
-    var programFilename = Path.Combine(folder, "program.cs");
-    var projectFilename = Path.Combine(folder, "program.csproj");
-
-    var csproj = @"
+    var csProjectFilename = Path.Combine(folder, "program.csproj");
+    var csProject = @"
 <Project Sdk=""Microsoft.NET.Sdk"">
 
   <PropertyGroup>
@@ -114,7 +112,9 @@ public partial class GeneralUtilsTests
 
 </Project>
 ".Trim();
+    File.WriteAllText(csProjectFilename, csProject);
 
+    var programFilename = Path.Combine(folder, "program.cs");
     var program = @$"
 using System;
 
@@ -137,8 +137,6 @@ public class Program
   }}
 }}
 ";
-
-    File.WriteAllText(projectFilename, csproj);
     File.WriteAllText(programFilename, program);
   }
 }

@@ -10,9 +10,13 @@
     <RepositoryUrl>https://github.com/ctimmons/Lazy8</RepositoryUrl>
     <PackageIcon>infinity-32.png</PackageIcon>
     <PackageTags>general purpose library</PackageTags>
-    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
-    <Deterministic>True</Deterministic>
-    <AssemblyVersion>1.0.373.0</AssemblyVersion>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <Deterministic>False</Deterministic>
+    <Version>1.0.$([System.DateTime]::Now.ToString('yyyyMMdd')).$([System.DateTime]::Now.ToString('HHmmss'))</Version>
+    <AssemblyVersion Condition=" '$(Version)' == '' ">1.0.0.0</AssemblyVersion>
+    <AssemblyVersion Condition=" '$(Version)' != '' ">$(Version)</AssemblyVersion>
+    <Version Condition=" '$(Version)' == '' ">1.0.0.0</Version>
+    <Version Condition=" '$(Version)' != '' ">$(Version)</Version>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <Nullable>disable</Nullable>
   </PropertyGroup>
@@ -45,7 +49,4 @@
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="&quot;C:\Users\ctimmons\Documents\Data\Dev\Visual Studio\CSharp\IncrementAssemblyVersion\bin\Debug\net6.0\IncrementAssemblyVersion.exe&quot; &quot;$(ProjectPath)&quot;" />
-  </Target>
 </Project>

@@ -19,6 +19,8 @@ namespace Lazy8.Core;
 /// </summary>
 public class StringScanner
 {
+  public const Int32 END_OF_INPUT = -1;
+
   private readonly String _s;
   private readonly Int32 _length;
 
@@ -50,7 +52,7 @@ public class StringScanner
      Read() method increments _index.  Altering this logic would just create a mess (I've tried).
 
      Besides, the user of StringScanner doesn't need to really know where the eof is
-     because both the Read() and Peek() methods return -1 when they should (no surprising behavior).
+     because both the Read() and Peek() methods return END_OF_INPUT (-1) when they should (no surprising behavior).
 
      And there are the SavePosition(), GoBackToSavedPosition() and AcceptNewPosition() methods in case
      the caller needs to backtrack after an unsuccessful match. */
@@ -93,12 +95,12 @@ public class StringScanner
   /// Reads the next character from the input string.
   /// </summary>
   /// <returns>An integer representing the character read from the underlying string,
-  /// or -1 if no more characters are available.</returns>
+  /// or END_OF_INPUT (-1) if no more characters are available.</returns>
   public Int32 Read()
   {
     var currentChar = this.Peek();
 
-    if (currentChar == -1)
+    if (currentChar == END_OF_INPUT)
       return currentChar;
 
     this._index++;
@@ -116,7 +118,7 @@ public class StringScanner
     {
       /* Is currentChar \r the first part of a \r\n combo? */
       var nextChar = this.Peek();
-      if ((nextChar != -1) && ((Char) nextChar == '\n'))
+      if ((nextChar != END_OF_INPUT) && ((Char) nextChar == '\n'))
       {
         /* Yes. Just increment _column and leave _line unchanged. */
         this._column++;
@@ -148,15 +150,15 @@ public class StringScanner
   /// <summary>
   /// Returns the next available character but does not consume it.
   /// </summary>
-  /// <returns>An integer representing the next character to be read, or -1 if at the end of the string.</returns>
-  public Int32 Peek() => this.IsEof ? -1 : this._s[this._index];
+  /// <returns>An integer representing the next character to be read, or END_OF_INPUT (-1) if at the end of the string.</returns>
+  public Int32 Peek() => this.IsEof ? END_OF_INPUT : this._s[this._index];
 
   /// <summary>
   /// Returns the previously available character but does not consume it.
   /// </summary>
   /// <returns>Returns an integer representing the character immediately prior to the scanner's current position,
-  /// or -1 if at the beginning of the string.</returns>
-  public Int32 ReversePeek() => this.IsBof ? -1 : this._s[this._index - 1];
+  /// or END_OF_INPUT (-1) if at the beginning of the string.</returns>
+  public Int32 ReversePeek() => this.IsBof ? END_OF_INPUT : this._s[this._index - 1];
 
   /// <summary>
   /// Match zero or more characters as long as the <paramref name="predicate"/> returns true.
@@ -168,7 +170,7 @@ public class StringScanner
   {
     StringBuilder result = new();
     Int32 nextChar;
-    while (((nextChar = this.Peek()) != -1) && predicate((Char) nextChar))
+    while (((nextChar = this.Peek()) != END_OF_INPUT) && predicate((Char) nextChar))
       result.Append((Char) this.Read());
     return result.ToString();
   }
@@ -191,7 +193,7 @@ public class StringScanner
     while (true)
     {
       nextChar = this.Peek();
-      if (nextChar == -1)
+      if (nextChar == END_OF_INPUT)
         break;
 
       if (sPosition == s.Length)

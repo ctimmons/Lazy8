@@ -38,25 +38,30 @@ public enum LogEntryType
 public class Log
 {
   private readonly TextWriter _writer;
+  private readonly Boolean _useUtcTimestamps;
 
   private Log()
     : base()
   {
   }
 
-  public Log(TextWriter writer)
+  public Log(TextWriter writer, Boolean useUtcTimestamps = false)
     : this()
   {
     writer.Name(nameof(writer)).NotNull();
 
     this._writer = writer;
+    this._useUtcTimestamps = useUtcTimestamps;
   }
 
   public void WriteLine(LogEntryType logEntryType, String message)
   {
     /* Timestamps are represented in the Round Trip Format Specifier
        (http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#Roundtrip). */
-    var timestamp = DateTime.Now.ToUniversalTime().ToString("o");
+    var timestamp =
+      this._useUtcTimestamps
+      ? DateTime.UtcNow.ToString("o")
+      : DateTime.Now.ToString("o");
 
     var type = logEntryType switch
     {

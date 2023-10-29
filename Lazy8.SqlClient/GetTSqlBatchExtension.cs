@@ -23,14 +23,14 @@ public static class GetTSqlBatchExtension
   public static IEnumerable<String> GetTSqlBatches(this String tsql)
   {
     /* StringBuilder's default buffer size is 16 characters. It cannot be known in advance
-       how large a single T-SQL batch will be, but 16 characters certainly won't be sufficient.
+       how large a single T-SQL batch will be, but 16 characters certainly won't suffice.
 
        To hopefully prevent StringBuilder from having to perform a large number of memory re-allocations,
        an arbitrary batch buffer size of 8K characters is selected.
 
        See StringBuilder's "Memory" entry in MSDN for more info:
 
-         https://docs.microsoft.com/en-us/dotnet/api/system.text.stringbuilder?view=net-5.0#Memory */
+         https://docs.microsoft.com/en-us/dotnet/api/system.text.stringbuilder#Memory */
 
     const Int32 kilobyte = 1024;
     StringBuilder batch = new(8 * kilobyte);
@@ -38,7 +38,7 @@ public static class GetTSqlBatchExtension
     StringScanner scanner = new(tsql);
     List<String> batches = new();
 
-    while (scanner.Peek() != -1)
+    while (scanner.Peek() != StringScanner.END_OF_INPUT)
     {
       if (MatchSingleLineComment(scanner) || MatchNestedBlockComment(scanner))
         continue;
@@ -114,7 +114,7 @@ END;
     StringBuilder result = new();
 
     Int32 charValue;
-    while ((charValue = scanner.Peek()) != -1)
+    while ((charValue = scanner.Peek()) != StringScanner.END_OF_INPUT)
     {
       var ch = (Char) charValue;
       if (Char.IsDigit(ch))
@@ -145,7 +145,7 @@ END;
 
          "A Transact-SQL statement cannot occupy the same line as a GO command. However, the line can contain comments."
 
-       [0]: https://docs.microsoft.com/en-us/sql/t-sql/language-elements/sql-server-utilities-statements-go?view=sql-server-ver15
+       [0]: https://docs.microsoft.com/en-us/sql/t-sql/language-elements/sql-server-utilities-statements-go
 
        This last statement about comments is frustratingly vague.  Assuming a liberal interpretation, the documentation allows
        almost pathological syntax like this (C# doesn't allow nested block comments, so the code example below
@@ -207,7 +207,7 @@ END;
 
        String literals may contain character sequences that indicate the start or end of comments.
        If this matching function didn't exist, portions of those strings would be matched by either the
-       MatchNestedBlockComment() or MatchSingleLineComment() methods, which would be incorrect logic. */
+       MatchNestedBlockComment() or MatchSingleLineComment() methods, which would be incorrect. */
 
     const String SINGLE_QUOTE = "'";
     const String DOUBLE_QUOTE = "\"";
@@ -226,7 +226,7 @@ END;
        string nesting level at one instead of zero. */
     var stringNestingLevel = 1;
 
-    while ((stringNestingLevel > 0) && (scanner.Peek() != -1))
+    while ((stringNestingLevel > 0) && (scanner.Peek() != StringScanner.END_OF_INPUT))
     {
       if (scanner.MatchLiteral(actualQuoteCharacter))
       {
@@ -246,7 +246,7 @@ END;
       }
     }
 
-    if (stringNestingLevel > 0)
+    if (stringNestingLevel != 0)
       throw new Exception("Unbalanced string literal.");
     else
       return result.ToString();
@@ -257,7 +257,7 @@ END;
     if (!scanner.MatchLiteral("--"))
       return false;
 
-    while ((scanner.Peek() != -1) && ((Char) scanner.Peek() != '\r') && ((Char) scanner.Peek() != '\n'))
+    while ((scanner.Peek() != StringScanner.END_OF_INPUT) && ((Char) scanner.Peek() != '\r') && ((Char) scanner.Peek() != '\n'))
       scanner.Read();
 
     return true;
@@ -272,7 +272,7 @@ END;
     else
       return false;
 
-    while ((blockCommentNestingLevel > 0) && (scanner.Peek() != -1))
+    while ((blockCommentNestingLevel > 0) && (scanner.Peek() != StringScanner.END_OF_INPUT))
     {
       if (scanner.MatchLiteral("*/"))
         blockCommentNestingLevel--;
@@ -282,7 +282,7 @@ END;
         scanner.Read();
     }
 
-    if (blockCommentNestingLevel > 0)
+    if (blockCommentNestingLevel != 0)
       throw new Exception("Unbalanced nested block comment.");
     else
       return true;

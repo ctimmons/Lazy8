@@ -3,9 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
-    <Deterministic>True</Deterministic>
-    <AssemblyVersion>1.0.233.0</AssemblyVersion>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <Deterministic>False</Deterministic>
+    <Version>1.0.$([System.DateTime]::Now.ToString('yyyyMMdd')).$([System.DateTime]::Now.ToString('HHmmss'))</Version>
+    <AssemblyVersion Condition=" '$(Version)' == '' ">1.0.0.0</AssemblyVersion>
+    <AssemblyVersion Condition=" '$(Version)' != '' ">$(Version)</AssemblyVersion>
+    <Version Condition=" '$(Version)' == '' ">1.0.0.0</Version>
+    <Version Condition=" '$(Version)' != '' ">$(Version)</Version>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <IsPublishable>False</IsPublishable>
     <Nullable>disable</Nullable>
@@ -35,7 +39,4 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="&quot;C:\Users\ctimmons\Documents\Data\Dev\Visual Studio\CSharp\IncrementAssemblyVersion\bin\Debug\net6.0\IncrementAssemblyVersion.exe&quot; &quot;$(ProjectPath)&quot;" />
-  </Target>
 </Project>

@@ -77,7 +77,12 @@ public class RunProcessInfo
   /// </summary>
   public Int32 TimeoutInMilliseconds => Math.Max(this.TimeoutInSeconds * 1000, Timeout.Infinite);
 
-  private Predicate<String> _stdOutPredicate = line => true;
+  /// <summary>
+  /// A default Predicate that always returns true.
+  /// </summary>
+  public static readonly Predicate<String> DefaultStdOutPredicate = _ => true;
+
+  private Predicate<String> _stdOutPredicate = DefaultStdOutPredicate;
   /// <summary>
   /// A Predicate that takes a String and returns a Boolean value.
   /// <para>The data Command sends to stdout is line oriented.  This predicate is applied to each line of that ouput.
@@ -101,7 +106,12 @@ public class RunProcessInfo
     }
   }
 
-  private Predicate<String> _stdErrPredicate = line => true;
+  /// <summary>
+  /// A default Predicate that always returns true.
+  /// </summary>
+  public static readonly Predicate<String> DefaultStdErrPredicate = _ => true;
+
+  private Predicate<String> _stdErrPredicate = DefaultStdErrPredicate;
   /// <summary>
   /// A Predicate that takes a String and returns a Boolean value.
   /// <para>The data Command sends to stderr is line oriented.  This predicate is applied to each line of that ouput.
@@ -193,7 +203,7 @@ public static class GeneralUtils
        Below are links to some code and discussions about how to do that.
     
        I'm not going to bother implementing an asynchronous version of this method until I reeeeeaaaaallly need to.
-       There are way too many ways subtle bugs can get introduced into such an algorithm.  A quick-n-dirty way to run this
+       There are way too many ways subtle bugs can creep into such an algorithm.  A quick-n-dirty way to run this
        method asynchronously is to wrap it in a Task.Run() call - the drawback being that it won't
        be cancellable after the work is started.
     

@@ -31,9 +31,9 @@ public class StringScannerTests
 
     Assert.That(s.IsBol, Is.True);
     Assert.That(s.IsEol, Is.True);
-    Assert.That(s.Peek() == -1);
-    Assert.That(s.ReversePeek() == -1);
-    Assert.That(s.Read() == -1);
+    Assert.That(s.Peek() == StringScanner.END_OF_INPUT);
+    Assert.That(s.ReversePeek() == StringScanner.END_OF_INPUT);
+    Assert.That(s.Read() == StringScanner.END_OF_INPUT);
     Assert.That(s.MatchLiteral(""), Is.False);
     Assert.That(s.MatchLiteral("anything"), Is.False);
   }
@@ -48,14 +48,14 @@ public class StringScannerTests
     s.Read();
     Assert.That((Char) s.Peek() == '2');
     s.Read();
-    Assert.That(s.Peek() == -1);
+    Assert.That(s.Peek() == StringScanner.END_OF_INPUT);
   }
 
   [Test]
   public void ReversePeekTest()
   {
     var s = new StringScanner("012");
-    Assert.That(s.ReversePeek() == -1);
+    Assert.That(s.ReversePeek() == StringScanner.END_OF_INPUT);
     s.Read();
     Assert.That((Char) s.ReversePeek() == '0');
     s.Read();
@@ -68,7 +68,7 @@ public class StringScannerTests
   public void ReadTest()
   {
     var s = new StringScanner("");
-    Assert.That(s.Read() == -1);
+    Assert.That(s.Read() == StringScanner.END_OF_INPUT);
 
     s = new StringScanner("012");
     Assert.That((Char) s.Read() == '0');
