@@ -608,9 +608,6 @@ public class StringTests
     Assert.That(input.Indent(-4) == output);
   }
 
-  /* Don't need to test EqualsCI() and StartsWithCI(),
-     because they're just fluent wrappers around their respective System.String.* methods. */
-
   [Test]
   public void CRLFTest()
   {
