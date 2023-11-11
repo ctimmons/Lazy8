@@ -173,22 +173,6 @@ public static partial class StringUtils
     (!String.IsNullOrEmpty(value)) &&
     ContainsCI(Properties.Resources.StringUtils_BooleanTruthLiterals, value.Trim());
 
-  /// <summary>
-  /// Case insensitive (CI) version of String.IndexOf().
-  /// </summary>
-  public static Int32 IndexOfCI(this String source, String searchValue)
-  {
-    source.Name(nameof(source)).NotNull();
-    searchValue.Name(nameof(searchValue)).NotNull();
-
-    return source.IndexOf(searchValue, StringComparison.CurrentCultureIgnoreCase);
-  }
-
-  /// <summary>
-  /// Case insensitive (CI) version of String.Contains().
-  /// </summary>
-  public static Boolean ContainsCI(this String source, String searchValue) => (source.IndexOfCI(searchValue) > -1);
-
   private static readonly ConcurrentDictionary<(String value, Int32 count), String> _memoizedRepeatStrings = new();
 
   /// <summary>
@@ -503,14 +487,47 @@ public static partial class StringUtils
   }
 
   /// <summary>
+  /// Case insensitive (CI) version of String.IndexOf().
+  /// </summary>
+  public static Int32 IndexOfCI(this String source, String searchValue)
+  {
+    source.Name(nameof(source)).NotNull();
+    searchValue.Name(nameof(searchValue)).NotNull();
+
+    return source.IndexOf(searchValue, StringComparison.CurrentCultureIgnoreCase);
+  }
+
+  /// <summary>
+  /// Case insensitive (CI) version of String.Contains().
+  /// </summary>
+  public static Boolean ContainsCI(this String source, String searchValue) => source.IndexOfCI(searchValue) > -1;
+
+  /// <summary>
   /// Case-insensitive version of String.Equals().
   /// </summary>
-  public static Boolean EqualsCI(this String value, String other) => value.Equals(other, StringComparison.CurrentCultureIgnoreCase);
+  public static Boolean EqualsCI(this String value, String other) => String.Equals(value, other, StringComparison.CurrentCultureIgnoreCase);
+
+  /// <summary>
+  /// Case insensitive (CI) version of String.EndsWith().
+  /// </summary>
+  public static Boolean EndsWithCI(this String source, String searchValue)
+  {
+    source.Name(nameof(source)).NotNull();
+    searchValue.Name(nameof(searchValue)).NotNull();
+
+    return source.EndsWith(searchValue, StringComparison.CurrentCultureIgnoreCase);
+  }
 
   /// <summary>
   /// Case-insensitive version of String.StartsWith().
   /// </summary>
-  public static Boolean StartsWithCI(this String value, String other) => value.StartsWith(other, StringComparison.CurrentCultureIgnoreCase);
+  public static Boolean StartsWithCI(this String source, String searchValue)
+  {
+    source.Name(nameof(source)).NotNull();
+    searchValue.Name(nameof(searchValue)).NotNull();
+
+    return source.StartsWith(searchValue, StringComparison.CurrentCultureIgnoreCase);
+  }
 
   /// <summary>
   /// Replace all solitary carriage returns (\r) and line feeds (\n) with carriage return/linefeed pairs (\r\n).

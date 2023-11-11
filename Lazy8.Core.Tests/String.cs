@@ -219,6 +219,63 @@ public class StringTests
   }
 
   [Test]
+  public void EqualsCITest()
+  {
+    String foo;
+    String bar;
+
+    foo = null;
+    bar = null;
+    Assert.That(foo.EqualsCI(bar), Is.True);
+    
+    foo = "abcdef";
+    bar = null;
+    Assert.That(foo.EqualsCI(bar), Is.False);
+
+    foo = null;
+    bar = "abcdef";
+    Assert.That(foo.EqualsCI(bar), Is.False);
+
+    foo = "abcdef";
+    bar = "abcdef";
+    Assert.That(foo.EqualsCI(bar), Is.True);
+
+    foo = "abcdef";
+    bar = "zzzz";
+    Assert.That(foo.EqualsCI(bar), Is.False);
+  }
+
+  [Test]
+  public void EndsWithCITest()
+  {
+    String foo = null;
+    Assert.That(() => foo.EndsWithCI(null), Throws.TypeOf<ArgumentNullException>());
+    Assert.That(() => foo.EndsWithCI("ef"), Throws.TypeOf<ArgumentNullException>());
+
+    foo = "abcdef";
+    Assert.That(() => foo.EndsWithCI(null), Throws.TypeOf<ArgumentNullException>());
+
+    Assert.That(foo.EndsWithCI("ef"), Is.True);
+    Assert.That(foo.EndsWithCI("EF"), Is.True);
+    Assert.That(foo.EndsWithCI("eZ"), Is.False);
+  }
+
+  [Test]
+  public void StartsWithCITest()
+  {
+    String foo = null;
+    Assert.That(() => foo.StartsWithCI(null), Throws.TypeOf<ArgumentNullException>());
+    Assert.That(() => foo.StartsWithCI("ab"), Throws.TypeOf<ArgumentNullException>());
+
+    foo = "abcdef";
+    Assert.That(() => foo.StartsWithCI(null), Throws.TypeOf<ArgumentNullException>());
+
+    Assert.That(foo.StartsWithCI("ab"), Is.True);
+    Assert.That(foo.StartsWithCI("AB"), Is.True);
+    Assert.That(foo.StartsWithCI("ZZ"), Is.False);
+  }
+
+  [Test]
   public void RepeatTest()
   {
     String s = null;
