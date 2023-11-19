@@ -123,4 +123,7 @@
   <data name="NonNullableCast" xml:space="preserve">
     <value>Cannot cast DBNull.Value to type '{0}'. Please use a nullable type.  Column name = '{1}', column index = {2}.</value>
   </data>
+  <data name="ReferencingTheSameDataTable" xml:space="preserve">
+    <value>The DataTable parameters '{0}' and '{1}' reference the same DataTable.</value>
+  </data>
 </root>

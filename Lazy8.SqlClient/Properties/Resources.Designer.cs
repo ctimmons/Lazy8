@@ -77,5 +77,14 @@ namespace Lazy8.SqlClient.Properties {
                 return ResourceManager.GetString("NonNullableCast", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The DataTable parameters &apos;{0}&apos; and &apos;{1}&apos; reference the same DataTable..
+        /// </summary>
+        internal static string ReferencingTheSameDataTable {
+            get {
+                return ResourceManager.GetString("ReferencingTheSameDataTable", resourceCulture);
+            }
+        }
     }
 }
