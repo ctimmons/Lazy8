@@ -24,17 +24,17 @@ namespace Lazy8.SqlClient;
 public enum StringColumnType { Char, NChar, VarChar, NVarChar }
 
 /// <summary>
-/// A collection of methods to transform DataSet, DataTable, and DataRelation schemas into T-SQL DML and DDL statements.
+/// A collection of methods to create T-SQL DML and DDL statements from DataSet, DataTable, and DataRelation schemas.
 /// </summary>
 public static class GetTSqlDataTableExtensions
 {
-  /* The AreDataTableContentsEqual() method below needs to sort the rows in
-     both of its DataTable parameters before comparing them.  This method
-     calculates how to most efficiently sort the DataTable, then returns a
-     comma separated string of the given DataTable's column names to sort on. */
-
   private static String GetColumnNamesForSorting(DataTable table)
   {
+    /* The AreDataTableContentsEqual() method below needs to sort the rows in
+       both of its DataTable parameters before comparing them.  This method
+       calculates how to most efficiently sort the DataTable, then returns a
+       comma separated string of the given DataTable's column names to sort on. */
+
     var columns = table.Columns.Cast<DataColumn>();
 
     /* First check if the table has a unique column.
@@ -113,7 +113,7 @@ public static class GetTSqlDataTableExtensions
       nameof(Int64) => "BIGINT",
       nameof(Single) => "REAL",
       nameof(TimeSpan) => "TIME",
-      _ => throw new ArgumentExceptionFmt(@"Cannot map '{0}' to a T-SQL type.  Use the DataColumn's ExtendedProperties with a key of 'type' to add additional T-SQL type information.  E.g. 'nameColumn.ExtendedProperties.Add(""type"", ""NVARCHAR(100)"");'.", clrType.Name),
+      _ => throw new ArgumentException($"Cannot map '{clrType.Name}' to a T-SQL type.  Use the DataColumn's ExtendedProperties with a key of 'type' to add additional T-SQL type information.  E.g. 'nameColumn.ExtendedProperties.Add(\"type\", \"NVARCHAR(100)\");'.", nameof(clrType)),
     };
   }
 
@@ -447,11 +447,11 @@ GO")
   ///   </item>
   ///   <item>
   ///     <term>primary key direction</term>
-  ///     <description>DataColumn only.  Valid values are "asc" and "desc" (case sensitive).</description>
+  ///     <description>Valid values are "asc" and "desc" (case sensitive).</description>
   ///   </item>
   ///   <item>
   ///     <term>type</term>
-  ///     <description></description>
+  ///     <description>Valid values are any T-SQL data type declaration (e.g. NVARCHAR(50)).</description>
   ///   </item>
   /// </list>
   /// <example>
