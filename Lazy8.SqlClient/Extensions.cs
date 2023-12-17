@@ -200,6 +200,30 @@ public static class SqlServerExtensionMethods
   }
 
   /// <summary>
+  /// Execute the given action within a transaction on connection.  The transaction is committed if action does not
+  /// throw an exception.  Likewise, if action throws any exception, the transaction is rolled back and the exception
+  /// is re-thrown.
+  /// </summary>
+  /// <param name="connection">An SqlConnection.  The connection is assumed to be open.</param>
+  /// <param name="action">An action that executes code on connection.</param>
+  public static void ExecuteInTransaction(this SqlConnection connection, Action action)
+  {
+    using (var transaction = connection.BeginTransaction())
+    {
+      try
+      {
+        action();
+        transaction.Commit();
+      }
+      catch
+      {
+        transaction.Rollback();
+        throw;
+      }
+    }
+  }
+
+  /// <summary>
   /// Given an <see cref="Microsoft.Data.SqlClient.SqlDataReader">SqlDataReader</see>,
   /// and a columnName, retrieve an XDocument from that column.
   /// </summary>
