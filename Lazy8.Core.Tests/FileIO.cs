@@ -278,8 +278,7 @@ public partial class FileUtilsTests
   [Test]
   public void LinesTest()
   {
-    using (var sr = new StreamReader(_testStringsFile, true))
-      Assert.That(sr.Lines().Count(), Is.EqualTo(10));
+    Assert.That(File.ReadAllText(_testStringsFile).Lines().Count(), Is.EqualTo(10));
   }
 
   [Test]

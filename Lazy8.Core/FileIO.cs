@@ -20,7 +20,7 @@ public enum OverwriteFile { Yes, No }
 
 public static partial class FileUtils
 {
-  public static readonly Char[] DirectorySeparators = new Char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+  public static readonly Char[] DirectorySeparators = [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
 
   /// <summary>
   /// Same behavior as <see cref="System.IO.Directory.Delete"/>(<paramref name="directory"/>, true), except this method will
@@ -447,6 +447,24 @@ public static partial class FileUtils
   /// <param name="directoryInfo">A <see cref="DirectoryInfo"/> value.</param>
   /// <returns>A <see cref="Boolean"/> value.</returns>
   public static Boolean IsDirectoryEmpty(this DirectoryInfo directoryInfo) => !directoryInfo.EnumerateFileSystemInfos().Any();
+
+  /// <summary>
+  /// Delete all files and folders from directory, while not deleting directory itself.
+  /// </summary>
+  /// <param name="directory">A valid path.</param>
+  public static void EmptyDirectory(String directory)
+  {
+    DirectoryInfo dir = new(directory);
+
+    foreach (FileInfo fi in dir.GetFiles())
+      fi.Delete();
+
+    foreach (DirectoryInfo di in dir.GetDirectories())
+    {
+      EmptyDirectory(di.FullName);
+      di.Delete();
+    }
+  }
 
   private static readonly MD5 _md5 = MD5.Create();
 

@@ -206,13 +206,13 @@ public static class SqlServerExtensionMethods
   /// </summary>
   /// <param name="connection">An SqlConnection.  The connection is assumed to be open.</param>
   /// <param name="action">An action that executes code on connection.</param>
-  public static void ExecuteInTransaction(this SqlConnection connection, Action action)
+  public static void ExecuteInTransaction(this SqlConnection connection, Action<SqlTransaction> action)
   {
     using (var transaction = connection.BeginTransaction())
     {
       try
       {
-        action();
+        action(transaction);
         transaction.Commit();
       }
       catch

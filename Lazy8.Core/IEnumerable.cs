@@ -129,31 +129,17 @@ public static partial class IEnumerableUtils
   public static IEnumerable<String> RemoveNullOrWhiteSpace(this IEnumerable<String> values) => values.Where(s => !String.IsNullOrWhiteSpace(s));
 
   /// <summary>
-  /// Allow the lines of a text file to be lazily read from within a LINQ expression.  This can be useful if the file to be processed is very large.
-  /// Essentially, this method is a lazy cousin to the <see cref="File.ReadAllLines"/> method.
-  /// <br/>
-  /// <br/>
-  /// <example>
-  /// Example:
-  /// <code>
-  /// using (var sr = new StreamReader(largeTextFile, true))<br/>
-  /// {<br/>
-  ///   var lines =<br/>
-  ///     sr<br/>
-  ///     .Lines()<br/>
-  ///     .SkipWhile(line =&gt; (line != "&lt;XML&gt;") &amp;&amp; (line != "&lt;PAGE&gt;"))<br/>
-  ///     .SkipWhile(line =&gt; String.IsNullOrWhiteSpace(line))<br/>
-  ///     ...
-  /// </code>
-  /// </example>
+  /// Allow the lines of a string to be lazily read from within a LINQ expression.
+  /// <para>The lines may be separated by \r\n, \n, or \r.</para>
   /// </summary>
-  /// <param name="textReader">A <see cref="TextReader"/> or one of its descendents.</param>
-  /// <returns>Lazily returns the lines in the file as an <see cref="IEnumerable&lt;String&gt;"/>.</returns>
-  public static IEnumerable<String> Lines(this TextReader textReader)
+  /// <param name="s">A <see cref="String"/>.</param>
+  /// <returns>Lazily returns the lines in the string as an <see cref="IEnumerable&lt;String&gt;"/>.</returns>
+  public static IEnumerable<String> Lines(this String s)
   {
     String line;
-    while ((line = textReader.ReadLine()) != null)
-      yield return line;
+    using (var sr = new StringReader(s))
+      while ((line = sr.ReadLine()) != null)
+        yield return line;
   }
 
   /// <summary>
