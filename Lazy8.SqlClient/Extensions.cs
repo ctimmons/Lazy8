@@ -6,7 +6,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlTypes;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +19,7 @@ using System.Xml.Schema;
 using Lazy8.Core;
 
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient.Server;
 
 namespace Lazy8.SqlClient;
 
@@ -450,6 +453,51 @@ public static class SqlServerExtensionMethods
       SqlCommandBuilder.DeriveParameters(sqlCommand);
       return sqlCommand.Parameters;
     }
+  }
+
+  /// <summary>
+  /// SqlDataRecord's Set* methods don't handle nulls.  This method is an abstraction that will
+  /// nominally call SetDateTime(), or SetDBNull() for an empty string value.
+  /// </summary>
+  /// <param name="dataRecord">An SqlDataRecord.</param>
+  /// <param name="index">The field's index within the data record.</param>
+  /// <param name="value">A string value.  Null, empty, and whitespace values are all treated as nulls.</param>
+  public static void SetNullableDateTime(this SqlDataRecord dataRecord, Int32 index, String value)
+  {
+    if (String.IsNullOrWhiteSpace(value))
+      dataRecord.SetDBNull(index);
+    else
+      dataRecord.SetDateTime(index, Convert.ToDateTime(value));
+  }
+
+  /// <summary>
+  /// SqlDataRecord's Set* methods don't handle nulls.  This method is an abstraction that will
+  /// nominally call SetDecimal(), or SetDBNull() for an empty string value.
+  /// </summary>
+  /// <param name="dataRecord">An SqlDataRecord.</param>
+  /// <param name="index">The field's index within the data record.</param>
+  /// <param name="value">A string value.  Null, empty, and whitespace values are all treated as nulls.</param>
+  public static void SetNullableDecimal(this SqlDataRecord dataRecord, Int32 index, String value)
+  {
+    if (String.IsNullOrWhiteSpace(value))
+      dataRecord.SetDBNull(index);
+    else
+      dataRecord.SetDecimal(index, Decimal.Parse(value, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign));
+  }
+
+  /// <summary>
+  /// SqlDataRecord's Set* methods don't handle nulls.  This method is an abstraction that will
+  /// nominally call SetInt64(), or SetDBNull() for an empty string value.
+  /// </summary>
+  /// <param name="dataRecord">An SqlDataRecord.</param>
+  /// <param name="index">The field's index within the data record.</param>
+  /// <param name="value">A string value.  Null, empty, and whitespace values are all treated as nulls.</param>
+  public static void SetNullableInt64(this SqlDataRecord dataRecord, Int32 index, String value)
+  {
+    if (String.IsNullOrWhiteSpace(value))
+      dataRecord.SetDBNull(index);
+    else
+      dataRecord.SetInt64(index, Int64.Parse(value, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign));
   }
 }
 
