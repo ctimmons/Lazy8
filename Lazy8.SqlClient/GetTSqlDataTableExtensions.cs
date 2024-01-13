@@ -1,11 +1,4 @@
-﻿/* This code proves to be unnecessary.  Most (all?) of what this class
-   does can be done with DataAdapters. */
-
-
-
-
-
-/* Unless otherwise noted, this source code is licensed
+﻿/* Unless otherwise noted, this source code is licensed
    under the GNU Public License V3.
 
    See the LICENSE file in the root folder for details. */
@@ -192,7 +185,7 @@ GO
 
   private static String GetRowValuesAsString(IEnumerable<DataColumn> columns, DataRow row)
   {
-    List<String> result = new();
+    List<String> result = [];
 
     foreach (var column in columns)
     {
