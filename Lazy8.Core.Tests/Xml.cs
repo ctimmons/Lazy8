@@ -112,9 +112,9 @@ public partial class Xml
 
     var xmlNamespaces = XDocument.Parse(xml).GetXmlNamespaces();
     Assert.That(xmlNamespaces.Count(), Is.EqualTo(3));
-    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => xmlNamespace.Prefix == "default" && xmlNamespace.Name == "http://www.xbrl.org/2003/instance"));
-    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => xmlNamespace.Prefix == "dei" && xmlNamespace.Name == "http://xbrl.sec.gov/dei/2022"));
-    Assert.IsTrue(xmlNamespaces.Any(xmlNamespace => xmlNamespace.Prefix == "xbrldi" && xmlNamespace.Name == "http://xbrl.org/2006/xbrldi"));
+    Assert.That(xmlNamespaces.Any(xmlNamespace => xmlNamespace.Prefix == "default" && xmlNamespace.Name == "http://www.xbrl.org/2003/instance"), Is.True);
+    Assert.That(xmlNamespaces.Any(xmlNamespace => xmlNamespace.Prefix == "dei" && xmlNamespace.Name == "http://xbrl.sec.gov/dei/2022"), Is.True);
+    Assert.That(xmlNamespaces.Any(xmlNamespace => xmlNamespace.Prefix == "xbrldi" && xmlNamespace.Name == "http://xbrl.org/2006/xbrldi"), Is.True);
   }
 
   [Test]
