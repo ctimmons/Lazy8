@@ -196,16 +196,19 @@ GO
       else if (column.DataType == typeof(String))
       {
         /* Regardless of the underlying T-SQL type (CHAR, VARCHAR, NCHAR, etc.)
-           all string literals need to be quoted. */
+           all string literals need to be surrounded with single quotes, and any single quotes w/i the string
+           need to be duplicated. */
 
         result.Add($"'{row[column].ToString().Replace("'", "''")}'");
       }
       else if (column.DataType == typeof(DateTime))
       {
-        /* SQL Server date and time literals are complex. See https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetime-transact-sql
+        /* SQL Server date and time literals are non-trivial. See https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetime-transact-sql
            for details. 
 
-           This algorithm first checks for type annotations in ExtendedProperties. */
+           This algorithm first checks for type annotations in column's ExtendedProperties. */
+
+        var dt = Convert.ToDateTime(row[column]);
 
         if (column.ExtendedProperties.ContainsKey("type"))
         {
@@ -214,32 +217,32 @@ GO
           switch (type)
           {
             case "date":
-              result.Add($"'{Convert.ToDateTime(row[column]):yyyy-MM-dd}'");
+              result.Add($"'{dt:yyyy-MM-dd}'");
               break;
             case "datetime":
-              result.Add($"'{Convert.ToDateTime(row[column]):yyyy-MM-ddThh:mm:ss.fff}'");
+              result.Add($"'{dt:yyyy-MM-ddThh:mm:ss.fff}'");
               break;
             case "datetime2":
-              result.Add($"'{Convert.ToDateTime(row[column]):yyyy-MM-ddThh:mm:ss.fffffff}'");
+              result.Add($"'{dt:yyyy-MM-ddThh:mm:ss.fffffff}'");
               break;
             case "datetimeoffset":
-              result.Add($"'{DateTime.SpecifyKind(Convert.ToDateTime(row[column]), DateTimeKind.Local):O}'");
+              result.Add($"'{DateTime.SpecifyKind(dt, DateTimeKind.Local):O}'");
               break;
             case "smalldatetime":
-              result.Add($"'{Convert.ToDateTime(row[column]):yyyy-MM-dd hh:mm:ss}'");
+              result.Add($"'{dt:yyyy-MM-dd hh:mm:ss}'");
               break;
             case "time":
-              result.Add($"'{Convert.ToDateTime(row[column]):hh:mm:ss.fffffff}'");
+              result.Add($"'{dt:hh:mm:ss.fffffff}'");
               break;
             default:
-              throw new Exception($"Unknown type '{type}'.");
+              throw new Exception($"Unknown type '{type}'.  When used in a DataColumn's ExtendedProperties, T-SQL types are case-sensitive.  Allowed types are 'date', 'datetime', 'datetime2', 'datetimeoffset', 'smalldatetime', and 'time'.");
           }
         }
         else
         {
-          /* If there aren't any type annotations, just assume an SQL Server type of DATETIME. */
+          /* If there aren't any ExtendedProperties type annotations, just assume a T-SQL type of DATETIME. */
 
-          result.Add($"'{Convert.ToDateTime(row[column]):yyyy-MM-ddThh:mm:ss.fff}'");
+          result.Add($"'{dt:yyyy-MM-ddThh:mm:ss.fff}'");
         }
       }
       else
@@ -248,14 +251,14 @@ GO
       }
     }
 
-    return $"({result.Join(",")})";
+    return $"({result.Join(", ")})";
   }
 
   /// <summary>
-  /// 
+  /// Given a DataTable, remove all DataColumn extended properties with a key of 'excluded'.
   /// </summary>
-  /// <param name="table"></param>
-  /// <returns></returns>
+  /// <param name="table">A DataTable.</param>
+  /// <returns>The modified DataTable.</returns>
   public static DataTable ClearAllExcludedColumnFlags(this DataTable table)
   {
     var columnNames =
@@ -271,11 +274,12 @@ GO
   }
 
   /// <summary>
-  /// 
+  /// Given a DataTable and an array of column names, remove all DataColumn extended properties with a key of 'excluded' from
+  /// those columns.
   /// </summary>
-  /// <param name="table"></param>
-  /// <param name="columnNames"></param>
-  /// <returns></returns>
+  /// <param name="table">A DataTable.</param>
+  /// <param name="columnNames">An array of strings containing the names of the columns to modify.</param>
+  /// <returns>The modified DataTable.</returns>
   public static DataTable ClearExcludedColumnFlag(this DataTable table, params String[] columnNames)
   {
     var columnsToClear =
@@ -292,11 +296,12 @@ GO
   }
 
   /// <summary>
-  /// 
+  /// Given a DataTable and an array of column names, set all DataColumn extended properties to a key of 'excluded' in
+  /// those columns.
   /// </summary>
-  /// <param name="table"></param>
-  /// <param name="columnNames"></param>
-  /// <returns></returns>
+  /// <param name="table">A DataTable.</param>
+  /// <param name="columnNames">An array of strings containing the names of the columns to modify.</param>
+  /// <returns>The modified DataTable.</returns>
   public static DataTable SetExcludedColumnFlag(this DataTable table, params String[] columnNames)
   {
     var columnsToExclude =
@@ -409,8 +414,8 @@ GO")
   /// Given a DataSet, return a string consisting of T-SQL DDL commands that will create that DataSet's schema on SQL Server.
   /// </summary>
   /// <remarks>
-  /// Generation of T-SQL is guided by metadata found in the ExtendedProperties property of DataTables and DataColumns,
-  /// and by DataRelations in the dataSet.
+  /// Generation of T-SQL is guided by metadata found in the DataTables, DataColumns, and DataRelations in the dataSet.
+  /// ExtendedProperties properties may be specified in DataTables and DataColumns to generate more accurate T-SQL.
   /// <para>
   /// The recognized metadata keys (case sensitive) for DataTables are:
   /// </para>
@@ -436,7 +441,8 @@ GO")
   ///   </listheader>
   ///   <item>
   ///     <term>excluded</term>
-  ///     <description>Applicable for both DataTable and DataColumn.  No value necessary.  The presence of this key will omit the table or column from code generation.</description>
+  ///     <description>Applicable for both DataTable and DataColumn.  No value necessary.
+  ///     The presence of this key will omit the table or column from code generation.</description>
   ///   </item>
   ///   <item>
   ///     <term>primary key direction</term>
@@ -444,7 +450,7 @@ GO")
   ///   </item>
   ///   <item>
   ///     <term>type</term>
-  ///     <description>Valid values are any T-SQL data type declaration (e.g. NVARCHAR(50)).</description>
+  ///     <description>Valid values are any T-SQL data type declaration (e.g. NVARCHAR(50)).  The value is not case sensitive.</description>
   ///   </item>
   /// </list>
   /// <example>
