@@ -11,9 +11,11 @@ Unless otherwise noted, the code in this respository is governed by the GNU GENE
 Overview
 --------
 
-The repository contains Visual Studio 2022 projects which are configured to use .Net 8, but most of the code should work with earlier Core-related versions.
+The repository contains Visual Studio 2022 projects which are configured to use .Net 8, but most of the code should work with earlier Core-related versions of .Net.
 
-Most of the code in Lazy8.Core has unit tests in Lazy8.Core.Tests.  The majority of methods are short, usually less than five lines of code.  I've tried to make the method and property names clearly state what they do.  The documentation is OK, but I'm still working on it (and probably always will be).
+There are two main projects: Lazy8.Core and Lazy8.SqlClient.  Each has an associated NUnit-based unit test project.
+
+The majority of methods are short, usually less than five lines of code.  I've tried to make the method and property names clearly state what they do.  The documentation is OK, but I'm still working on it (and probably always will be).
 
 Dependencies
 ------------
@@ -25,7 +27,7 @@ Highlights
 
 Lazy8.Core includes abstractions for easier handling of strings and DateTimes, code for chaining assertions together (Assert.cs), and code for serializing/deserializing XML (Xml.cs).  StringScanner.cs implements a general purpose recursive-descent lexical scanner.  To see how it's used, check out GetTSqlBatchExtension.cs in the Lazy8.SqlClient project.
 
-Lazy8.SqlClient contains extension methods making it a little easier to execute T-SQL on a connection.  Included is the above mentioned GetTSqlBatchExtension.cs file, which contains a scanner that intelligently splits a given T-SQL string on any embedded GO batch separators, and submits each batch on the given connection.  Note that this does not use Sql Server Management Objects to achieve this.
+Lazy8.SqlClient contains extension methods making it a little easier to execute T-SQL on a connection.  Included is the above mentioned GetTSqlBatchExtension.cs file, which contains a scanner that intelligently splits a given T-SQL string on any embedded GO batch separators, and submits each batch on the given connection.  Note that this does __not__ use Sql Server Management Objects (SMO) to achieve this.
 
 Pull Requests and Copying
 -------------------------

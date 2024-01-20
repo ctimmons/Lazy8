@@ -17,7 +17,10 @@ namespace Lazy8.SqlClient;
 public enum StringColumnType { Char, NChar, VarChar, NVarChar }
 
 /// <summary>
-/// A collection of methods to create T-SQL DML and DDL statements from DataSet, DataTable, and DataRelation schemas.
+/// A collection of methods to create T-SQL DML and DDL statements from DataSet, DataTable, and DataRelation schemas and data.
+/// <para>The primary use of these methods is for code generation.  Specifically, when one has a DataSet and wants to know
+/// what the corresponding T-SQL DDL looks like.  The DML-generating method GetTSqlInsertStatements() isn't of much use
+/// because SqlDataAdapter already has a robust set of methods to send data in a DataSet to/from whatever database it's connected to.</para>
 /// </summary>
 public static class GetTSqlDataTableExtensions
 {
@@ -74,7 +77,7 @@ public static class GetTSqlDataTableExtensions
       return false;
 
     /* Create views for both tables.  This allows for sorting the views without altering
-       the state of the underlying tables, resulting in much better performance (O(table1.Rows.Count))
+       the state of the underlying tables, resulting in much better comparison performance (O(table1.Rows.Count))
        as opposed to comparing two unsorted tables (O(table1.Rows.Count * table2.Rows.Count)). */
 
     var view1 = new DataView(table1) { Sort = GetColumnNamesForSorting(table1) };
@@ -106,7 +109,18 @@ public static class GetTSqlDataTableExtensions
       nameof(Int64) => "BIGINT",
       nameof(Single) => "REAL",
       nameof(TimeSpan) => "TIME",
-      _ => throw new ArgumentException($"Cannot map '{clrType.Name}' to a T-SQL type.  Use the DataColumn's ExtendedProperties with a key of 'type' to add additional T-SQL type information.  E.g. 'nameColumn.ExtendedProperties.Add(\"type\", \"NVARCHAR(100)\");'.", nameof(clrType)),
+      _ => throw new ArgumentException($@"
+Cannot map '{clrType.Name}' to a T-SQL type.
+
+Use the DataColumn's ExtendedProperties with a key of 'type' to add additional
+T-SQL type information.  For example:
+
+  nameColumn.ExtendedProperties.Add(""type"", ""NVARCHAR(100)"");
+
+Or call the AddTSqlTypeInfoForStringColumns(DataTable) method.
+For String columns that do not have an extended property with a key of 'type',
+that method will add the necessary type annotations based on the
+longest string found in each String column.".Trim(), nameof(clrType)),
     };
   }
 
@@ -148,6 +162,8 @@ public static class GetTSqlDataTableExtensions
   /// <summary>
   /// Transform a DataTable's data into T-SQL INSERT statements.  Any DataTable columns that have an extended property of "excluded"
   /// will not be present in the generated INSERT statements.
+  /// <para>This method isn't very useful.  One should use an SqlDataAdapter instead to read/write data from/to an
+  /// SQL Server database.</para>
   /// </summary>
   /// <param name="table">A DataTable.</param>
   /// <returns>A String consisting of T-SQL INSERT statements.</returns>
@@ -318,21 +334,22 @@ GO
   }
 
   /// <summary>
-  /// 
+  /// Note that T-SQL types such as CHAR and NVARCHAR have a length requirement, whereas a DataTable column with type String does not.
+  /// <para>In order to generate T-SQL DDL from a DataSet or DataTable, all String columns in a DataTable must have an extended property of 'type'.
+  /// This extended property should contain a T-SQL character type with an accompanying length, like 'NCHAR(10)'.</para>
+  /// <para>To automate this process, this method will scan all of the data in the given DataTable's String columns and add the appropriate
+  /// 'type' extended property.</para>
   /// </summary>
-  /// <param name="table"></param>
-  /// <param name="stringColumnType"></param>
-  /// <returns></returns>
-  /// <exception cref="Exception"></exception>
+  /// <param name="table">A DataTable.</param>
+  /// <param name="stringColumnType">An enumeration specifying what kind of T-SQL type to use in the extended 'type' property.</param>
+  /// <returns>The modified DataTable.</returns>
   public static DataTable AddTSqlTypeInfoForStringColumns(this DataTable table, StringColumnType stringColumnType = StringColumnType.NVarChar)
   {
     /* To explain the magic numbers 8000 and 4000, see the T-SQL CHAR* help entries
        for descriptions of their respective column width limits:
 
          https://docs.microsoft.com/en-us/sql/t-sql/data-types/char-and-varchar-transact-sql
-         https://docs.microsoft.com/en-us/sql/t-sql/data-types/nchar-and-nvarchar-transact-sql
-
-    */
+         https://docs.microsoft.com/en-us/sql/t-sql/data-types/nchar-and-nvarchar-transact-sql */
 
     Int32 getMaximumAllowableWidth() =>
       stringColumnType switch
@@ -367,10 +384,70 @@ GO
   }
 
   /// <summary>
-  /// 
+  /// Given a DataTable, return a string consisting of T-SQL DDL commands that will create that DataTable's column schema
+  /// and primary key contraint on SQL Server.
   /// </summary>
-  /// <param name="table"></param>
-  /// <returns></returns>
+  /// <remarks>
+  /// Generation of T-SQL is guided by metadata found in the DataTable and its DataColumns.
+  /// ExtendedProperties properties may be specified in DataTables and DataColumns to generate more accurate T-SQL.
+  /// <para>
+  /// The recognized metadata keys (case sensitive) for DataTables are:
+  /// </para>
+  /// <list type="bullet">
+  ///   <item>
+  ///     <description>schema</description>
+  ///   </item>
+  /// </list>
+  /// <example>
+  ///  Example:
+  /// <code>
+  ///  DataTable dt = new("item");
+  ///  dt.ExtendedProperties.Add("schema", "inventory");
+  /// </code>
+  /// </example>
+  /// <para>
+  /// The recognized metadata keys (case sensitive) for DataColumns are:
+  /// </para>
+  /// <list type="table">
+  ///   <listheader>
+  ///     <term>Key</term>
+  ///     <description>Valid Values</description>
+  ///   </listheader>
+  ///   <item>
+  ///     <term>excluded</term>
+  ///     <description>Applicable for both DataTable and DataColumn.  No value necessary.
+  ///     The presence of this key will omit the table or column from code generation.</description>
+  ///   </item>
+  ///   <item>
+  ///     <term>primary key direction</term>
+  ///     <description>Valid values are "asc" and "desc" (case sensitive).</description>
+  ///   </item>
+  ///   <item>
+  ///     <term>type</term>
+  ///     <description>Valid values are any T-SQL data type declaration (e.g. NVARCHAR(50)).  The value is not case sensitive.</description>
+  ///   </item>
+  /// </list>
+  /// <example>
+  ///  Example 1:
+  /// <code>
+  ///  DataColumn descriptionColumn = new DataColumn("description", typeof(String)) { AllowDBNull = false };
+  ///  descriptionColumn.ExtendedProperties.Add("primary key direction", "desc");
+  ///  descriptionColumn.ExtendedProperties.Add("type", "nvarchar(100)");
+  /// </code>
+  /// </example>
+  /// <example>
+  ///  Example 2:
+  /// <code>
+  ///  DataColumn descriptionColumn = new DataColumn("quantity", typeof(Int32)) { AllowDBNull = false };
+  ///  // "excluded" is a flag indicating this column will be excluded from the code generation process. The value doesn't matter.
+  ///  descriptionColumn.ExtendedProperties.Add("excluded", "");
+  /// </code>
+  /// </example>
+  /// </remarks>
+  /// <param name="table">A DataTable.
+  /// The DataTable's DataColumns may contain extended properties as described in the 'Remarks' section.
+  /// A DataColumn's Expression property will be copied into the DDL without modification.</param>
+  /// <returns>A String as described in the summary.</returns>
   public static String GetTSqlDdl(this DataTable table)
   {
     var columns = table.Columns.Cast<DataColumn>().Where(c => !c.ExtendedProperties.ContainsKey("excluded"));
@@ -387,7 +464,7 @@ CONSTRAINT [PK_{table.TableName}] PRIMARY KEY CLUSTERED
     return $@"
 CREATE TABLE {GetTableSchemaAndName(table)}
 (
-  {columns.Select(c => GetColumnDdl(c)).Join(",\n").Indent(2).Trim()}
+  {columns.Select(GetColumnDdl).Join(",\n").Indent(2).Trim()}
 
   {primaryKeyConstraint.Indent(2).Trim()}
 ) ON [PRIMARY];
