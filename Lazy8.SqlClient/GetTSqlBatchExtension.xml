@@ -6,13 +6,13 @@
       </summary>
       <remarks>
         <para>
-          [Author's Note:  I hated having to write this code at all.  Microsoft already knows about some of the GO-related bugs:
+          [Author's Note:  I hate having to write this code at all.  Microsoft already knows about some of the GO-related bugs:
           <ul>
             <li><a href="https://feedback.azure.com/d365community/idea/59edae68-5325-ec11-b6e6-000d3a4f0da0">GO in 2nd half of nested block comments breaks batch parsing in SSMS and SQLCMD</a></li>
             <li><a href="https://feedback.azure.com/d365community/idea/76fed513-5725-ec11-b6e6-000d3a4f0da0">Incorrect Syntax near 'GO' when nested block comments</a></li>
             <li><a href="https://feedback.azure.com/d365community/idea/5b100326-6c25-ec11-b6e6-000d3a4f0da0">SQL Server 2014 Management Studio, when delimiting on GO command, doesn't handle nested comments</a></li>
           </ul>
-          in the possible solutions listed below.  But they refuse to fix them.]"
+          Note that these bugs are at least six years old at the time of this writing, but MS has so far refused to fix them.]"
         </para>
         <para>
           Executing a T-SQL batch file that contains multiple batches (separated by GO statements) isn't easy.
@@ -20,7 +20,7 @@
         <para>
           None of the Microsoft.Data.SqlClient.SqlCommand methods (ExecuteNonQuery(), ExecuteReader(), etc.)
           understand GO statements, so these methods will throw exceptions when encountering a GO statement.
-          There are several other approaches, but all of them have bugs.  That lead to
+          There are several other approaches, but all of them have bugs.  That inspired
           the creation of this class, which uses a lexical scanner to split the T-SQL batches into multiple strings,
           each of which can then be executed in the normal fashion.
         </para>
