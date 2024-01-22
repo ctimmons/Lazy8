@@ -19,7 +19,15 @@ namespace Lazy8.SqlClient;
 /// <include file='GetTSqlBatchExtension.xml' path='docs/members[@name="sqlclient"]/GetTSqlBatchExtension/*'/>
 public static class GetTSqlBatchExtension
 {
-  /// <include file='GetTSqlBatchExtension.xml' path='docs/members[@name="sqlclient"]/GetTSqlBatches/*'/>
+  /// <summary>
+  /// Given a String tsql, split tsql into separate batches based on the "GO" keyword.
+  /// <para>The "GO" keyword may optionally be followed by a positive integer indicating how many times that batch should be executed.</para>
+  /// </summary>
+  /// <param name="tsql">A String containing one or more T-SQL batches.</param>
+  /// <returns>An IEnumerable&lt;String&gt;.  Each element of the IEnumerable corresponds to a separate batch found in tsql.
+  /// <para>If tsql is null, empty, or contains only whitespace, the result has zero elements.</para>
+  /// <para>If tsql contains no GO separators, the result has one element consisting of tsql itself.</para>
+  /// </returns>
   public static IEnumerable<String> GetTSqlBatches(this String tsql)
   {
     /* StringBuilder's default buffer size is 16 characters. It cannot be known in advance
@@ -28,9 +36,9 @@ public static class GetTSqlBatchExtension
        To hopefully prevent StringBuilder from having to perform a large number of memory re-allocations,
        an arbitrary batch buffer size of 8K characters is selected.
 
-       See StringBuilder's "Memory" entry in MSDN for more info:
+       See StringBuilder's "Memory allocation" entry in MSDN for more info:
 
-         https://docs.microsoft.com/en-us/dotnet/api/system.text.stringbuilder#Memory */
+         https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-text-stringbuilder#memory-allocation */
 
     const Int32 kilobyte = 1024;
     StringBuilder batch = new(8 * kilobyte);
@@ -68,12 +76,18 @@ public static class GetTSqlBatchExtension
   }
 
   /// <summary>
-  /// 
+  /// Given a String tsql, split tsql into separate batches based on the "GO" keyword, and submit each batch separately to SQL Server for execution.
+  /// <para>The "GO" keyword may optionally be followed by a positive integer indicating how many times that batch should be executed.</para>
+  /// <para>If there are no "GO" keywords in tsql, the entire string will be submitted to SQL Server.</para>
+  /// <para>If tsql is null, empty, or contains only whitespace, this method is a no-op.</para>
   /// </summary>
-  /// <param name="connection"></param>
-  /// <param name="tsql"></param>
+  /// <param name="connection">An SqlConnection.</param>
+  /// <param name="tsql">A String containing one or more T-SQL batches.</param>
   public static void ExecuteTSqlBatches(this SqlConnection connection, String tsql)
   {
+    if (String.IsNullOrWhiteSpace(tsql))
+      return;
+
     using (var command = new SqlCommand() { CommandTimeout = 0, Connection = connection, CommandType = CommandType.Text })
     {
       foreach (var batch in GetTSqlBatches(tsql))
@@ -85,12 +99,20 @@ public static class GetTSqlBatchExtension
   }
 
   /// <summary>
-  /// 
+  /// Given a filename to a text file containing one or more T-SQL batches, load the file into memory and split the T-SQL batches
+  /// into separate batches based on the "GO" keyword, and submit each batch separately to SQL Server for execution.
+  /// <para>The "GO" keyword may optionally be followed by a positive integer indicating how many times that batch should be executed.</para>
+  /// <para>If there are no "GO" keywords in the file's text, the entire string will be submitted to SQL Server.</para>
+  /// <para>If file is empty or contains only whitespace, this method is a no-op.</para>
   /// </summary>
-  /// <param name="connection"></param>
-  /// <param name="filename"></param>
-  public static void ExecuteTSqlFileBatches(this SqlConnection connection, String filename) =>
+  /// <param name="connection">An SqlConnection.</param>
+  /// <param name="filename">A filename for an existing file containing one or more T-SQL batches.</param>
+  public static void ExecuteTSqlFileBatches(this SqlConnection connection, String filename)
+  {
+    filename.Name(nameof(filename)).NotNullEmptyOrOnlyWhitespace().FileExists();
+
     connection.ExecuteTSqlBatches(File.ReadAllText(filename));
+  }
 
   private static String GetBatch(String batch, Int32 goMultiplier)
   {
@@ -163,7 +185,7 @@ END;
        Also, this code assumes valid inputs, so it won't check for illegal constructs like "go999", or "select 42; go".
        So this function only has to worry about valid, but non-trivial lines like this: */
 
-    //         go /* block comment */42
+    //  go /* block comment */42
 
     void SkipBlockCommentsAndLinearWhitespace()
     {
@@ -175,13 +197,16 @@ END;
     scanner.SavePosition();
     scanner.SkipLinearWhitespace();
 
+    const Int32 goNotFound = 0;
+    const Int32 defaultMultiplier = 1;
+
     /* 'GO' and 'GOTO' are the only two keywords that start with 'GO'.
        Eliminate the chance of mistaking 'GOTO' for 'GO' by executing
        the following matches. */
     if (scanner.MatchLiteral("goto") || !scanner.MatchLiteral("go"))
     {
       scanner.GoBackToSavedPosition();
-      return 0;
+      return goNotFound;
     }
 
     SkipBlockCommentsAndLinearWhitespace();
@@ -189,12 +214,12 @@ END;
     if (MatchSingleLineComment(scanner))
     {
       scanner.AcceptNewPosition();
-      return 1;
+      return defaultMultiplier;
     }
 
     var count = MatchNumber(scanner);
     scanner.AcceptNewPosition();
-    return count.Any() ? Convert.ToInt32(count) : 1;
+    return count.Any() ? Convert.ToInt32(count) : defaultMultiplier;
   }
 
   private static String MatchStringLiteral(StringScanner scanner)

@@ -6,10 +6,13 @@
       </summary>
       <remarks>
         <para>
-          [Author's Note:  I hated having to write this code at all.  Microsoft already knows about some of the
-          <a href="https://feedback.azure.com/forums/908035-sql-server/suggestions/32901208--go-in-2nd-half-of-nested-block-comments-breaks-b">GO-related bugs</a>
-          in the possible solutions listed below.  But they refuse to fix them or, in the alternative, open source
-          the relevant source code so I can fix them.]
+          [Author's Note:  I hated having to write this code at all.  Microsoft already knows about some of the GO-related bugs:
+          <ul>
+            <li><a href="https://feedback.azure.com/d365community/idea/59edae68-5325-ec11-b6e6-000d3a4f0da0">GO in 2nd half of nested block comments breaks batch parsing in SSMS and SQLCMD</a></li>
+            <li><a href="https://feedback.azure.com/d365community/idea/76fed513-5725-ec11-b6e6-000d3a4f0da0">Incorrect Syntax near 'GO' when nested block comments</a></li>
+            <li><a href="https://feedback.azure.com/d365community/idea/5b100326-6c25-ec11-b6e6-000d3a4f0da0">SQL Server 2014 Management Studio, when delimiting on GO command, doesn't handle nested comments</a></li>
+          </ul>
+          in the possible solutions listed below.  But they refuse to fix them.]"
         </para>
         <para>
           Executing a T-SQL batch file that contains multiple batches (separated by GO statements) isn't easy.
@@ -31,7 +34,7 @@
         </para>
         <para>
           When one of those tools sees a GO statement, the tool sends the T-SQL preceding the GO statement to the server to
-          be executed. Each batch is separate, in that variables declared in one batch are not visible in any other batches.
+          be executed. Each batch is a separate lexical scope, in that variables declared in one batch are not visible in any other batches.
           Also, commands like CREATE statements must appear in a batch by themselves.
         </para>
         <para>
@@ -94,183 +97,5 @@
         </para>
       </remarks>
     </GetTSqlBatchExtension>
-    <GetTSqlBatches>
-      <summary>
-      </summary>
-      <returns>
-      </returns>
-      <param name="tsql"></param>
-    </GetTSqlBatches>
-    <AddDouble>
-      <summary>
-        Adds two doubles <paramref name="a"/> and <paramref name="b"/> and returns the result.
-      </summary>
-      <returns>
-        The sum of two doubles.
-      </returns>
-      <example>
-        <code>
-          double c = Math.Add(4.5, 5.4);
-          if (c > 10)
-          {
-          Console.WriteLine(c);
-          }
-        </code>
-      </example>
-      <exception cref="System.OverflowException">
-        Thrown when one parameter is max
-        and the other is greater than 0.
-      </exception>
-      See <see cref="Math.Add(int, int)"/> to add integers.
-      <seealso cref="Math.Subtract(double, double)"/>
-      <seealso cref="Math.Multiply(double, double)"/>
-      <seealso cref="Math.Divide(double, double)"/>
-      <param name="a">A double precision number.</param>
-      <param name="b">A double precision number.</param>
-    </AddDouble>
-    <SubtractInt>
-      <summary>
-        Subtracts <paramref name="b"/> from <paramref name="a"/> and returns the result.
-      </summary>
-      <returns>
-        The difference between two integers.
-      </returns>
-      <example>
-        <code>
-          int c = Math.Subtract(4, 5);
-          if (c > 1)
-          {
-          Console.WriteLine(c);
-          }
-        </code>
-      </example>
-      See <see cref="Math.Subtract(double, double)"/> to subtract doubles.
-      <seealso cref="Math.Add(int, int)"/>
-      <seealso cref="Math.Multiply(int, int)"/>
-      <seealso cref="Math.Divide(int, int)"/>
-      <param name="a">An integer.</param>
-      <param name="b">An integer.</param>
-    </SubtractInt>
-    <SubtractDouble>
-      <summary>
-        Subtracts a double <paramref name="b"/> from another double <paramref name="a"/> and returns the result.
-      </summary>
-      <returns>
-        The difference between two doubles.
-      </returns>
-      <example>
-        <code>
-          double c = Math.Subtract(4.5, 5.4);
-          if (c > 1)
-          {
-          Console.WriteLine(c);
-          }
-        </code>
-      </example>
-      See <see cref="Math.Subtract(int, int)"/> to subtract integers.
-      <seealso cref="Math.Add(double, double)"/>
-      <seealso cref="Math.Multiply(double, double)"/>
-      <seealso cref="Math.Divide(double, double)"/>
-      <param name="a">A double precision number.</param>
-      <param name="b">A double precision number.</param>
-    </SubtractDouble>
-    <MultiplyInt>
-      <summary>
-        Multiplies two integers <paramref name="a"/> and <paramref name="b"/> and returns the result.
-      </summary>
-      <returns>
-        The product of two integers.
-      </returns>
-      <example>
-        <code>
-          int c = Math.Multiply(4, 5);
-          if (c > 100)
-          {
-          Console.WriteLine(c);
-          }
-        </code>
-      </example>
-      See <see cref="Math.Multiply(double, double)"/> to multiply doubles.
-      <seealso cref="Math.Add(int, int)"/>
-      <seealso cref="Math.Subtract(int, int)"/>
-      <seealso cref="Math.Divide(int, int)"/>
-      <param name="a">An integer.</param>
-      <param name="b">An integer.</param>
-    </MultiplyInt>
-    <MultiplyDouble>
-      <summary>
-        Multiplies two doubles <paramref name="a"/> and <paramref name="b"/> and returns the result.
-      </summary>
-      <returns>
-        The product of two doubles.
-      </returns>
-      <example>
-        <code>
-          double c = Math.Multiply(4.5, 5.4);
-          if (c > 100.0)
-          {
-          Console.WriteLine(c);
-          }
-        </code>
-      </example>
-      See <see cref="Math.Multiply(int, int)"/> to multiply integers.
-      <seealso cref="Math.Add(double, double)"/>
-      <seealso cref="Math.Subtract(double, double)"/>
-      <seealso cref="Math.Divide(double, double)"/>
-      <param name="a">A double precision number.</param>
-      <param name="b">A double precision number.</param>
-    </MultiplyDouble>
-    <DivideInt>
-      <summary>
-        Divides an integer <paramref name="a"/> by another integer <paramref name="b"/> and returns the result.
-      </summary>
-      <returns>
-        The quotient of two integers.
-      </returns>
-      <example>
-        <code>
-          int c = Math.Divide(4, 5);
-          if (c > 1)
-          {
-          Console.WriteLine(c);
-          }
-        </code>
-      </example>
-      <exception cref="System.DivideByZeroException">
-        Thrown when <paramref name="b"/> is equal to 0.
-      </exception>
-      See <see cref="Math.Divide(double, double)"/> to divide doubles.
-      <seealso cref="Math.Add(int, int)"/>
-      <seealso cref="Math.Subtract(int, int)"/>
-      <seealso cref="Math.Multiply(int, int)"/>
-      <param name="a">An integer dividend.</param>
-      <param name="b">An integer divisor.</param>
-    </DivideInt>
-    <DivideDouble>
-      <summary>
-        Divides a double <paramref name="a"/> by another double <paramref name="b"/> and returns the result.
-      </summary>
-      <returns>
-        The quotient of two doubles.
-      </returns>
-      <example>
-        <code>
-          double c = Math.Divide(4.5, 5.4);
-          if (c > 1.0)
-          {
-          Console.WriteLine(c);
-          }
-        </code>
-      </example>
-      <exception cref="System.DivideByZeroException">
-        Thrown when <paramref name="b"/> is equal to 0.
-      </exception>
-      See <see cref="Math.Divide(int, int)"/> to divide integers.
-      <seealso cref="Math.Add(double, double)"/>
-      <seealso cref="Math.Subtract(double, double)"/>
-      <seealso cref="Math.Multiply(double, double)"/>
-      <param name="a">A double precision dividend.</param>
-      <param name="b">A double precision divisor.</param>
-    </DivideDouble>
   </members>
 </docs>
