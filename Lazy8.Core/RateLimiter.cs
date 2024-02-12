@@ -29,8 +29,7 @@ public class RateLimiter
 
   public RateLimiter(Int32 maxActionsPerTimeUnit, TimeSpan timeUnit)
   {
-    if (maxActionsPerTimeUnit < 1)
-      throw new ArgumentOutOfRangeException(nameof(maxActionsPerTimeUnit));
+    ArgumentOutOfRangeException.ThrowIfLessThan(maxActionsPerTimeUnit, 1, nameof(maxActionsPerTimeUnit));
 
     if ((timeUnit < TimeSpan.Zero) || (timeUnit.TotalMilliseconds > Int32.MaxValue))
       throw new ArgumentOutOfRangeException(nameof(timeUnit));

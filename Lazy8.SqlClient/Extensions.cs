@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlTypes;
 using System.Globalization;
 using System.IO;
@@ -456,6 +455,16 @@ public static class SqlServerExtensionMethods
   }
 
   /// <summary>
+  /// SqlDataRecord's SetDateTime method accepts a DateTime value, whereas this method accepts a String value.
+  /// This method will do the String-to-DateTime conversion so the caller doesn't have to.
+  /// </summary>
+  /// <param name="dataRecord">An SqlDataRecord.</param>
+  /// <param name="index">The field's index within the data record.</param>
+  /// <param name="value">A string value that contains a valid DateTime value.</param>
+  public static void SetDateTime(this SqlDataRecord dataRecord, Int32 index, String value) =>
+    dataRecord.SetDateTime(index, Convert.ToDateTime(value));
+
+  /// <summary>
   /// SqlDataRecord's Set* methods don't handle nulls.  This method is an abstraction that will
   /// nominally call SetDateTime(), or SetDBNull() for an empty string value.
   /// </summary>
@@ -470,6 +479,18 @@ public static class SqlServerExtensionMethods
       dataRecord.SetDateTime(index, Convert.ToDateTime(value));
   }
 
+  private static readonly NumberStyles _numberStyle = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign;
+
+  /// <summary>
+  /// SqlDataRecord's SetDecimal method accepts a Decimal value, whereas this method accepts a String value.
+  /// This method will do the String-to-Decimal conversion so the caller doesn't have to.
+  /// </summary>
+  /// <param name="dataRecord">An SqlDataRecord.</param>
+  /// <param name="index">The field's index within the data record.</param>
+  /// <param name="value">A string value that contains a valid Decimal value.</param>
+  public static void SetDecimal(this SqlDataRecord dataRecord, Int32 index, String value) =>
+    dataRecord.SetDecimal(index, Decimal.Parse(value, _numberStyle));
+
   /// <summary>
   /// SqlDataRecord's Set* methods don't handle nulls.  This method is an abstraction that will
   /// nominally call SetDecimal(), or SetDBNull() for an empty string value.
@@ -482,12 +503,24 @@ public static class SqlServerExtensionMethods
     if (String.IsNullOrWhiteSpace(value))
       dataRecord.SetDBNull(index);
     else
-      dataRecord.SetDecimal(index, Decimal.Parse(value, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign));
+      dataRecord.SetDecimal(index, Decimal.Parse(value, _numberStyle));
   }
+
+  /// <summary>
+  /// SqlDataRecord's SetInt64 method accepts an Int64 value, whereas this method accepts a String value.
+  /// This method will do the String-to-Int64 conversion so the caller doesn't have to.
+  /// <para>This method will also correctly handle string values that have all zeros after the decimal point.</para>
+  /// </summary>
+  /// <param name="dataRecord">An SqlDataRecord.</param>
+  /// <param name="index">The field's index within the data record.</param>
+  /// <param name="value">A string value that contains a valid Int64 value.</param>
+  public static void SetInt64(this SqlDataRecord dataRecord, Int32 index, String value) =>
+    dataRecord.SetInt64(index, Int64.Parse(value, _numberStyle));
 
   /// <summary>
   /// SqlDataRecord's Set* methods don't handle nulls.  This method is an abstraction that will
   /// nominally call SetInt64(), or SetDBNull() for an empty string value.
+  /// <para>This method will also correctly handle string values that have all zeros after the decimal point.</para>
   /// </summary>
   /// <param name="dataRecord">An SqlDataRecord.</param>
   /// <param name="index">The field's index within the data record.</param>
@@ -497,7 +530,7 @@ public static class SqlServerExtensionMethods
     if (String.IsNullOrWhiteSpace(value))
       dataRecord.SetDBNull(index);
     else
-      dataRecord.SetInt64(index, Int64.Parse(value, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign));
+      dataRecord.SetInt64(index, Int64.Parse(value, _numberStyle));
   }
 }
 
