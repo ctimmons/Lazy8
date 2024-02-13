@@ -476,7 +476,7 @@ public static class SqlServerExtensionMethods
     if (String.IsNullOrWhiteSpace(value))
       dataRecord.SetDBNull(index);
     else
-      dataRecord.SetDateTime(index, Convert.ToDateTime(value));
+      dataRecord.SetDateTime(index, value);
   }
 
   private static readonly NumberStyles _numberStyle = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign;
@@ -503,7 +503,7 @@ public static class SqlServerExtensionMethods
     if (String.IsNullOrWhiteSpace(value))
       dataRecord.SetDBNull(index);
     else
-      dataRecord.SetDecimal(index, Decimal.Parse(value, _numberStyle));
+      dataRecord.SetDecimal(index, value);
   }
 
   /// <summary>
@@ -530,7 +530,7 @@ public static class SqlServerExtensionMethods
     if (String.IsNullOrWhiteSpace(value))
       dataRecord.SetDBNull(index);
     else
-      dataRecord.SetInt64(index, Int64.Parse(value, _numberStyle));
+      dataRecord.SetInt64(index, value);
   }
 }
 
