@@ -4,8 +4,6 @@
    See the LICENSE file in the root folder for details. */
 
 using System;
-using System.Data;
-using System.Linq;
 
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -90,14 +88,14 @@ GO
   public void CheckConnectionStringTest()
   {
     /* Both well-formed and valid connection string. */
-    Assert.That(() => _connection.ConnectionString.CheckConnectionString(), Throws.Nothing);
+    Assert.That(_connection.ConnectionString.CheckConnectionString, Throws.Nothing);
 
     /* Well-formed, but not valid. */
     SqlConnectionStringBuilder builder = new(_connection.ConnectionString) { DataSource = "database that does not exist" };
-    Assert.That(() => builder.ConnectionString.CheckConnectionString(), Throws.TypeOf<SqlException>());
+    Assert.That(builder.ConnectionString.CheckConnectionString, Throws.TypeOf<SqlException>());
 
     /* Ill-formed. */
-    Assert.That(() => "random text that can't possibly be a connection string".CheckConnectionString(), Throws.TypeOf<ArgumentException>());
+    Assert.That("random text that can't possibly be a connection string".CheckConnectionString, Throws.TypeOf<ArgumentException>());
 
     /* There is no test for both ill-formed and invalid. */
   }

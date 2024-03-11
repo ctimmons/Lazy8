@@ -65,7 +65,7 @@ public static class SqlServerExtensionMethods
 
     /* BUG WORKAROUND
 
-       The current (August 2023) help entries for both the .NetFx and .Net Core libraries for SqlConnection.Clone() state:
+       The current (March 2024) help entries for both the .NetFx and .Net Core libraries for SqlConnection.Clone() state:
 
          "This member is only supported by the .NET Compact Framework."
 
@@ -76,7 +76,7 @@ public static class SqlServerExtensionMethods
          https://docs.microsoft.com/en-us/dotnet/api/microsoft.data.sqlclient.sqlconnection.system-icloneable-clone
 
        Two things are notable - 1) the compact framework hasn't been updated since 2013, and is apparently
-       abandonware, and 2) aside from that single line in the help file, the Microsoft.Data.SqlClient project
+       abandonware, and 2) aside from that single line in the help files, the Microsoft.Data.SqlClient project
        documentation and source code make no mention of the compact framework.
 
        This leads to the probable conclusion that this line in the help file is incorrect, and should be removed.
@@ -108,7 +108,7 @@ public static class SqlServerExtensionMethods
   /// </summary>
   /// <param name="connection"><see cref="Microsoft.Data.SqlClient.SqlConnection">SqlConnection</see> the sql is sent to.  The connection must be opened before calling this method.</param>
   /// <param name="sql"><see cref="System.String">String</see> containing sql to execute.</param>
-  /// <returns></returns>
+  /// <returns>A DataSet.</returns>
   public static DataSet GetDataSet(this SqlConnection connection, String sql, Int32 commandTimeout = 0)
   {
     using (var command = new SqlCommand() { Connection = connection, CommandTimeout = commandTimeout, CommandType = CommandType.Text, CommandText = sql })

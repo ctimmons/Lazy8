@@ -25,7 +25,7 @@ public class RateLimiterTests
     /* Start N tasks as quickly as possible to see if RateLimiter
        actually limits the concurrent nubmer of tasks. */
 
-    await WaitAsyncTest(numberOfTasks: 100, delay: () => Task.CompletedTask);
+    await WaitAsyncTest(numberOfTasks: 100, delay: () => Task.CompletedTask).ConfigureAwait(false);
   }
 
   [Test]
@@ -36,7 +36,7 @@ public class RateLimiterTests
     const Int32 shortestTaskStartDelay = 500;
     const Int32 longestTaskStartDelay = 2500;
 
-    await WaitAsyncTest(numberOfTasks: 20, delay: () => Task.Delay(_random.Next(shortestTaskStartDelay, longestTaskStartDelay)));
+    await WaitAsyncTest(numberOfTasks: 20, delay: () => Task.Delay(_random.Next(shortestTaskStartDelay, longestTaskStartDelay))).ConfigureAwait(false);
   }
   
   private async Task WaitAsyncTest(Int32 numberOfTasks, Func<Task> delay)
@@ -54,9 +54,9 @@ public class RateLimiterTests
 
     foreach (var _ in Enumerable.Range(1, numberOfTasks))
     {
-      await delay();
+      await delay().ConfigureAwait(false);
 
-      await rateLimiter.WaitAsync();
+      await rateLimiter.WaitAsync().ConfigureAwait(false);
       taskList.Add(Task.Factory.StartNew(
         async () =>
         {

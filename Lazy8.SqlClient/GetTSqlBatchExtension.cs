@@ -44,7 +44,7 @@ public static class GetTSqlBatchExtension
     StringBuilder batch = new(8 * kilobyte);
 
     StringScanner scanner = new(tsql);
-    List<String> batches = new();
+    List<String> batches = [];
 
     while (scanner.Peek() != StringScanner.END_OF_INPUT)
     {
@@ -182,7 +182,7 @@ END;
        (including the GO statement's optional 'count' parameter).
 
        Fortunately, the main loop of this parser will handle leading and trailing block comments.
-       Also, this code assumes valid inputs, so it won't check for illegal constructs like "go999", or "select 42; go".
+       Also, this code assumes valid inputs - it won't check for illegal constructs like "go999", or "select 42; go".
        So this function only has to worry about valid, but non-trivial lines like this: */
 
     //  go /* block comment */42

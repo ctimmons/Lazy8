@@ -71,10 +71,10 @@ public static class GZipExtensions
   /* Asynchronous Methods */
 
   public static async Task<String> CompressToBase64Async(this String uncompressedData, CancellationToken token = default) =>
-    Convert.ToBase64String(await Encoding.UTF8.GetBytes(uncompressedData).CompressAsync(token));
+    Convert.ToBase64String(await Encoding.UTF8.GetBytes(uncompressedData).CompressAsync(token).ConfigureAwait(false));
 
   public static async Task<String> DecompressFromBase64Async(this String compressedData, CancellationToken token = default) =>
-    Encoding.UTF8.GetString(await Convert.FromBase64String(compressedData).DecompressAsync(token));
+    Encoding.UTF8.GetString(await Convert.FromBase64String(compressedData).DecompressAsync(token).ConfigureAwait(false));
 
   public static async Task<Byte[]> CompressAsync(this Byte[] uncompressedData, CancellationToken token = default)
   {
@@ -82,7 +82,7 @@ public static class GZipExtensions
     {
       using (var destinationStream = new MemoryStream())
       {
-        await sourceStream.CompressToAsync(destinationStream, token);
+        await sourceStream.CompressToAsync(destinationStream, token).ConfigureAwait(false);
         return destinationStream.ToArray();
       }
     }
@@ -94,7 +94,7 @@ public static class GZipExtensions
     {
       using (var destinationStream = new MemoryStream())
       {
-        await sourceStream.DecompressToAsync(destinationStream, token);
+        await sourceStream.DecompressToAsync(destinationStream, token).ConfigureAwait(false);
         return destinationStream.ToArray();
       }
     }

@@ -162,7 +162,6 @@ public class StringScanner
 
   /// <summary>
   /// Match zero or more characters as long as the <paramref name="predicate"/> returns true.
-  /// <para>This is analogous to LINQ's TakeWhile() method.</para>
   /// </summary>
   /// <param name="predicate">A method that takes a Char and returns a Boolean.</param>
   /// <returns>A String with zero or more matched characters.</returns>
@@ -223,14 +222,12 @@ public class StringScanner
 
   /// <summary>
   /// Starting from the scanner's current position, skip one or more line ending characters (carriage return (\r) or line feed (\n)).
-  /// <para>Logically equivalent to the LINQ expression "s.TakeWhile(c => (c == '\n') || (c == '\r'))".</para>
   /// </summary>
   public void SkipLineEndings() => this.MatchWhile(IsLineEnding);
 
   /// <summary>
   /// Starting from the scanner's current position, skip one or more whitespace characters (but not
   /// line ending characters (carriage return (\r) or line feed (\n))).
-  /// <para>Logically equivalent to the LINQ expression "s.TakeWhile(c => Char.IsWhiteSpace(c) &amp;&amp; (c != '\n') &amp;&amp; (c != '\r'))".</para>
   /// </summary>
   public void SkipLinearWhitespace() => this.MatchWhile(c => !IsLineEnding(c) && Char.IsWhiteSpace(c));
 

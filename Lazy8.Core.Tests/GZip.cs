@@ -25,8 +25,8 @@ public class GZipTests
   [Test]
   public async Task Base64RoundTripTestAsync()
   {
-    var compressedSource = await _source.CompressToBase64Async();
-    var decompressedSource = await compressedSource.DecompressFromBase64Async();
+    var compressedSource = await _source.CompressToBase64Async().ConfigureAwait(false);
+    var decompressedSource = await compressedSource.DecompressFromBase64Async().ConfigureAwait(false);
     Assert.That(_source == decompressedSource);
   }
 
@@ -41,8 +41,8 @@ public class GZipTests
   [Test]
   public async Task ByteArrayRoundTripTestAsync()
   {
-    var compressedSource = await Encoding.UTF8.GetBytes(_source).CompressAsync();
-    var decompressedSource = Encoding.UTF8.GetString(await compressedSource.DecompressAsync());
+    var compressedSource = await Encoding.UTF8.GetBytes(_source).CompressAsync().ConfigureAwait(false);
+    var decompressedSource = Encoding.UTF8.GetString(await compressedSource.DecompressAsync().ConfigureAwait(false));
     Assert.That(_source == decompressedSource);
   }
 }

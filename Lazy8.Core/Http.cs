@@ -48,7 +48,7 @@ public partial class Http
   private static String GetFilenameFromUri(Uri uri) => uri.Segments.Last();
 
   public static async Task DownloadFileAsync(String sourceUrl, String destinationFolder, String destinationFilename = null) =>
-    await DownloadFileAsync(new Uri(sourceUrl), destinationFolder, destinationFilename);
+    await DownloadFileAsync(new Uri(sourceUrl), destinationFolder, destinationFilename).ConfigureAwait(false);
 
   public static async Task DownloadFileAsync(Uri uri, String destinationFolder, String destinationFilename = null)
   {
@@ -59,7 +59,7 @@ public partial class Http
       destinationFilename ??= GetFilenameFromHttpResponseMessage(responseMessage) ?? GetFilenameFromUri(uri);
 
       using (var destinationStream = File.OpenWrite(Path.Combine(destinationFolder, destinationFilename)))
-        await (await responseMessage.Content.ReadAsStreamAsync()).CopyToAsync(destinationStream);
+        await (await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false)).CopyToAsync(destinationStream).ConfigureAwait(false);
     }
   }
 }
