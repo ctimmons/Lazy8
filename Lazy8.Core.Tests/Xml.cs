@@ -43,13 +43,13 @@ Another line.
       {
         StringProperty1 = "Hello, world!",
         Int32Property1 = 42,
-        ListInt32Property1 = new List<Int32>() { 1, 2, 3 },
+        ListInt32Property1 = [1, 2, 3],
         TestClassInstance =
           new TestClass()
           {
             StringProperty1 = "foo bar baz quux",
             Int32Property1 = 138,
-            ListInt32Property1 = new List<Int32>() { 4, 5, 6 },
+            ListInt32Property1 = [4, 5, 6],
             TestClassInstance = null
           }
       };

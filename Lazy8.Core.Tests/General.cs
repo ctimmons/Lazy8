@@ -78,7 +78,7 @@ public partial class GeneralUtilsTests
            the current directory.
         
            This also prevents failures in subsequent unit tests that expect
-           the current directory to be in a certain location. (see UU.cs). */
+           the current directory to point to a certain location. (see UU.cs). */
 
         Directory.SetCurrentDirectory(previousCurrentDirectory);
         Directory.Delete(tempFolder, recursive: true);
@@ -94,7 +94,7 @@ public partial class GeneralUtilsTests
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <IsPublishable>False</IsPublishable>

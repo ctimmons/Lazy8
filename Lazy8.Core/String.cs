@@ -375,7 +375,7 @@ public static partial class StringUtils
   {
     value.Name(nameof(value)).NotNull();
 
-    return value.EndsWith("/") ? value : value + "/";
+    return value.EndsWith('/') ? value : value + "/";
   }
 
   [GeneratedRegex("<[^>]+?>", RegexOptions.Singleline)]
@@ -760,7 +760,7 @@ public static partial class StringUtils
 
           if (elements.Count() == 1)
           {
-            return new List<Int32>() { Convert.ToInt32(elements.First()) };
+            return [Convert.ToInt32(elements.First())];
           }
           else if (elements.Count() == 2)
           {

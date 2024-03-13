@@ -90,7 +90,7 @@ public class IEnumerableTests
     BigInteger expected = 0;
     Assert.That(expected, Is.EqualTo(data.Product()));
 
-    data = new List<Int32>() { 2, 3, 4, 5 };
+    data = [2, 3, 4, 5];
     expected = 120;
     Assert.That(expected, Is.EqualTo(data.Product()));
   }
@@ -103,28 +103,27 @@ public class IEnumerableTests
     Assert.That(expected, Is.EqualTo(data.Split(3)));
 
     data.Add(1);
-    expected.Add(new List<Int32>() { 1 });
+    expected.Add([1]);
     Assert.That(expected, Is.EqualTo(data.Split(3)));
 
     data.Add(2);
-    expected.Add(new List<Int32>() { 2 });
+    expected.Add([2]);
     Assert.That(expected, Is.EqualTo(data.Split(3)));
 
     data.Add(3);
-    expected.Add(new List<Int32>() { 3 });
+    expected.Add([3]);
     Assert.That(expected, Is.EqualTo(data.Split(3)));
 
     data.Add(4);
-    expected.Add(new List<Int32>() { 4 });
+    expected.Add([4]);
     Assert.That(expected, Is.Not.EqualTo(data.Split(3)));
 
     expected =
-      new List<List<Int32>>()
-      {
-          new List<Int32>() { 1, 4 },
-          new List<Int32>() { 2 },
-          new List<Int32>() { 3 }
-      };
+      [
+        [1, 4],
+        [2],
+        [3]
+      ];
     Assert.That(expected, Is.EqualTo(data.Split(3)));
   }
 

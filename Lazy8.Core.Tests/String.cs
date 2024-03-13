@@ -548,7 +548,7 @@ public class StringTests
     List<String> strings = null;
     Assert.That(() => strings.AreAllEmpty(), Throws.TypeOf<ArgumentNullException>());
 
-    strings = new List<String>();
+    strings = [];
     Assert.That(strings.AreAllEmpty(), Is.True);
 
     strings.Add("a");
@@ -571,7 +571,7 @@ public class StringTests
     List<String> strings = null;
     Assert.That(() => strings.AreAnyEmpty(), Throws.TypeOf<ArgumentNullException>());
 
-    strings = new List<String>();
+    strings = [];
     Assert.That(strings.AreAnyEmpty(), Is.False);
 
     strings.Add("a");

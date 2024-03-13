@@ -8,15 +8,9 @@ using System.Threading;
 
 namespace Lazy8.Core;
 
-public class StringMessageEventArgs : EventArgs
+public class StringMessageEventArgs(String message) : EventArgs()
 {
-  public String Message { get; set; }
-
-  public StringMessageEventArgs(String message)
-    : base()
-  {
-    this.Message = message;
-  }
+  public String Message { get; set; } = message;
 }
 
 public static class EventArgsExtensions

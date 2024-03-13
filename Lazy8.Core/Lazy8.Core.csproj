@@ -18,7 +18,7 @@
     <Version Condition=" '$(Version)' == '' ">1.0.0.0</Version>
     <Version Condition=" '$(Version)' != '' ">$(Version)</Version>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-    <Nullable>disable</Nullable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>

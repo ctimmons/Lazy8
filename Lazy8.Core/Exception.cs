@@ -14,12 +14,8 @@ namespace Lazy8.Core;
 /// <para>Instead of calling 'throw new Exception(String.Format("", ...))', this class's
 /// constructor eliminates the need to call String.Format(), i.e. 'throw new ExceptionFmt("", ...)'.</para>
 /// </summary>
-public class ExceptionFmt : Exception
+public class ExceptionFmt(String message, params Object[] args) : Exception(String.Format(message, args))
 {
-  public ExceptionFmt(String message, params Object[] args)
-    : base(String.Format(message, args))
-  {
-  }
 }
 
 /// <summary>
@@ -27,12 +23,8 @@ public class ExceptionFmt : Exception
 /// <para>Instead of calling 'throw new NotImplementedException(String.Format("", ...))', this class's
 /// constructor eliminates the need to call String.Format(), i.e. 'throw new NotImplementedExceptionFmt("", ...)'.</para>
 /// </summary>
-public class ArgumentExceptionFmt : ArgumentException
+public class ArgumentExceptionFmt(String message, params Object[] args) : ArgumentException(String.Format(message, args))
 {
-  public ArgumentExceptionFmt(String message, params Object[] args)
-    : base(String.Format(message, args))
-  {
-  }
 }
 
 /// <summary>
@@ -40,20 +32,12 @@ public class ArgumentExceptionFmt : ArgumentException
 /// <para>Instead of calling 'throw new NotImplementedException(String.Format("", ...))', this class's
 /// constructor eliminates the need to call String.Format(), i.e. 'throw new NotImplementedExceptionFmt("", ...)'.</para>
 /// </summary>
-public class NotImplementedExceptionFmt : NotImplementedException
+public class NotImplementedExceptionFmt(String message, params Object[] args) : NotImplementedException(String.Format(message, args))
 {
-  public NotImplementedExceptionFmt(String message, params Object[] args)
-    : base(String.Format(message, args))
-  {
-  }
 }
 
-public class ItemNotFoundException : Exception
+public class ItemNotFoundException(String message) : Exception(message)
 {
-  public ItemNotFoundException(String message)
-    : base(message)
-  {
-  }
 }
 
 public static class ExceptionUtils

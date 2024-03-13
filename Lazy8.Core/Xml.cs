@@ -245,17 +245,9 @@ public static class XmlUtils
 }
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public class XmlCommentAttribute : Attribute
+public class XmlCommentAttribute(String value) : Attribute()
 {
-  private String _value = "";
-
-  public XmlCommentAttribute(String value)
-    : base()
-  {
-    this._value = value;
-    this.ShouldIndent = true;
-    this.IndentSize = 2;
-  }
+  private String _value = value;
 
   public String Value
   {
@@ -269,7 +261,7 @@ public class XmlCommentAttribute : Attribute
     set { this._value = value; }
   }
 
-  public Boolean ShouldIndent { get; set; }
-  public Int32 IndentSize { get; set; }
+  public Boolean ShouldIndent { get; set; } = true;
+  public Int32 IndentSize { get; set; } = 2;
 }
 

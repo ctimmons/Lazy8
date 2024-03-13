@@ -14,13 +14,12 @@ namespace Lazy8.Core.Tests;
 public class DateTimeUtilsTests
 {
   private readonly Tuple<DateTime, DateTime>[] _quarterDateRanges =
-    new Tuple<DateTime, DateTime>[4]
-    {
-        new Tuple<DateTime, DateTime>(new DateTime(2000, 1, 1), new DateTime(2000, 3, 31)),
-        new Tuple<DateTime, DateTime>(new DateTime(2000, 4, 1), new DateTime(2000, 6, 30)),
-        new Tuple<DateTime, DateTime>(new DateTime(2000, 7, 1), new DateTime(2000, 9, 30)),
-        new Tuple<DateTime, DateTime>(new DateTime(2000, 10, 1), new DateTime(2000, 12, 31))
-    };
+    [
+      new Tuple<DateTime, DateTime>(new DateTime(2000, 1, 1), new DateTime(2000, 3, 31)),
+      new Tuple<DateTime, DateTime>(new DateTime(2000, 4, 1), new DateTime(2000, 6, 30)),
+      new Tuple<DateTime, DateTime>(new DateTime(2000, 7, 1), new DateTime(2000, 9, 30)),
+      new Tuple<DateTime, DateTime>(new DateTime(2000, 10, 1), new DateTime(2000, 12, 31))
+    ];
 
   private void RunActionOverQuarterDateRanges(Action<Int32, DateTime, DateTime, DateTime> action)
   {

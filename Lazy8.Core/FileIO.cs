@@ -550,7 +550,7 @@ public static partial class FileUtils
     return
       directory
       .TrimEnd()
-      .TrimEnd(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
+      .TrimEnd([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar]);
   }
 
   /// <summary>

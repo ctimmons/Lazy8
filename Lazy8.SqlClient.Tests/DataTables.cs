@@ -16,7 +16,7 @@ public static class DataTables
 
     DataColumn idColumn = new("id", typeof(Int32)) { AllowDBNull = false };
     result.Columns.Add(idColumn);
-    result.PrimaryKey = new[] { idColumn };
+    result.PrimaryKey = [idColumn];
 
     DataColumn descriptionColumn = new DataColumn("description", typeof(String)) { AllowDBNull = false };
     descriptionColumn.ExtendedProperties.Add("type", "nvarchar(100)");
@@ -56,7 +56,7 @@ public static class DataTables
 
     DataColumn idColumn = new("id", typeof(Int32)) { AllowDBNull = false };
     result.Columns.Add(idColumn);
-    result.PrimaryKey = new[] { idColumn };
+    result.PrimaryKey = [idColumn];
 
     DataColumn descriptionColumn = new DataColumn("name", typeof(String)) { AllowDBNull = false };
     descriptionColumn.ExtendedProperties.Add("type", "nvarchar(100)");
@@ -86,7 +86,7 @@ public static class DataTables
 
     DataColumn idColumn = new("id", typeof(Int32)) { AllowDBNull = false };
     result.Columns.Add(idColumn);
-    result.PrimaryKey = new[] { idColumn };
+    result.PrimaryKey = [idColumn];
 
     DataColumn customerIdColumn = new("customer_id", typeof(Int32)) { AllowDBNull = false };
     result.Columns.Add(customerIdColumn);
@@ -121,7 +121,7 @@ public static class DataTables
 
     DataColumn idColumn = new("id", typeof(Int32)) { AllowDBNull = false };
     result.Columns.Add(idColumn);
-    result.PrimaryKey = new[] { idColumn };
+    result.PrimaryKey = [idColumn];
 
     DataColumn orderIdColumn = new("order_id", typeof(Int32)) { AllowDBNull = false };
     result.Columns.Add(orderIdColumn);

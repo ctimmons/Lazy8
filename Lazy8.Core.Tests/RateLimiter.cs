@@ -39,12 +39,12 @@ public class RateLimiterTests
     await WaitAsyncTest(numberOfTasks: 20, delay: () => Task.Delay(_random.Next(shortestTaskStartDelay, longestTaskStartDelay))).ConfigureAwait(false);
   }
   
-  private async Task WaitAsyncTest(Int32 numberOfTasks, Func<Task> delay)
+  private static async Task WaitAsyncTest(Int32 numberOfTasks, Func<Task> delay)
   {
     const Int32 maximumNumberOfTasksPerTimeSpan = 10;
     var timeSpanInSeconds = TimeSpan.FromSeconds(1);
 
-    List<Task> taskList = new();
+    List<Task> taskList = [];
     /* Have to use a concurrent queue because the List<T>.Add() method isn't threadsafe. */
     ConcurrentQueue<TimeSpan> startTimes = new();
     RateLimiter rateLimiter = new(maximumNumberOfTasksPerTimeSpan, timeSpanInSeconds);

@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
     <IsPublishable>False</IsPublishable>
-    <Nullable>disable</Nullable>
+    <Nullable>enable</Nullable>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
   </PropertyGroup>
 
