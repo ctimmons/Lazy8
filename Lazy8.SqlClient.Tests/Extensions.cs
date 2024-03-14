@@ -15,7 +15,7 @@ namespace Lazy8.SqlClient.Tests;
 [TestFixture]
 public class ExtensionsTests
 {
-  private static SqlConnection _connection;
+  private static SqlConnection? _connection;
 
   private const String _dropLazy8TestDatabaseSql = $@"
 /* It is required to switch to a different database before dropping the Lazy8TestDB database.
@@ -80,15 +80,15 @@ GO
 
     SqlConnection.ClearPool(_connection);
 
-    _connection.ExecuteTSqlBatches(_dropLazy8TestDatabaseSql);
-    _connection.Close();
+    _connection!.ExecuteTSqlBatches(_dropLazy8TestDatabaseSql);
+    _connection!.Close();
   }
 
   [Test]
   public void CheckConnectionStringTest()
   {
     /* Both well-formed and valid connection string. */
-    Assert.That(_connection.ConnectionString.CheckConnectionString, Throws.Nothing);
+    Assert.That(_connection!.ConnectionString.CheckConnectionString, Throws.Nothing);
 
     /* Well-formed, but not valid. */
     SqlConnectionStringBuilder builder = new(_connection.ConnectionString) { DataSource = "database that does not exist" };

@@ -40,7 +40,7 @@ public class AssertTests
     Assert.That(() => s.NotNull(), Throws.Nothing);
     Assert.That(() => s.Name(nameof(s)).NotNull(), Throws.Nothing);
 
-    s = null;
+    s = null!;
     Assert.That(() => s.NotNull(), Throws.TypeOf<ArgumentNullException>());
     Assert.That(() => s.Name(nameof(s)).NotNull(), Throws.TypeOf<ArgumentNullException>());
   }

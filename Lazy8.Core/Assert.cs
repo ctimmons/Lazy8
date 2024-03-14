@@ -215,23 +215,16 @@ public static partial class AssertUtils
 /// <typeparam name="T">Any type.</typeparam>
 public class AssertionContext<T>
 {
-  public String Name { get; private set; }
-  public T Value { get; private set; }
-
-  private AssertionContext()
-    : base()
-  {
-  }
+  public String Name { get; init; }
+  public T Value { get; init; }
 
   public AssertionContext(T value)
-    : this()
   {
     this.Name = "<Unknown variable name>";
     this.Value = value;
   }
 
   public AssertionContext(String name, T value)
-    : this()
   {
     this.Name = name;
     this.Value = value;

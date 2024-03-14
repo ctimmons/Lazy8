@@ -276,7 +276,7 @@ public static partial class FileUtils
   /// <param name="errorHandler">An <see cref="Action"/> that takes a <see cref="String"/> and an <see cref="Exception"/> as parameters
   /// <para>The string is the path that was being processed when the exception was thrown.</para></param>
   /// <returns>An <see cref="IEnumerable&lt;FileSystemInfo&gt;"/> containing the matching <see cref="FileSystemInfo"/>s.</returns>
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(String path, String filemask, SearchOption searchOption, Action<String, Exception> errorHandler)
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(String path, String filemask, SearchOption searchOption, Action<String, Exception>? errorHandler)
   {
     /* Yield statements cannot appear inside of a try/catch statement.
        That's why the di and diEnumerator variables,
@@ -284,7 +284,7 @@ public static partial class FileUtils
 
     errorHandler ??= (s, e) => { };
 
-    DirectoryInfo di = null;
+    DirectoryInfo? di = null;
     try
     {
       di = new DirectoryInfo(path);
@@ -302,7 +302,7 @@ public static partial class FileUtils
     {
       yield return di;
 
-      IEnumerable<FileSystemInfo> diEnumerator = null;
+      IEnumerable<FileSystemInfo>? diEnumerator = null;
       try
       {
         diEnumerator = di.EnumerateFileSystemInfos(filemask);
@@ -504,7 +504,7 @@ public static partial class FileUtils
   /// Returns the path of the currently executing assembly.
   /// </summary>
   /// <returns>A <see cref="String"/> containing the directory of the currently executing assembly.</returns>
-  public static String GetExecutablePath() => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location).AddTrailingSeparator();
+  public static String GetExecutablePath() => Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!.AddTrailingSeparator();
 
   [GeneratedRegex(@"\\+", RegexOptions.Singleline)]
   private static partial Regex MultipleBackslashesRegex();
