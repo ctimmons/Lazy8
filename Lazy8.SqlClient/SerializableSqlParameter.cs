@@ -139,27 +139,27 @@ public class SerializableSqlParameter
 
      The setters must be public for serialization to work. */
 
-  public String CompareInfo { get; set; }
-  public String Direction { get; set; }
-  public String ForceColumnEncryption { get; set; }
-  public String IsNullable { get; set; }
-  public String LocaleId { get; set; }
-  public String Offset { get; set; }
-  public String ParameterName { get; set; }
-  public String Precision { get; set; }
-  public String Scale { get; set; }
-  public String Size { get; set; }
-  public String SourceColumn { get; set; } = "";
-  public String SourceColumnNullMapping { get; set; }
-  public String SourceVersion { get; set; }
-  public String SqlDbType { get; set; }
-  public String TypeName { get; set; }
-  public String UdtTypeName { get; set; }
-  public String Value { get; set; }
-  public String ValueType { get; set; }
-  public String XmlSchemaCollectionDatabase { get; set; }
-  public String XmlSchemaCollectionName { get; set; }
-  public String XmlSchemaCollectionOwningSchema { get; set; }
+  public String? CompareInfo { get; set; }
+  public String? Direction { get; set; }
+  public String? ForceColumnEncryption { get; set; }
+  public String? IsNullable { get; set; }
+  public String? LocaleId { get; set; }
+  public String? Offset { get; set; }
+  public String? ParameterName { get; set; }
+  public String? Precision { get; set; }
+  public String? Scale { get; set; }
+  public String? Size { get; set; }
+  public String? SourceColumn { get; set; } = "";
+  public String? SourceColumnNullMapping { get; set; }
+  public String? SourceVersion { get; set; }
+  public String? SqlDbType { get; set; }
+  public String? TypeName { get; set; }
+  public String? UdtTypeName { get; set; }
+  public String? Value { get; set; }
+  public String? ValueType { get; set; }
+  public String? XmlSchemaCollectionDatabase { get; set; }
+  public String? XmlSchemaCollectionName { get; set; }
+  public String? XmlSchemaCollectionOwningSchema { get; set; }
 
   /* Standard types that can be referenced by the Value property. */
 
@@ -475,10 +475,10 @@ public class SerializableSqlParameter
          See the comments at the beginning of this class as to why these two
          properties can and should be ignored. */
 
-      CompareInfo = (SqlCompareOptions) Enum.Parse(typeof(SqlCompareOptions), this.CompareInfo, ignoreCase: true),
-      Direction = (ParameterDirection) Enum.Parse(typeof(ParameterDirection), this.Direction, ignoreCase: true),
-      ForceColumnEncryption = Boolean.Parse(this.ForceColumnEncryption),
-      IsNullable = Boolean.Parse(this.IsNullable),
+      CompareInfo = (SqlCompareOptions) Enum.Parse(typeof(SqlCompareOptions), this.CompareInfo!, ignoreCase: true),
+      Direction = (ParameterDirection) Enum.Parse(typeof(ParameterDirection), this.Direction!, ignoreCase: true),
+      ForceColumnEncryption = Boolean.Parse(this.ForceColumnEncryption!),
+      IsNullable = Boolean.Parse(this.IsNullable!),
       LocaleId = Convert.ToInt32(this.LocaleId),
       Offset = Convert.ToInt32(this.Offset),
       ParameterName = this.ParameterName,
@@ -486,8 +486,8 @@ public class SerializableSqlParameter
       Scale = Convert.ToByte(this.Scale),
       Size = Convert.ToInt32(this.Size),
       SourceColumn = this.SourceColumn,
-      SourceColumnNullMapping = Boolean.Parse(this.SourceColumnNullMapping),
-      SourceVersion = (DataRowVersion) Enum.Parse(typeof(DataRowVersion), this.SourceVersion, ignoreCase: true),
+      SourceColumnNullMapping = Boolean.Parse(this.SourceColumnNullMapping!),
+      SourceVersion = (DataRowVersion) Enum.Parse(typeof(DataRowVersion), this.SourceVersion!, ignoreCase: true),
       TypeName = this.TypeName,
       UdtTypeName = this.UdtTypeName,
       XmlSchemaCollectionDatabase = this.XmlSchemaCollectionDatabase,
@@ -501,29 +501,29 @@ public class SerializableSqlParameter
         result.Value = null;
         break;
       case _boolean:
-        result.Value = Boolean.Parse(this.Value);
+        result.Value = Boolean.Parse(this.Value!);
         break;
       case _byte:
         result.Value = Convert.ToByte(this.Value);
         break;
       case _byteArray:
-        result.Value = Convert.FromBase64String(this.Value);
+        result.Value = Convert.FromBase64String(this.Value!);
         break;
       case _char:
-        result.Value = Convert.ToChar(this.Value);
+        result.Value = Convert.ToChar(this.Value!);
         break;
       case _charArray:
-        result.Value = this.Value.ToCharArray();
+        result.Value = this.Value!.ToCharArray();
         break;
       case _datetime:
         /* Strip off the leading tilde added during serialization. The tilde
            was added to prevent Newtonsoft's JSON.Net from screwing things up. */
-        result.Value = DateTime.ParseExact(this.Value[1..], "O", CultureInfo.InvariantCulture);
+        result.Value = DateTime.ParseExact(this.Value![1..], "O", CultureInfo.InvariantCulture);
         break;
       case _datetimeOffset:
         /* Strip off the leading tilde added during serialization. The tilde
            was added to prevent Newtonsoft's JSON.Net from screwing things up. */
-        result.Value = DateTimeOffset.ParseExact(this.Value[1..], "O", CultureInfo.InvariantCulture);
+        result.Value = DateTimeOffset.ParseExact(this.Value![1..], "O", CultureInfo.InvariantCulture);
         break;
       case _dbnull:
         result.Value = DBNull.Value;
@@ -535,7 +535,7 @@ public class SerializableSqlParameter
         result.Value = Convert.ToDouble(this.Value);
         break;
       case _guid:
-        result.Value = Guid.ParseExact(this.Value, "N");
+        result.Value = Guid.ParseExact(this.Value!, "N");
         break;
       case _int16:
         result.Value = Convert.ToInt16(this.Value);
@@ -555,27 +555,27 @@ public class SerializableSqlParameter
       case _timespan:
         /* Strip off the leading tilde added during serialization. The tilde
            was added to prevent Newtonsoft's JSON.Net from screwing things up. */
-        result.Value = TimeSpan.ParseExact(this.Value[1..], "c", CultureInfo.InvariantCulture);
+        result.Value = TimeSpan.ParseExact(this.Value![1..], "c", CultureInfo.InvariantCulture);
         break;
       case _sqlBinary:
-        result.Value = new SqlBinary(Convert.FromBase64String(this.Value));
+        result.Value = new SqlBinary(Convert.FromBase64String(this.Value!));
         break;
       case _sqlBoolean:
-        result.Value = new SqlBoolean(Boolean.Parse(this.Value));
+        result.Value = new SqlBoolean(Boolean.Parse(this.Value!));
         break;
       case _sqlByte:
         result.Value = new SqlByte(Convert.ToByte(this.Value));
         break;
       case _sqlBytes:
-        result.Value = new SqlBytes(Convert.FromBase64String(this.Value));
+        result.Value = new SqlBytes(Convert.FromBase64String(this.Value!));
         break;
       case _sqlChars:
-        result.Value = new SqlChars(this.Value.ToCharArray());
+        result.Value = new SqlChars(this.Value!.ToCharArray());
         break;
       case _sqlDateTime:
         /* Strip off the leading tilde added during serialization. The tilde
            was added to prevent Newtonsoft's JSON.Net from screwing things up. */
-        result.Value = new SqlDateTime(DateTime.ParseExact(this.Value[1..], "O", CultureInfo.InvariantCulture));
+        result.Value = new SqlDateTime(DateTime.ParseExact(this.Value![1..], "O", CultureInfo.InvariantCulture));
         break;
       case _sqlDecimal:
         result.Value = new SqlDecimal(Convert.ToDecimal(this.Value));
@@ -584,7 +584,7 @@ public class SerializableSqlParameter
         result.Value = new SqlDouble(Convert.ToDouble(this.Value));
         break;
       case _sqlGuid:
-        result.Value = new SqlGuid(this.Value);
+        result.Value = new SqlGuid(this.Value!);
         break;
       case _sqlInt16:
         result.Value = new SqlInt16(Convert.ToInt16(this.Value));
@@ -605,7 +605,7 @@ public class SerializableSqlParameter
         result.Value = new SqlString(this.Value);
         break;
       case _sqlXml:
-        using (var stringReader = new StringReader(this.Value))
+        using (var stringReader = new StringReader(this.Value!))
           using (var xmlTextReader = new XmlTextReader(stringReader))
             result.Value = new SqlXml(xmlTextReader);
         break;
@@ -621,7 +621,7 @@ public class SerializableSqlParameter
        SqlDbType.  Let the owner's choice override the calculated SqlDbType value by assigning
        SqlDbType *after* setting Value. */
 
-    result.SqlDbType = (SqlDbType) Enum.Parse(typeof(SqlDbType), this.SqlDbType, ignoreCase: true);
+    result.SqlDbType = (SqlDbType) Enum.Parse(typeof(SqlDbType), this.SqlDbType!, ignoreCase: true);
 
     return result;
   }

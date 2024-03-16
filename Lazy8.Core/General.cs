@@ -25,7 +25,7 @@ public class RunProcessInfo
   /// an empty string, or a string consisting entirely of whitespace, then an exception will be thrown
   /// when the RunProcess() method is executed.</para>
   /// </summary>
-  public String Command { get; set; }
+  public String? Command { get; set; }
 
   private String _arguments = "";
   /// <summary>
@@ -197,7 +197,8 @@ public static class GeneralUtils
   /// <returns>A RunProcessOutput struct containing the process's exit code, standard output, and standard error output.</returns>
   public static RunProcessOutput RunProcess(RunProcessInfo runProcessInfo)
   {
-    runProcessInfo.Command.Name(nameof(runProcessInfo.Command)).NotNullEmptyOrOnlyWhitespace();
+    runProcessInfo.Name(nameof(runProcessInfo)).NotNull();
+    runProcessInfo.Command!.Name(nameof(runProcessInfo.Command)).NotNullEmptyOrOnlyWhitespace();
 
     /* RunProcess() is a synchronous method.  To run an external process in an ASYNCHRONOUS manner is non-trivial.
        Below are links to some code and discussions about how to do that.
@@ -368,7 +369,7 @@ public static class GeneralUtils
 
     var mb = sf.GetMethod();
 
-    return $"{mb.DeclaringType.FullName}.{mb.Name}";
+    return $"{mb!.DeclaringType!.FullName}.{mb.Name}";
   }
 
   /// <summary>
@@ -396,7 +397,7 @@ public static class GeneralUtils
 
     var mb = sf.GetMethod();
 
-    return $"{Path.GetFileName(sf.GetFileName())}::{mb.DeclaringType.FullName}.{mb.Name} - Line {sf.GetFileLineNumber()}";
+    return $"{Path.GetFileName(sf.GetFileName())}::{mb!.DeclaringType!.FullName}.{mb.Name} - Line {sf.GetFileLineNumber()}";
   }
 
   /// <summary>
@@ -405,7 +406,7 @@ public static class GeneralUtils
   /// <typeparam name="T">A type that descends from System.Attribute.</typeparam>
   /// <param name="assembly">An assembly.</param>
   /// <returns>An instance of T : Attribute.</returns>
-  public static T GetAssemblyAttribute<T>(this Assembly assembly)
+  public static T? GetAssemblyAttribute<T>(this Assembly assembly)
     where T : Attribute
   {
     var attributes = assembly.GetCustomAttributes(typeof(T), true);

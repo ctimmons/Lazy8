@@ -23,10 +23,10 @@ public partial class GeneralUtilsTests
     Assert.That(() => new RunProcessInfo() { StdOutPredicate = line => line.Length > 42 }, Throws.Nothing);
     Assert.That(() => new RunProcessInfo() { StdErrPredicate = line => line.Length < 69 }, Throws.Nothing);
 
-    Assert.That(() => new RunProcessInfo() { Arguments = null }, Throws.ArgumentException);
+    Assert.That(() => new RunProcessInfo() { Arguments = null! }, Throws.ArgumentException);
     Assert.That(() => new RunProcessInfo() { TimeoutInSeconds = -2 }, Throws.ArgumentException);
-    Assert.That(() => new RunProcessInfo() { StdOutPredicate = null }, Throws.ArgumentException);
-    Assert.That(() => new RunProcessInfo() { StdErrPredicate = null }, Throws.ArgumentException);
+    Assert.That(() => new RunProcessInfo() { StdOutPredicate = null! }, Throws.ArgumentException);
+    Assert.That(() => new RunProcessInfo() { StdErrPredicate = null! }, Throws.ArgumentException);
   }
 
   private readonly Int32 _expectedExitCode = 99;

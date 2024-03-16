@@ -285,11 +285,11 @@ public static partial class FileUtils
   /// <param name="errorHandler">An <see cref="Action"/> that takes a <see cref="String"/> and an <see cref="Exception"/> as parameters
   /// <para>The string is the path that was being processed when the exception was thrown.</para></param>
   /// <returns>An <see cref="IEnumerable&lt;FileSystemInfo&gt;"/> containing the matching <see cref="FileSystemInfo"/>s.</returns>
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(String path, String filemask, SearchOption searchOption, Action<String, Exception> errorHandler)
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(String path, String filemask, SearchOption searchOption, Action<String, Exception>? errorHandler)
   {
     path.Name(nameof(path)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     filemask.Name(nameof(filemask)).NotNullEmptyOrOnlyWhitespace();
-    errorHandler.Name(nameof(errorHandler)).NotNull();
+    errorHandler!.Name(nameof(errorHandler)).NotNull();
 
     /* Yield statements cannot appear anywhere inside of a 'try/catch' statement, or in a 'finally' block.
        (See https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/statements#1315-the-yield-statement).

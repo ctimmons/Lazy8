@@ -128,7 +128,7 @@ longest string found in each String column.".Trim(), nameof(clrType)),
   {
     var type =
       column.ExtendedProperties.ContainsKey("type")
-      ? column.ExtendedProperties["type"].ToString()
+      ? column.ExtendedProperties["type"]!.ToString()
       : GetSqlTypeFromClrType(column.DataType);
     var nullability =
       column.AllowDBNull
@@ -140,7 +140,7 @@ longest string found in each String column.".Trim(), nameof(clrType)),
 
   private static String GetPrimaryKeyDirection(DataColumn column) =>
     column.ExtendedProperties.ContainsKey("primary key direction")
-    ? column.ExtendedProperties["primary key direction"].ToString()
+    ? column.ExtendedProperties["primary key direction"]!.ToString()!
     : "ASC";
 
   private static String GetPrimaryKeysDdl(DataTable table) =>
@@ -153,7 +153,7 @@ longest string found in each String column.".Trim(), nameof(clrType)),
   {
     var schema =
       table.ExtendedProperties.ContainsKey("schema")
-      ? table.ExtendedProperties["schema"].ToString()
+      ? table.ExtendedProperties["schema"]!.ToString()
       : "dbo";
 
     return $"[{schema}].[{table.TableName}]";
@@ -215,7 +215,7 @@ GO
            all string literals need to be surrounded with single quotes, and any single quotes w/i the string
            need to be duplicated. */
 
-        result.Add($"'{row[column].ToString().Replace("'", "''")}'");
+        result.Add($"'{row[column]!.ToString()!.Replace("'", "''")}'");
       }
       else if (column.DataType == typeof(DateTime))
       {
@@ -228,7 +228,7 @@ GO
 
         if (column.ExtendedProperties.ContainsKey("type"))
         {
-          var type = column.ExtendedProperties["type"].ToString();
+          var type = column.ExtendedProperties["type"]!.ToString();
 
           switch (type)
           {
@@ -263,7 +263,7 @@ GO
       }
       else
       {
-        result.Add(row[column].ToString());
+        result.Add(row[column]!.ToString()!);
       }
     }
 
@@ -372,7 +372,7 @@ GO
         var lengthOfWidestColumn =
           table
          .AsEnumerable()
-         .Select(row => row[column.ColumnName].ToString().Length)
+         .Select(row => row[column.ColumnName]!.ToString()!.Length)
          .Max();
         var widthSpecifier = (lengthOfWidestColumn <= getMaximumAllowableWidth()) ? lengthOfWidestColumn.ToString() : "MAX";
 
@@ -565,7 +565,7 @@ GO
     var createSchemasDdl =
       tables
       .Where(t => t.ExtendedProperties.Contains("schema"))
-      .Select(t => t.ExtendedProperties["schema"].ToString())
+      .Select(t => t.ExtendedProperties["schema"]!.ToString())
       .Distinct()
       .Select(schemaName => String.Format(schemaSqlTemplate, schemaName))
       .Join("\n");

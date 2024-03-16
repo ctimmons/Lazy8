@@ -128,7 +128,7 @@ public class SerializableSqlParameterTests
 
     var newtonSoftJsonString = JsonConvert.SerializeObject(expectedSerializedSqlParameter, settings);
     var actualSerializedSqlParameter = JsonConvert.DeserializeObject<SerializableSqlParameter>(newtonSoftJsonString, settings);
-    var actualSqlParameter = actualSerializedSqlParameter.GetSqlParameter();
+    var actualSqlParameter = actualSerializedSqlParameter!.GetSqlParameter();
     comparisonPredicate(expectedSqlParameter, actualSqlParameter);
 
     /* System.Text.Json */
@@ -140,7 +140,7 @@ public class SerializableSqlParameterTests
 
     var dotNetJsonString = System.Text.Json.JsonSerializer.Serialize(expectedSerializedSqlParameter, options);
     actualSerializedSqlParameter = System.Text.Json.JsonSerializer.Deserialize<SerializableSqlParameter>(dotNetJsonString, options);
-    actualSqlParameter = actualSerializedSqlParameter.GetSqlParameter();
+    actualSqlParameter = actualSerializedSqlParameter!.GetSqlParameter();
     comparisonPredicate(expectedSqlParameter, actualSqlParameter);
 
     /* XML */
