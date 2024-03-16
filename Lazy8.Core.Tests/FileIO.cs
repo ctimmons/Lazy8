@@ -223,7 +223,7 @@ public partial class FileUtilsTests
   [Test]
   public void SafelyCreateEmptyFileTest()
   {
-    String filename = null;
+    String? filename = null;
     Assert.That(() => FileUtils.SafelyCreateEmptyFile(filename), Throws.TypeOf<ArgumentNullException>());
 
     filename = "";
@@ -452,6 +452,12 @@ public partial class FileUtilsTests
       File.Delete(filename1);
       File.Delete(filename2);
     }
+  }
+
+  [Test]
+  public void GetDirectoriesTest()
+  {
+
   }
 }
 

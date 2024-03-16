@@ -201,10 +201,24 @@ public static partial class AssertUtils
     ? source
     : throw new ArgumentException(String.Format(Properties.Resources.Assert_DirectoryExists, source.Name, source.Value));
 
+  public static AssertionContext<DirectoryInfo> DirectoryExists(this DirectoryInfo source) => (new AssertionContext<DirectoryInfo>(source)).DirectoryExists();
+
+  public static AssertionContext<DirectoryInfo> DirectoryExists(this AssertionContext<DirectoryInfo> source) =>
+    source.Value.Exists
+    ? source
+    : throw new ArgumentException(String.Format(Properties.Resources.Assert_DirectoryExists, source.Name, source.Value));
+
   public static AssertionContext<String> FileExists(this String source) => (new AssertionContext<String>(source)).FileExists();
 
   public static AssertionContext<String> FileExists(this AssertionContext<String> source) =>
     File.Exists(source.Value)
+    ? source
+    : throw new ArgumentException(String.Format(Properties.Resources.Assert_FileExists, source.Name, source.Value));
+
+  public static AssertionContext<FileInfo> FileExists(this FileInfo source) => (new AssertionContext<FileInfo>(source)).FileExists();
+
+  public static AssertionContext<FileInfo> FileExists(this AssertionContext<FileInfo> source) =>
+    source.Value.Exists
     ? source
     : throw new ArgumentException(String.Format(Properties.Resources.Assert_FileExists, source.Name, source.Value));
 }
