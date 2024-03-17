@@ -29,11 +29,11 @@ public enum StringAssertion
 
     public String GetFileContents(String filename)
     {
-      if (filename is null)
-        throw new ArgumentNullException("filename cannot be null.");
+      if (String.IsNullOrWhiteSpace(filename))
+        throw new ArgumentNullException($"'{nameof(filename)}' cannot be null, empty, or contain only whitespace characters.");
 
-      if (filename.Trim().Length == 0)
-        throw new ArgumentException("filename cannot be empty.");
+      if (!File.Exists(filename))
+        throw new ArgumentException($"'{nameof(filename)}' must exist.");
 
       // execute core logic here...
     }
@@ -43,7 +43,7 @@ public enum StringAssertion
 
     public String GetFileContents(String filename)
     {
-      filename.Name(nameof(filename)).NotNull().NotEmpty();
+      filename.Name(nameof(filename)).NotNullEmptyOrOnlyWhitespace().FileExists();
 
       // execute core logic here...
     }
@@ -55,9 +55,9 @@ public enum StringAssertion
 
     // The following lines of code are equivalent.
 
-    String s = null;  s.Name(nameof(s)).NotNull();
+    String? s = null;  s!.Name(nameof(s)).NotNull();
 
-    ((String) null).Name(nameof(s)).NotNull();
+    ((String) null!).Name(nameof(s)).NotNull();
 
 
   See the unit tests in Lazy8.Core.Tests/Assert.cs for usage examples.
