@@ -750,7 +750,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return GetDirectories(directory, regexes, SearchOption.TopDirectoryOnly);
+    return GetDirectories(directory, regexes, SearchOption.AllDirectories);
   }
 
   public static String[] GetDirectories(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -778,7 +778,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return GetDirectories(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+    return GetDirectories(directory, searchPatterns, SearchOption.AllDirectories);
   }
 
   public static String[] GetDirectories(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -806,7 +806,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return GetFiles(directory, regex, SearchOption.TopDirectoryOnly);
+    return GetFiles(directory, regex, SearchOption.AllDirectories);
   }
 
   public static String[] GetFiles(String directory, Regex regex, SearchOption searchOption)
@@ -834,7 +834,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return GetFiles(directory, regexes, SearchOption.TopDirectoryOnly);
+    return GetFiles(directory, regexes, SearchOption.AllDirectories);
   }
 
   public static String[] GetFiles(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -862,7 +862,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return GetFiles(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+    return GetFiles(directory, searchPatterns, SearchOption.AllDirectories);
   }
 
   public static String[] GetFiles(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -890,7 +890,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return GetFileSystemEntries(directory, regex, SearchOption.TopDirectoryOnly);
+    return GetFileSystemEntries(directory, regex, SearchOption.AllDirectories);
   }
 
   public static String[] GetFileSystemEntries(String directory, Regex regex, SearchOption searchOption)
@@ -918,7 +918,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return GetFileSystemEntries(directory, regexes, SearchOption.TopDirectoryOnly);
+    return GetFileSystemEntries(directory, regexes, SearchOption.AllDirectories);
   }
 
   public static String[] GetFileSystemEntries(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -946,7 +946,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return GetFileSystemEntries(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+    return GetFileSystemEntries(directory, searchPatterns, SearchOption.AllDirectories);
   }
 
   public static String[] GetFileSystemEntries(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -976,7 +976,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return EnumerateDirectories(directory, regex, SearchOption.TopDirectoryOnly);
+    return EnumerateDirectories(directory, regex, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<String> EnumerateDirectories(String directory, Regex regex, SearchOption searchOption)
@@ -1003,7 +1003,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return EnumerateDirectories(directory, regexes, SearchOption.TopDirectoryOnly);
+    return EnumerateDirectories(directory, regexes, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<String> EnumerateDirectories(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -1030,7 +1030,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return EnumerateDirectories(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+    return EnumerateDirectories(directory, searchPatterns, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<String> EnumerateDirectories(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -1057,7 +1057,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return EnumerateFiles(directory, regex, SearchOption.TopDirectoryOnly);
+    return EnumerateFiles(directory, regex, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<String> EnumerateFiles(String directory, Regex regex, SearchOption searchOption)
@@ -1084,7 +1084,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return EnumerateFiles(directory, regexes, SearchOption.TopDirectoryOnly);
+    return EnumerateFiles(directory, regexes, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<String> EnumerateFiles(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -1111,7 +1111,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return EnumerateFiles(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+    return EnumerateFiles(directory, searchPatterns, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<String> EnumerateFiles(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -1138,7 +1138,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return EnumerateFileSystemEntries(directory, regex, SearchOption.TopDirectoryOnly);
+    return EnumerateFileSystemEntries(directory, regex, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<String> EnumerateFileSystemEntries(String directory, Regex regex, SearchOption searchOption)
@@ -1165,7 +1165,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return EnumerateFileSystemEntries(directory, regexes, SearchOption.TopDirectoryOnly);
+    return EnumerateFileSystemEntries(directory, regexes, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<String> EnumerateFileSystemEntries(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -1192,7 +1192,7 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return EnumerateFileSystemEntries(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+    return EnumerateFileSystemEntries(directory, searchPatterns, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<String> EnumerateFileSystemEntries(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -1219,7 +1219,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return directoryInfo.GetDirectories(regex, SearchOption.TopDirectoryOnly);
+    return directoryInfo.GetDirectories(regex, SearchOption.AllDirectories);
   }
 
   public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
@@ -1247,7 +1247,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return directoryInfo.GetDirectories(regexes, SearchOption.TopDirectoryOnly);
+    return directoryInfo.GetDirectories(regexes, SearchOption.AllDirectories);
   }
 
   public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -1275,7 +1275,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return directoryInfo.GetDirectories(searchPatterns, SearchOption.TopDirectoryOnly);
+    return directoryInfo.GetDirectories(searchPatterns, SearchOption.AllDirectories);
   }
 
   public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -1303,7 +1303,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return directoryInfo.GetFiles(regex, SearchOption.TopDirectoryOnly);
+    return directoryInfo.GetFiles(regex, SearchOption.AllDirectories);
   }
 
   public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
@@ -1331,7 +1331,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return directoryInfo.GetFiles(regexes, SearchOption.TopDirectoryOnly);
+    return directoryInfo.GetFiles(regexes, SearchOption.AllDirectories);
   }
 
   public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -1359,7 +1359,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return directoryInfo.GetFiles(searchPatterns, SearchOption.TopDirectoryOnly);
+    return directoryInfo.GetFiles(searchPatterns, SearchOption.AllDirectories);
   }
 
   public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -1387,7 +1387,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return directoryInfo.GetFileSystemInfos(regex, SearchOption.TopDirectoryOnly);
+    return directoryInfo.GetFileSystemInfos(regex, SearchOption.AllDirectories);
   }
 
   public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
@@ -1415,7 +1415,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return directoryInfo.GetFileSystemInfos(regexes, SearchOption.TopDirectoryOnly);
+    return directoryInfo.GetFileSystemInfos(regexes, SearchOption.AllDirectories);
   }
 
   public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -1443,7 +1443,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return directoryInfo.GetFileSystemInfos(searchPatterns, SearchOption.TopDirectoryOnly);
+    return directoryInfo.GetFileSystemInfos(searchPatterns, SearchOption.AllDirectories);
   }
 
   public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -1471,7 +1471,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return directoryInfo.EnumerateDirectories(regex, SearchOption.TopDirectoryOnly);
+    return directoryInfo.EnumerateDirectories(regex, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
@@ -1499,7 +1499,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return directoryInfo.EnumerateDirectories(regexes, SearchOption.TopDirectoryOnly);
+    return directoryInfo.EnumerateDirectories(regexes, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -1527,7 +1527,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return directoryInfo.EnumerateDirectories(searchPatterns, SearchOption.TopDirectoryOnly);
+    return directoryInfo.EnumerateDirectories(searchPatterns, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -1555,7 +1555,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return directoryInfo.EnumerateFiles(regex, SearchOption.TopDirectoryOnly);
+    return directoryInfo.EnumerateFiles(regex, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
@@ -1583,7 +1583,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return directoryInfo.EnumerateFiles(regexes, SearchOption.TopDirectoryOnly);
+    return directoryInfo.EnumerateFiles(regexes, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -1611,7 +1611,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return directoryInfo.EnumerateFiles(searchPatterns, SearchOption.TopDirectoryOnly);
+    return directoryInfo.EnumerateFiles(searchPatterns, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
@@ -1639,7 +1639,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return directoryInfo.EnumerateFileSystemInfos(regex, SearchOption.TopDirectoryOnly);
+    return directoryInfo.EnumerateFileSystemInfos(regex, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
@@ -1667,7 +1667,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-    return directoryInfo.EnumerateFileSystemInfos(regexes, SearchOption.TopDirectoryOnly);
+    return directoryInfo.EnumerateFileSystemInfos(regexes, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
@@ -1695,7 +1695,7 @@ public static partial class FileUtils
     directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
     searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-    return directoryInfo.EnumerateFileSystemInfos(searchPatterns, SearchOption.TopDirectoryOnly);
+    return directoryInfo.EnumerateFileSystemInfos(searchPatterns, SearchOption.AllDirectories);
   }
 
   public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
