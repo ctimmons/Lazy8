@@ -66,6 +66,30 @@ public class AssertTests
   }
 
   [Test]
+  public void NoStringsAreNullOrWhiteSpaceTest()
+  {
+    List<String> s = [];
+    Assert.That(() => s.NoStringsAreNullOrWhiteSpace(), Throws.Nothing);
+    Assert.That(() => s.Name(nameof(s)).NoStringsAreNullOrWhiteSpace(), Throws.Nothing);
+
+    s = [""];
+    Assert.That(() => s.NoStringsAreNullOrWhiteSpace(), Throws.TypeOf<ArgumentException>());
+    Assert.That(() => s.Name(nameof(s)).NoStringsAreNullOrWhiteSpace(), Throws.TypeOf<ArgumentException>());
+
+    s = ["Hello", null!, "World"];
+    Assert.That(() => s.NoStringsAreNullOrWhiteSpace(), Throws.TypeOf<ArgumentException>());
+    Assert.That(() => s.Name(nameof(s)).NoStringsAreNullOrWhiteSpace(), Throws.TypeOf<ArgumentException>());
+
+    s = ["Hello", "       ", "World"];
+    Assert.That(() => s.NoStringsAreNullOrWhiteSpace(), Throws.TypeOf<ArgumentException>());
+    Assert.That(() => s.Name(nameof(s)).NoStringsAreNullOrWhiteSpace(), Throws.TypeOf<ArgumentException>());
+
+    s = ["Hello", "World"];
+    Assert.That(() => s.NoStringsAreNullOrWhiteSpace(), Throws.Nothing);
+    Assert.That(() => s.Name(nameof(s)).NoStringsAreNullOrWhiteSpace(), Throws.Nothing);
+  }
+
+  [Test]
   public void GreaterThanTest()
   {
     var earlier = new DateTime(2014, 1, 1);

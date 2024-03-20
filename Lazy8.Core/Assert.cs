@@ -116,10 +116,12 @@ public static partial class AssertUtils
     throw new ArgumentException(String.Format(Properties.Resources.Assert_ContainerIsEmpty, source.Name));
   }
 
-  public static AssertionContext<IEnumerable<String>> NoStringsAreNullOrWhiteSpace(this IEnumerable<String> source) =>
-    (new AssertionContext<IEnumerable<String>>(source)).NoStringsAreNullOrWhiteSpace();
+  public static AssertionContext<T> NoStringsAreNullOrWhiteSpace<T>(this T source)
+    where T : IEnumerable<String> =>
+    (new AssertionContext<T>(source)).NoStringsAreNullOrWhiteSpace();
 
-  public static AssertionContext<IEnumerable<String>> NoStringsAreNullOrWhiteSpace(this AssertionContext<IEnumerable<String>> source) =>
+  public static AssertionContext<T> NoStringsAreNullOrWhiteSpace<T>(this AssertionContext<T> source)
+    where T : IEnumerable<String> =>
     source.Value.Any(String.IsNullOrWhiteSpace)
     ? throw new ArgumentException(String.Format(Properties.Resources.Assert_OneOrMoreStringsAreEmpty, source.Name))
     : source;
