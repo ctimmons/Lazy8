@@ -5,7 +5,9 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Lazy8.Core;
 
@@ -113,6 +115,14 @@ public static partial class AssertUtils
     /* Loop executed zero times, which means the IEnumerable is empty. */
     throw new ArgumentException(String.Format(Properties.Resources.Assert_ContainerIsEmpty, source.Name));
   }
+
+  public static AssertionContext<IEnumerable<String>> NoStringsAreNullOrWhiteSpace(this IEnumerable<String> source) =>
+    (new AssertionContext<IEnumerable<String>>(source)).NoStringsAreNullOrWhiteSpace();
+
+  public static AssertionContext<IEnumerable<String>> NoStringsAreNullOrWhiteSpace(this AssertionContext<IEnumerable<String>> source) =>
+    source.Value.Any(String.IsNullOrWhiteSpace)
+    ? throw new ArgumentException(String.Format(Properties.Resources.Assert_OneOrMoreStringsAreEmpty, source.Name))
+    : source;
 
   public static AssertionContext<T> GreaterThan<T>(this T source, T value)
     where T : IComparable<T> =>

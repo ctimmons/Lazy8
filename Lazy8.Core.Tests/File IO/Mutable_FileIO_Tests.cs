@@ -15,7 +15,7 @@ using NUnit.Framework;
 namespace Lazy8.Core.Tests;
 
 [TestFixture]
-public partial class FileUtilsTests
+public partial class Mutable_FileIO_Tests
 {
   private static readonly String _testFilesPath = FileUtils.GetTemporarySubfolder();
   private static readonly String _testStringsFile = _testFilesPath + "test_strings.txt";
@@ -29,7 +29,7 @@ public partial class FileUtilsTests
   private static readonly String _level_3_1 = Path.Combine(_testFilesPath, @"level_1.1\level_2.1\level_3.1");
   private static readonly String _level_3_2 = Path.Combine(_testFilesPath, @"level_1.1\level_2.1\level_3.2");
 
-  public FileUtilsTests()
+  public Mutable_FileIO_Tests()
     : base()
   {
   }
@@ -39,7 +39,7 @@ public partial class FileUtilsTests
   [SetUp]
   public void Init()
   {
-    /* Setup an environment of folders and files that most of the unit tests use when they run. */
+    /* Set up an environment of folders and files that most of the unit tests use when they run. */
 
     Directory.CreateDirectory(_level_1_2);
     Directory.CreateDirectory(_level_2_2);
@@ -452,12 +452,6 @@ public partial class FileUtilsTests
       File.Delete(filename1);
       File.Delete(filename2);
     }
-  }
-
-  [Test]
-  public void GetDirectoriesTest()
-  {
-
   }
 }
 

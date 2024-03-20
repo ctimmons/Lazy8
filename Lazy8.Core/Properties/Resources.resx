@@ -150,6 +150,9 @@
   <data name="Assert_NotLessThanOrEqualTo" xml:space="preserve">
     <value>The parameter '{0}', which has value '{1}', is not less than or equal to '{2}'.</value>
   </data>
+  <data name="Assert_OneOrMoreStringsAreEmpty" xml:space="preserve">
+    <value>The parameter '{0}' contains one or more empty strings.</value>
+  </data>
   <data name="Assert_StringInconsistentLengthParameters" xml:space="preserve">
     <value>The minimumLength parameter ({0}) cannot be greater than the maximumLength parameter ({1}).</value>
   </data>

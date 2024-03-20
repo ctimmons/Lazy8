@@ -279,15 +279,15 @@ public static partial class FileUtils
   /// <see cref="DirectoryWalker"/> is best used if modification is necessary while traversing
   /// the directory tree.</para>
   /// </remarks>
-  /// <param name="path">A <see cref="String"/> containing a valid path.</param>
+  /// <param name="directory">A <see cref="String"/> containing a valid path.</param>
   /// <param name="filemask">A <see cref="String"/> containing a file mask.  See the <see cref="DirectoryInfo.EnumerateFileSystemInfos"/> <a href="https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.enumeratefilesysteminfos">MSDN help entry</a> for more info on file masks.</param>
   /// <param name="searchOption">A <see cref="SearchOption"/> indicating whether to only process the top directory, or recursively enumerate all directories.</param>
   /// <param name="errorHandler">An <see cref="Action"/> that takes a <see cref="String"/> and an <see cref="Exception"/> as parameters
   /// <para>The string is the path that was being processed when the exception was thrown.</para></param>
   /// <returns>An <see cref="IEnumerable&lt;FileSystemInfo&gt;"/> containing the matching <see cref="FileSystemInfo"/>s.</returns>
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(String path, String filemask, SearchOption searchOption, Action<String, Exception>? errorHandler)
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(String directory, String filemask, SearchOption searchOption, Action<String, Exception>? errorHandler)
   {
-    path.Name(nameof(path)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     filemask.Name(nameof(filemask)).NotNullEmptyOrOnlyWhitespace();
     errorHandler!.Name(nameof(errorHandler)).NotNull();
 
@@ -298,11 +298,11 @@ public static partial class FileUtils
     DirectoryInfo? di = null;
     try
     {
-      di = new DirectoryInfo(path);
+      di = new DirectoryInfo(directory);
     }
     catch (Exception ex)
     {
-      errorHandler?.Invoke(path, ex);
+      errorHandler?.Invoke(directory, ex);
     }
 
     if (di is null)
@@ -320,7 +320,7 @@ public static partial class FileUtils
       }
       catch (Exception ex)
       {
-        errorHandler?.Invoke(path, ex);
+        errorHandler?.Invoke(directory, ex);
       }
 
       if (diEnumerator is null)
@@ -460,12 +460,12 @@ public static partial class FileUtils
   /// <summary>
   /// Recursively delete empty subdirectories.  Non-empty subdirectories are not deleted.
   /// </summary>
-  /// <param name="path">An existing directory path.</param>
-  public static void DeleteEmptyDirectories(String path)
+  /// <param name="directory">An existing directory path.</param>
+  public static void DeleteEmptyDirectories(String directory)
   {
-    path.Name(nameof(path)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
 
-    DeleteEmptyDirectories(new DirectoryInfo(path));
+    DeleteEmptyDirectories(new DirectoryInfo(directory));
   }
 
   /// <summary>
@@ -537,7 +537,7 @@ public static partial class FileUtils
   /// <summary>
   /// Return the MD5 checksum for the contents of <paramref name="filename"/>.
   /// </summary>
-  /// <param name="path">An existing filename.</param>
+  /// <param name="filename">An existing filename.</param>
   /// <returns>A <see cref="String"/> containing the MD5 checksum.</returns>
   public static String GetMD5Checksum(String filename)
   {
@@ -574,7 +574,7 @@ public static partial class FileUtils
   /// <summary>
   /// Removes the last (rightmost) file extension from <paramref name="filename"/>.
   /// </summary>
-  /// <param name="path">A <see cref="String"/> containing a filename.  The file does not have to exist.</param>
+  /// <param name="filename">A <see cref="String"/> containing a filename.  The file does not have to exist.</param>
   /// <returns>A <see cref="String"/> containing the filename with the last extension removed.</returns>
   public static String RemoveFileExtension(this String filename)
   {
@@ -722,358 +722,1000 @@ public static partial class FileUtils
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     regex.Name(nameof(regex)).NotNull();
 
-    return GetDirectories(directory, regex, SearchOption.TopDirectoryOnly);
+    return GetDirectories(directory, regex, SearchOption.AllDirectories);
   }
 
-  public static String[] GetDirectories(String path, Regex regex, SearchOption searchOption) => GetDirectories(path, regex, GetEnumerationOptions(searchOption));
+  public static String[] GetDirectories(String directory, Regex regex, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
 
-  public static String[] GetDirectories(String path, Regex regex, EnumerationOptions enumerationOptions) =>
-    Directory
-    .GetDirectories(path, "*", enumerationOptions)
-    .Where(p => regex.IsMatch(p))
-    .ToArray();
+    return GetDirectories(directory, regex, GetEnumerationOptions(searchOption));
+  }
 
-  public static String[] GetDirectories(String path, IEnumerable<Regex> regexes) => GetDirectories(path, regexes, SearchOption.TopDirectoryOnly);
+  public static String[] GetDirectories(String directory, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
 
-  public static String[] GetDirectories(String path, IEnumerable<Regex> regexes, SearchOption searchOption) => GetDirectories(path, regexes, GetEnumerationOptions(searchOption));
+    return
+      Directory
+      .GetDirectories(directory, "*", enumerationOptions)
+      .Where(p => regex.IsMatch(p))
+      .ToArray();
+  }
 
-  public static String[] GetDirectories(String path, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => GetDirectories(path, regex, enumerationOptions))
-    .ToArray();
+  public static String[] GetDirectories(String directory, IEnumerable<Regex> regexes)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-  public static String[] GetDirectories(String path, IEnumerable<String> searchPatterns) => GetDirectories(path, searchPatterns, SearchOption.TopDirectoryOnly);
+    return GetDirectories(directory, regexes, SearchOption.TopDirectoryOnly);
+  }
 
-  public static String[] GetDirectories(String path, IEnumerable<String> searchPatterns, SearchOption searchOption) => GetDirectories(path, searchPatterns, GetEnumerationOptions(searchOption));
+  public static String[] GetDirectories(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-  public static String[] GetDirectories(String path, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => Directory.GetDirectories(path, searchPattern, enumerationOptions))
-    .ToArray();
+    return GetDirectories(directory, regexes, GetEnumerationOptions(searchOption));
+  }
 
-  public static String[] GetFiles(String path, Regex regex) => GetFiles(path, regex, SearchOption.TopDirectoryOnly);
+  public static String[] GetDirectories(String directory, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-  public static String[] GetFiles(String path, Regex regex, SearchOption searchOption) => GetFiles(path, regex, GetEnumerationOptions(searchOption));
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => GetDirectories(directory, regex, enumerationOptions))
+      .ToArray();
+  }
 
-  public static String[] GetFiles(String path, Regex regex, EnumerationOptions enumerationOptions) =>
-    Directory
-    .GetFiles(path, "*", enumerationOptions)
-    .Where(p => regex.IsMatch(p))
-    .ToArray();
+  public static String[] GetDirectories(String directory, IEnumerable<String> searchPatterns)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-  public static String[] GetFiles(String path, IEnumerable<Regex> regexes) => GetFiles(path, regexes, SearchOption.TopDirectoryOnly);
+    return GetDirectories(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+  }
 
-  public static String[] GetFiles(String path, IEnumerable<Regex> regexes, SearchOption searchOption) => GetFiles(path, regexes, GetEnumerationOptions(searchOption));
+  public static String[] GetDirectories(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-  public static String[] GetFiles(String path, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => GetFiles(path, regex, enumerationOptions))
-    .ToArray();
+    return GetDirectories(directory, searchPatterns, GetEnumerationOptions(searchOption));
+  }
 
-  public static String[] GetFiles(String path, IEnumerable<String> searchPatterns) => GetFiles(path, searchPatterns, SearchOption.TopDirectoryOnly);
+  public static String[] GetDirectories(String directory, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
 
-  public static String[] GetFiles(String path, IEnumerable<String> searchPatterns, SearchOption searchOption) => GetFiles(path, searchPatterns, GetEnumerationOptions(searchOption));
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => Directory.GetDirectories(directory, searchPattern, enumerationOptions))
+      .ToArray();
+  }
 
-  public static String[] GetFiles(String path, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => Directory.GetFiles(path, searchPattern, enumerationOptions))
-    .ToArray();
+  public static String[] GetFiles(String directory, Regex regex)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
 
-  public static String[] GetFileSystemEntries(String path, Regex regex) => GetFileSystemEntries(path, regex, SearchOption.TopDirectoryOnly);
+    return GetFiles(directory, regex, SearchOption.TopDirectoryOnly);
+  }
 
-  public static String[] GetFileSystemEntries(String path, Regex regex, SearchOption searchOption) => GetFileSystemEntries(path, regex, GetEnumerationOptions(searchOption));
+  public static String[] GetFiles(String directory, Regex regex, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
 
-  public static String[] GetFileSystemEntries(String path, Regex regex, EnumerationOptions enumerationOptions) =>
-    Directory
-    .GetFileSystemEntries(path, "*", enumerationOptions)
-    .Where(p => regex.IsMatch(p))
-    .ToArray();
+    return GetFiles(directory, regex, GetEnumerationOptions(searchOption));
+  }
 
-  public static String[] GetFileSystemEntries(String path, IEnumerable<Regex> regexes) => GetFileSystemEntries(path, regexes, SearchOption.TopDirectoryOnly);
+  public static String[] GetFiles(String directory, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
 
-  public static String[] GetFileSystemEntries(String path, IEnumerable<Regex> regexes, SearchOption searchOption) => GetFileSystemEntries(path, regexes, GetEnumerationOptions(searchOption));
+    return
+      Directory
+      .GetFiles(directory, "*", enumerationOptions)
+      .Where(p => regex.IsMatch(p))
+      .ToArray();
+  }
 
-  public static String[] GetFileSystemEntries(String path, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => GetFileSystemEntries(path, regex, enumerationOptions))
-    .ToArray();
+  public static String[] GetFiles(String directory, IEnumerable<Regex> regexes)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-  public static String[] GetFileSystemEntries(String path, IEnumerable<String> searchPatterns) => GetFileSystemEntries(path, searchPatterns, SearchOption.TopDirectoryOnly);
+    return GetFiles(directory, regexes, SearchOption.TopDirectoryOnly);
+  }
 
-  public static String[] GetFileSystemEntries(String path, IEnumerable<String> searchPatterns, SearchOption searchOption) => GetFileSystemEntries(path, searchPatterns, GetEnumerationOptions(searchOption));
+  public static String[] GetFiles(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
 
-  public static String[] GetFileSystemEntries(String path, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => Directory.GetFileSystemEntries(path, searchPattern, enumerationOptions))
-    .ToArray();
+    return GetFiles(directory, regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static String[] GetFiles(String directory, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => GetFiles(directory, regex, enumerationOptions))
+      .ToArray();
+  }
+
+  public static String[] GetFiles(String directory, IEnumerable<String> searchPatterns)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return GetFiles(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static String[] GetFiles(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return GetFiles(directory, searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static String[] GetFiles(String directory, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => Directory.GetFiles(directory, searchPattern, enumerationOptions))
+      .ToArray();
+  }
+
+  public static String[] GetFileSystemEntries(String directory, Regex regex)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return GetFileSystemEntries(directory, regex, SearchOption.TopDirectoryOnly);
+  }
+
+  public static String[] GetFileSystemEntries(String directory, Regex regex, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return GetFileSystemEntries(directory, regex, GetEnumerationOptions(searchOption));
+  }
+
+  public static String[] GetFileSystemEntries(String directory, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return
+      Directory
+      .GetFileSystemEntries(directory, "*", enumerationOptions)
+      .Where(p => regex.IsMatch(p))
+      .ToArray();
+  }
+
+  public static String[] GetFileSystemEntries(String directory, IEnumerable<Regex> regexes)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return GetFileSystemEntries(directory, regexes, SearchOption.TopDirectoryOnly);
+  }
+
+  public static String[] GetFileSystemEntries(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return GetFileSystemEntries(directory, regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static String[] GetFileSystemEntries(String directory, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => GetFileSystemEntries(directory, regex, enumerationOptions))
+      .ToArray();
+  }
+
+  public static String[] GetFileSystemEntries(String directory, IEnumerable<String> searchPatterns)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return GetFileSystemEntries(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static String[] GetFileSystemEntries(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return GetFileSystemEntries(directory, searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static String[] GetFileSystemEntries(String directory, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => Directory.GetFileSystemEntries(directory, searchPattern, enumerationOptions))
+      .ToArray();
+  }
 
   //////////////////
 
-  public static IEnumerable<String> EnumerateDirectories(String path, Regex regex) => EnumerateDirectories(path, regex, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<String> EnumerateDirectories(String path, Regex regex, SearchOption searchOption) => EnumerateDirectories(path, regex, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<String> EnumerateDirectories(String path, Regex regex, EnumerationOptions enumerationOptions) =>
-    Directory
-    .EnumerateDirectories(path, "*", enumerationOptions)
-    .Where(p => regex.IsMatch(p));
-
-  public static IEnumerable<String> EnumerateDirectories(String path, IEnumerable<Regex> regexes) => EnumerateDirectories(path, regexes, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<String> EnumerateDirectories(String path, IEnumerable<Regex> regexes, SearchOption searchOption) => EnumerateDirectories(path, regexes, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<String> EnumerateDirectories(String path, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => EnumerateDirectories(path, regex, enumerationOptions));
-
-  public static IEnumerable<String> EnumerateDirectories(String path, IEnumerable<String> searchPatterns) => EnumerateDirectories(path, searchPatterns, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<String> EnumerateDirectories(String path, IEnumerable<String> searchPatterns, SearchOption searchOption) => EnumerateDirectories(path, searchPatterns, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<String> EnumerateDirectories(String path, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => Directory.EnumerateDirectories(path, searchPattern, enumerationOptions));
-
-  public static IEnumerable<String> EnumerateFiles(String path, Regex regex) => EnumerateFiles(path, regex, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<String> EnumerateFiles(String path, Regex regex, SearchOption searchOption) => EnumerateFiles(path, regex, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<String> EnumerateFiles(String path, Regex regex, EnumerationOptions enumerationOptions) =>
-    Directory
-    .EnumerateFiles(path, "*", enumerationOptions)
-    .Where(p => regex.IsMatch(p));
-
-  public static IEnumerable<String> EnumerateFiles(String path, IEnumerable<Regex> regexes) => EnumerateFiles(path, regexes, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<String> EnumerateFiles(String path, IEnumerable<Regex> regexes, SearchOption searchOption) => EnumerateFiles(path, regexes, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<String> EnumerateFiles(String path, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => EnumerateFiles(path, regex, enumerationOptions));
-
-  public static IEnumerable<String> EnumerateFiles(String path, IEnumerable<String> searchPatterns) => EnumerateFiles(path, searchPatterns, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<String> EnumerateFiles(String path, IEnumerable<String> searchPatterns, SearchOption searchOption) => EnumerateFiles(path, searchPatterns, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<String> EnumerateFiles(String path, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => Directory.EnumerateFiles(path, searchPattern, enumerationOptions));
-
-  public static IEnumerable<String> EnumerateFileSystemEntries(String path, Regex regex) => EnumerateFileSystemEntries(path, regex, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<String> EnumerateFileSystemEntries(String path, Regex regex, SearchOption searchOption) => EnumerateFileSystemEntries(path, regex, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<String> EnumerateFileSystemEntries(String path, Regex regex, EnumerationOptions enumerationOptions) =>
-    Directory
-    .EnumerateFileSystemEntries(path, "*", enumerationOptions)
-    .Where(p => regex.IsMatch(p));
-
-  public static IEnumerable<String> EnumerateFileSystemEntries(String path, IEnumerable<Regex> regexes) => EnumerateFileSystemEntries(path, regexes, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<String> EnumerateFileSystemEntries(String path, IEnumerable<Regex> regexes, SearchOption searchOption) => EnumerateFileSystemEntries(path, regexes, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<String> EnumerateFileSystemEntries(String path, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => EnumerateFileSystemEntries(path, regex, enumerationOptions));
-
-  public static IEnumerable<String> EnumerateFileSystemEntries(String path, IEnumerable<String> searchPatterns) => EnumerateFileSystemEntries(path, searchPatterns, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<String> EnumerateFileSystemEntries(String path, IEnumerable<String> searchPatterns, SearchOption searchOption) => EnumerateFileSystemEntries(path, searchPatterns, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<String> EnumerateFileSystemEntries(String path, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => Directory.EnumerateFileSystemEntries(path, searchPattern, enumerationOptions));
-
-  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, Regex regex) => directoryInfo.GetDirectories(regex, SearchOption.TopDirectoryOnly);
-
-  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption) => directoryInfo.GetDirectories(regex, GetEnumerationOptions(searchOption));
-
-  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions) =>
-    directoryInfo
-    .GetDirectories("*", enumerationOptions)
-    .Where(p => regex.IsMatch(p.FullName))
-    .ToArray();
-
-  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes) => directoryInfo.GetDirectories(regexes, SearchOption.TopDirectoryOnly);
-
-  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption) => directoryInfo.GetDirectories(regexes, GetEnumerationOptions(searchOption));
-
-  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => directoryInfo.GetDirectories(regex, enumerationOptions))
-    .ToArray();
-
-  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns) => directoryInfo.GetDirectories(searchPatterns, SearchOption.TopDirectoryOnly);
-
-  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption) => directoryInfo.GetDirectories(searchPatterns, GetEnumerationOptions(searchOption));
-
-  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => directoryInfo.GetDirectories(searchPattern, enumerationOptions))
-    .ToArray();
-
-  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, Regex regex) => directoryInfo.GetFiles(regex, SearchOption.TopDirectoryOnly);
-
-  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption) => directoryInfo.GetFiles(regex, GetEnumerationOptions(searchOption));
-
-  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions) =>
-    directoryInfo
-    .GetFiles("*", enumerationOptions)
-    .Where(p => regex.IsMatch(p.FullName))
-    .ToArray();
-
-  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes) => directoryInfo.GetFiles(regexes, SearchOption.TopDirectoryOnly);
-
-  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption) => directoryInfo.GetFiles(regexes, GetEnumerationOptions(searchOption));
-
-  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => directoryInfo.GetFiles(regex, enumerationOptions))
-    .ToArray();
-
-  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns) => directoryInfo.GetFiles(searchPatterns, SearchOption.TopDirectoryOnly);
-
-  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption) => directoryInfo.GetFiles(searchPatterns, GetEnumerationOptions(searchOption));
-
-  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => directoryInfo.GetFiles(searchPattern, enumerationOptions))
-    .ToArray();
-
-  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex) => directoryInfo.GetFileSystemInfos(regex, SearchOption.TopDirectoryOnly);
-
-  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption) => directoryInfo.GetFileSystemInfos(regex, GetEnumerationOptions(searchOption));
-
-  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions) =>
-    directoryInfo
-    .GetFileSystemInfos("*", enumerationOptions)
-    .Where(p => regex.IsMatch(p.FullName))
-    .ToArray();
-
-  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes) => directoryInfo.GetFileSystemInfos(regexes, SearchOption.TopDirectoryOnly);
-
-  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption) => directoryInfo.GetFileSystemInfos(regexes, GetEnumerationOptions(searchOption));
-
-  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => directoryInfo.GetFileSystemInfos(regex, enumerationOptions))
-    .ToArray();
-
-  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns) => directoryInfo.GetFileSystemInfos(searchPatterns, SearchOption.TopDirectoryOnly);
-
-  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption) => directoryInfo.GetFileSystemInfos(searchPatterns, GetEnumerationOptions(searchOption));
-
-  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => directoryInfo.GetFileSystemInfos(searchPattern, enumerationOptions))
-    .ToArray();
-
-  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, Regex regex) => directoryInfo.EnumerateDirectories(regex, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption) => directoryInfo.EnumerateDirectories(regex, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions) =>
-    directoryInfo
-    .EnumerateDirectories("*", enumerationOptions)
-    .Where(p => regex.IsMatch(p.FullName))
-    .ToArray();
-
-  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes) => directoryInfo.EnumerateDirectories(regexes, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption) => directoryInfo.EnumerateDirectories(regexes, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => directoryInfo.EnumerateDirectories(regex, enumerationOptions))
-    .ToArray();
-
-  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns) => directoryInfo.EnumerateDirectories(searchPatterns, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption) => directoryInfo.EnumerateDirectories(searchPatterns, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => directoryInfo.EnumerateDirectories(searchPattern, enumerationOptions))
-    .ToArray();
-
-  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, Regex regex) => directoryInfo.EnumerateFiles(regex, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption) => directoryInfo.EnumerateFiles(regex, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions) =>
-    directoryInfo
-    .EnumerateFiles("*", enumerationOptions)
-    .Where(p => regex.IsMatch(p.FullName))
-    .ToArray();
-
-  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes) => directoryInfo.EnumerateFiles(regexes, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption) => directoryInfo.EnumerateFiles(regexes, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => directoryInfo.EnumerateFiles(regex, enumerationOptions))
-    .ToArray();
-
-  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns) => directoryInfo.EnumerateFiles(searchPatterns, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption) => directoryInfo.EnumerateFiles(searchPatterns, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => directoryInfo.EnumerateFiles(searchPattern, enumerationOptions))
-    .ToArray();
-
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex) => directoryInfo.EnumerateFileSystemInfos(regex, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption) => directoryInfo.EnumerateFileSystemInfos(regex, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions) =>
-    directoryInfo
-    .EnumerateFileSystemInfos("*", enumerationOptions)
-    .Where(p => regex.IsMatch(p.FullName))
-    .ToArray();
-
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes) => directoryInfo.EnumerateFileSystemInfos(regexes, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption) => directoryInfo.EnumerateFileSystemInfos(regexes, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions) =>
-    regexes
-    .AsParallel()
-    .SelectMany(regex => directoryInfo.EnumerateFileSystemInfos(regex, enumerationOptions))
-    .ToArray();
-
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns) => directoryInfo.EnumerateFileSystemInfos(searchPatterns, SearchOption.TopDirectoryOnly);
-
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption) => directoryInfo.EnumerateFileSystemInfos(searchPatterns, GetEnumerationOptions(searchOption));
-
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions) =>
-    searchPatterns
-    .AsParallel()
-    .SelectMany(searchPattern => directoryInfo.EnumerateFileSystemInfos(searchPattern, enumerationOptions))
-    .ToArray();
+  public static IEnumerable<String> EnumerateDirectories(String directory, Regex regex)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return EnumerateDirectories(directory, regex, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<String> EnumerateDirectories(String directory, Regex regex, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return EnumerateDirectories(directory, regex, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<String> EnumerateDirectories(String directory, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return
+      Directory
+      .EnumerateDirectories(directory, "*", enumerationOptions)
+      .Where(p => regex.IsMatch(p));
+  }
+
+  public static IEnumerable<String> EnumerateDirectories(String directory, IEnumerable<Regex> regexes)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return EnumerateDirectories(directory, regexes, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<String> EnumerateDirectories(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return EnumerateDirectories(directory, regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<String> EnumerateDirectories(String directory, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => EnumerateDirectories(directory, regex, enumerationOptions));
+  }
+
+  public static IEnumerable<String> EnumerateDirectories(String directory, IEnumerable<String> searchPatterns)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return EnumerateDirectories(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<String> EnumerateDirectories(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return EnumerateDirectories(directory, searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<String> EnumerateDirectories(String directory, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => Directory.EnumerateDirectories(directory, searchPattern, enumerationOptions));
+  }
+
+  public static IEnumerable<String> EnumerateFiles(String directory, Regex regex)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return EnumerateFiles(directory, regex, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<String> EnumerateFiles(String directory, Regex regex, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return EnumerateFiles(directory, regex, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<String> EnumerateFiles(String directory, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return
+      Directory
+      .EnumerateFiles(directory, "*", enumerationOptions)
+      .Where(p => regex.IsMatch(p));
+  }
+
+  public static IEnumerable<String> EnumerateFiles(String directory, IEnumerable<Regex> regexes)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return EnumerateFiles(directory, regexes, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<String> EnumerateFiles(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return EnumerateFiles(directory, regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<String> EnumerateFiles(String directory, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => EnumerateFiles(directory, regex, enumerationOptions));
+  }
+
+  public static IEnumerable<String> EnumerateFiles(String directory, IEnumerable<String> searchPatterns)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return EnumerateFiles(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<String> EnumerateFiles(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return EnumerateFiles(directory, searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<String> EnumerateFiles(String directory, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => Directory.EnumerateFiles(directory, searchPattern, enumerationOptions));
+  }
+
+  public static IEnumerable<String> EnumerateFileSystemEntries(String directory, Regex regex)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return EnumerateFileSystemEntries(directory, regex, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<String> EnumerateFileSystemEntries(String directory, Regex regex, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return EnumerateFileSystemEntries(directory, regex, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<String> EnumerateFileSystemEntries(String directory, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return
+      Directory
+      .EnumerateFileSystemEntries(directory, "*", enumerationOptions)
+      .Where(p => regex.IsMatch(p));
+  }
+
+  public static IEnumerable<String> EnumerateFileSystemEntries(String directory, IEnumerable<Regex> regexes)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return EnumerateFileSystemEntries(directory, regexes, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<String> EnumerateFileSystemEntries(String directory, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return EnumerateFileSystemEntries(directory, regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<String> EnumerateFileSystemEntries(String directory, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => EnumerateFileSystemEntries(directory, regex, enumerationOptions));
+  }
+
+  public static IEnumerable<String> EnumerateFileSystemEntries(String directory, IEnumerable<String> searchPatterns)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return EnumerateFileSystemEntries(directory, searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<String> EnumerateFileSystemEntries(String directory, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return EnumerateFileSystemEntries(directory, searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<String> EnumerateFileSystemEntries(String directory, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => Directory.EnumerateFileSystemEntries(directory, searchPattern, enumerationOptions));
+  }
+
+  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, Regex regex)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.GetDirectories(regex, SearchOption.TopDirectoryOnly);
+  }
+
+  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.GetDirectories(regex, GetEnumerationOptions(searchOption));
+  }
+
+  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return
+      directoryInfo
+      .GetDirectories("*", enumerationOptions)
+      .Where(p => regex.IsMatch(p.FullName))
+      .ToArray();
+  }
+
+  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.GetDirectories(regexes, SearchOption.TopDirectoryOnly);
+  }
+
+  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.GetDirectories(regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => directoryInfo.GetDirectories(regex, enumerationOptions))
+      .ToArray();
+  }
+
+  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.GetDirectories(searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.GetDirectories(searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static DirectoryInfo[] GetDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => directoryInfo.GetDirectories(searchPattern, enumerationOptions))
+      .ToArray();
+  }
+
+  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, Regex regex)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.GetFiles(regex, SearchOption.TopDirectoryOnly);
+  }
+
+  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.GetFiles(regex, GetEnumerationOptions(searchOption));
+  }
+
+  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return
+      directoryInfo
+      .GetFiles("*", enumerationOptions)
+      .Where(p => regex.IsMatch(p.FullName))
+      .ToArray();
+  }
+
+  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.GetFiles(regexes, SearchOption.TopDirectoryOnly);
+  }
+
+  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.GetFiles(regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => directoryInfo.GetFiles(regex, enumerationOptions))
+      .ToArray();
+  }
+
+  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.GetFiles(searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.GetFiles(searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static FileInfo[] GetFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => directoryInfo.GetFiles(searchPattern, enumerationOptions))
+      .ToArray();
+  }
+
+  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.GetFileSystemInfos(regex, SearchOption.TopDirectoryOnly);
+  }
+
+  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.GetFileSystemInfos(regex, GetEnumerationOptions(searchOption));
+  }
+
+  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return
+      directoryInfo
+      .GetFileSystemInfos("*", enumerationOptions)
+      .Where(p => regex.IsMatch(p.FullName))
+      .ToArray();
+  }
+
+  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.GetFileSystemInfos(regexes, SearchOption.TopDirectoryOnly);
+  }
+
+  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.GetFileSystemInfos(regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => directoryInfo.GetFileSystemInfos(regex, enumerationOptions))
+      .ToArray();
+  }
+
+  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.GetFileSystemInfos(searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.GetFileSystemInfos(searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static FileSystemInfo[] GetFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => directoryInfo.GetFileSystemInfos(searchPattern, enumerationOptions))
+      .ToArray();
+  }
+
+  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, Regex regex)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.EnumerateDirectories(regex, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.EnumerateDirectories(regex, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return
+      directoryInfo
+      .EnumerateDirectories("*", enumerationOptions)
+      .Where(p => regex.IsMatch(p.FullName))
+      .ToArray();
+  }
+
+  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.EnumerateDirectories(regexes, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.EnumerateDirectories(regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => directoryInfo.EnumerateDirectories(regex, enumerationOptions))
+      .ToArray();
+  }
+
+  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.EnumerateDirectories(searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.EnumerateDirectories(searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<DirectoryInfo> EnumerateDirectories(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => directoryInfo.EnumerateDirectories(searchPattern, enumerationOptions))
+      .ToArray();
+  }
+
+  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, Regex regex)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.EnumerateFiles(regex, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.EnumerateFiles(regex, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return
+      directoryInfo
+      .EnumerateFiles("*", enumerationOptions)
+      .Where(p => regex.IsMatch(p.FullName))
+      .ToArray();
+  }
+
+  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.EnumerateFiles(regexes, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.EnumerateFiles(regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => directoryInfo.EnumerateFiles(regex, enumerationOptions))
+      .ToArray();
+  }
+
+  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.EnumerateFiles(searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.EnumerateFiles(searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => directoryInfo.EnumerateFiles(searchPattern, enumerationOptions))
+      .ToArray();
+  }
+
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.EnumerateFileSystemInfos(regex, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return directoryInfo.EnumerateFileSystemInfos(regex, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, Regex regex, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regex.Name(nameof(regex)).NotNull();
+
+    return
+      directoryInfo
+      .EnumerateFileSystemInfos("*", enumerationOptions)
+      .Where(p => regex.IsMatch(p.FullName))
+      .ToArray();
+  }
+
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.EnumerateFileSystemInfos(regexes, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return directoryInfo.EnumerateFileSystemInfos(regexes, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<Regex> regexes, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    regexes.Name(nameof(regexes)).NotNull().NotEmpty();
+
+    return
+      regexes
+      .AsParallel()
+      .SelectMany(regex => directoryInfo.EnumerateFileSystemInfos(regex, enumerationOptions))
+      .ToArray();
+  }
+
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.EnumerateFileSystemInfos(searchPatterns, SearchOption.TopDirectoryOnly);
+  }
+
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, SearchOption searchOption)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return directoryInfo.EnumerateFileSystemInfos(searchPatterns, GetEnumerationOptions(searchOption));
+  }
+
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(this DirectoryInfo directoryInfo, IEnumerable<String> searchPatterns, EnumerationOptions enumerationOptions)
+  {
+    directoryInfo.Name(nameof(directoryInfo)).NotNull().DirectoryExists();
+    searchPatterns.Name(nameof(searchPatterns)).NotNull().NotEmpty().NoStringsAreNullOrWhiteSpace();
+
+    return
+      searchPatterns
+      .AsParallel()
+      .SelectMany(searchPattern => directoryInfo.EnumerateFileSystemInfos(searchPattern, enumerationOptions))
+      .ToArray();
+  }
 }
 

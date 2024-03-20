@@ -160,6 +160,15 @@ namespace Lazy8.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The parameter &apos;{0}&apos; contains one or more empty strings..
+        /// </summary>
+        public static string Assert_OneOrMoreStringsAreEmpty {
+            get {
+                return ResourceManager.GetString("Assert_OneOrMoreStringsAreEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The minimumLength parameter ({0}) cannot be greater than the maximumLength parameter ({1})..
         /// </summary>
         public static string Assert_StringInconsistentLengthParameters {
