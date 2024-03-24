@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 using NUnit.Framework;
 
-namespace Lazy8.Core.Tests;
+namespace Lazy8.Core.Tests.FileIO.Mutable;
 
 [TestFixture]
 public partial class Mutable_FileIO_Tests

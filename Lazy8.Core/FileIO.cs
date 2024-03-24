@@ -696,10 +696,9 @@ public static partial class FileUtils
      System.IO.DirectoryInfo.Get*, and System.IO.DirectoryInfo.Enumerate* methods.
 
      The BCL methods take a 'String searchPattern' parameter, whereas the methods below
-     take a Regex instance.
+     take a either a Regex instance, an IEnumerable of Regex instances, or an IEnumerable of search pattern strings.
 
-     The methods below also allow for passing in either an IEnumerable<String> or an IEnumerable<Regex>
-     as search parameters, which are processed in parallel during the search. */
+     The latter two are processed in parallel during the search. */
 
   private static readonly EnumerationOptions _recursiveEnumerationOptions = new() { MatchType = MatchType.Win32, AttributesToSkip = 0, IgnoreInaccessible = true, RecurseSubdirectories = true };
   private static readonly EnumerationOptions _nonRecursiveEnumerationOptions = new() { MatchType = MatchType.Win32, AttributesToSkip = 0, IgnoreInaccessible = true };
