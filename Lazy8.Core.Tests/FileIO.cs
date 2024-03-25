@@ -12,10 +12,10 @@ using System.Text.RegularExpressions;
 
 using NUnit.Framework;
 
-namespace Lazy8.Core.Tests.FileIO.Mutable;
+namespace Lazy8.Core.Tests;
 
 [TestFixture]
-public partial class Mutable_FileIO_Tests
+public partial class FileIO
 {
   private static readonly String _testFilesPath = FileUtils.GetTemporarySubfolder();
   private static readonly String _testStringsFile = _testFilesPath + "test_strings.txt";
@@ -29,7 +29,7 @@ public partial class Mutable_FileIO_Tests
   private static readonly String _level_3_1 = Path.Combine(_testFilesPath, @"level_1.1\level_2.1\level_3.1");
   private static readonly String _level_3_2 = Path.Combine(_testFilesPath, @"level_1.1\level_2.1\level_3.2");
 
-  public Mutable_FileIO_Tests()
+  public FileIO()
     : base()
   {
   }
