@@ -16,6 +16,75 @@ using Lazy8.Core;
 
 namespace Lazy8.SqlClient;
 
+/*
+
+EBNF rules for this lexical scanner.
+
+The rules reflect the fact that T-SQL allows nested multiline comments and string literals.
+
+The EBNF syntax used here generally follows the description in this Wikipedia page:
+
+  https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
+---------------------------------------------------------------------------------------------
+
+t-sql = { { go } | string-literal | { comment } | { ? any character ? } }
+
+
+(* GO *)
+
+go = ^ { multi-line-comment } "go" [ go-quantifier ] [ { multi-line-comment } | single_line_comment ] $
+
+go-quantifier = { white-space } non-zero-digit { digit }
+
+white-space = ? white space characters ?
+
+digit = { zero-digit | non-zero-digit }
+
+non-zero-digit = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+zero-digit = "0"
+
+
+(* STRING LITERALS *)
+
+string-literal = double-quoted-string-literal | single-quoted-string-literal
+
+double-quoted-string-literal = '"' { ? any character ? | ( '"' double-quoted-string-literal '"' ) } '"'
+
+single-quoted-string-literal = "'" { ? any character ? | ( "'" single-quoted-string-literal "'" ) } "'"
+
+
+(* COMMENTS *)
+
+comment = single-line-comment | multi-line-comment
+
+(* Note: the end of the multi-line-comment rule has to be incorrectly expressed as "* /",
+   otherwise C# will treat it as ending this block comment. *)
+
+multi-line-comment = "/*" { no-star-slash | multi-line-comment } "* /"
+
+no-star-slash = ? any character except the ordered pair of star and forward slash ?
+
+single_line_comment = "//" { no-abstract-newline } abstract-newline
+
+no-abstract-newline = ? any character except abstract-newline ?
+
+(* Cover all of the bases regarding newline possibilities by using an abstraction over:
+     
+     Windows (\r\n)
+     Unix-like and later versions of Windows (\n)
+     old MacOS (\r).
+
+   Note that the abstract-newline rule could also be expressed as '( [ carriage-return ] newline ) | carriage-return'. *)
+
+abstract-newline = ( carriage-return, newline ) | newline | carriage-return
+
+carriage-return = '\r'
+
+newline = '\n'
+
+*/
+
 /// <include file='GetTSqlBatchExtension.xml' path='docs/members[@name="sqlclient"]/GetTSqlBatchExtension/*'/>
 public static class GetTSqlBatchExtension
 {
@@ -290,12 +359,10 @@ END;
 
   private static Boolean MatchNestedBlockComment(StringScanner scanner)
   {
-    var blockCommentNestingLevel = 0;
-
-    if (scanner.MatchLiteral("/*"))
-      blockCommentNestingLevel++;
-    else
+    if (!scanner.MatchLiteral("/*"))
       return false;
+
+    var blockCommentNestingLevel = 1;
 
     while ((blockCommentNestingLevel > 0) && (scanner.Peek() != StringScanner.END_OF_INPUT))
     {
