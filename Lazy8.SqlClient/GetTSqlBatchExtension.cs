@@ -49,9 +49,9 @@ zero-digit = "0"
 
 string-literal = double-quoted-string-literal | single-quoted-string-literal
 
-double-quoted-string-literal = '"' { ? any character ? | ( '"' double-quoted-string-literal '"' ) } '"'
+double-quoted-string-literal = '"' { ? any character except double quote ? | ( '"' double-quoted-string-literal '"' ) } '"'
 
-single-quoted-string-literal = "'" { ? any character ? | ( "'" single-quoted-string-literal "'" ) } "'"
+single-quoted-string-literal = "'" { ? any character except single quote ? | ( "'" single-quoted-string-literal "'" ) } "'"
 
 
 (* COMMENTS *)
@@ -65,7 +65,7 @@ multi-line-comment = "/*" { no-star-slash | multi-line-comment } "* /"
 
 no-star-slash = ? any character except the ordered pair of star and forward slash ?
 
-single_line_comment = "//" { no-abstract-newline } abstract-newline
+single_line_comment = "--" { no-abstract-newline } abstract-newline
 
 no-abstract-newline = ? any character except abstract-newline ?
 
