@@ -1,0 +1,12 @@
+SELECT 42;
+/* preceding block comment
+   spanning two lines */ go
+SELECT 42;
+--~
+{
+  "Batches" :
+  [
+    { "Batch" : "SELECT 42;", "Count" : 1 },
+    { "Batch" : "SELECT 42;", "Count" : 1 }
+  ]
+}

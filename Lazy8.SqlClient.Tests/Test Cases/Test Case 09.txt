@@ -5,6 +5,9 @@ go
 */
 SELECT 42;
 --~
-SELECT 42;
-
-SELECT 42;
+{
+  "Batches" :
+  [
+    { "Batch" : "SELECT 42;\n\nSELECT 42;", "Count" : 1 }
+  ]
+}

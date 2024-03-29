@@ -1,0 +1,11 @@
+select 42;
+go -- single-line comment
+select 42;
+--~
+{
+  "Batches" :
+  [
+    { "Batch" : "select 42;", "Count" : 1 },
+    { "Batch" : "select 42;", "Count" : 1 }
+  ]
+}

@@ -85,6 +85,8 @@ newline = '\n'
 
 */
 
+public record TSqlBatch(String Batch, Int32 Count);
+
 /// <include file='GetTSqlBatchExtension.xml' path='docs/members[@name="sqlclient"]/GetTSqlBatchExtension/*'/>
 public static class GetTSqlBatchExtension
 {
@@ -97,7 +99,7 @@ public static class GetTSqlBatchExtension
   /// <para>If tsql is null, empty, or contains only whitespace, the result has zero elements.</para>
   /// <para>If tsql contains no GO separators, the result has one element consisting of tsql itself.</para>
   /// </returns>
-  public static IEnumerable<String> GetTSqlBatches(this String tsql)
+  public static IEnumerable<TSqlBatch> GetTSqlBatches(this String tsql)
   {
     /* StringBuilder's default buffer size is 16 characters. It cannot be known in advance
        how large a single T-SQL batch will be, but 16 characters certainly won't suffice.
@@ -113,7 +115,7 @@ public static class GetTSqlBatchExtension
     StringBuilder batch = new(8 * kilobyte);
 
     StringScanner scanner = new(tsql);
-    List<String> batches = [];
+    List<TSqlBatch> batches = [];
 
     while (scanner.Peek() != StringScanner.END_OF_INPUT)
     {
@@ -130,7 +132,7 @@ public static class GetTSqlBatchExtension
       var goMultiplier = MatchGo(scanner);
       if (goMultiplier > 0)
       {
-        batches.Add(GetBatch(batch.ToString(), goMultiplier));
+        batches.Add(new TSqlBatch(batch.ToString(), Count: goMultiplier));
         batch.Clear();
         continue;
       }
@@ -139,9 +141,9 @@ public static class GetTSqlBatchExtension
     }
 
     if (batch.Length > 0)
-      batches.Add(GetBatch(batch.ToString(), goMultiplier: 1));
+      batches.Add(new TSqlBatch(batch.ToString(), Count: 1));
 
-    return batches.Where(b => b.Trim().Any());
+    return batches.Where(b => b.Batch.Trim().Any());
   }
 
   /// <summary>
@@ -161,8 +163,10 @@ public static class GetTSqlBatchExtension
     {
       foreach (var batch in GetTSqlBatches(tsql))
       {
-        command.CommandText = batch;
-        command.ExecuteNonQuery();
+        command.CommandText = batch.Batch;
+
+        for (var n = 0; n < batch.Count; n++)
+          command.ExecuteNonQuery();
       }
     }
   }
@@ -181,23 +185,6 @@ public static class GetTSqlBatchExtension
     filename.Name(nameof(filename)).NotNullEmptyOrOnlyWhitespace().FileExists();
 
     connection.ExecuteTSqlBatches(File.ReadAllText(filename));
-  }
-
-  private static String GetBatch(String batch, Int32 goMultiplier)
-  {
-    var iteratedBatch = @$"
-DECLARE @counter INT = 0;
-WHILE @counter < {goMultiplier}
-BEGIN
-  {batch}
-  SET @counter = @counter + 1;
-END;
-".Trim();
-
-    return
-      (goMultiplier == 1)
-      ? batch
-      : iteratedBatch;
   }
 
   private static String MatchNumber(StringScanner scanner)

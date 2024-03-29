@@ -1,0 +1,12 @@
+SELECT 42;
+go 3
+SELECT 42;
+go
+--~
+{
+  "Batches" :
+  [
+    { "Batch" : "SELECT 42;", "Count" : 3 },
+    { "Batch" : "SELECT 42;", "Count" : 1 }
+  ]
+}

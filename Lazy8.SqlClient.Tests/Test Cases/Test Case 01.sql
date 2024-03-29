@@ -1,7 +1,0 @@
-SELECT 42;
-GO
-SELECT 42;
---~
-SELECT 42;
---~
-SELECT 42;

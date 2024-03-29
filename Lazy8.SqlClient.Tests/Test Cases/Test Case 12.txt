@@ -1,0 +1,18 @@
+  go
+-- comment
+/* comment */
+label:
+declare @s varchar(max) = '/* not a ''comment'' */';
+goto label--comment
+/*
+go
+*/
+print '-- not a comment';
+go
+--~
+{
+  "Batches" :
+  [
+    { "Batch" : "label:\ndeclare @s varchar(max) = '/* not a ''comment'' */';\ngoto label\n\nprint '-- not a comment';", "Count" : 1 }
+  ]
+}

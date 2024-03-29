@@ -1,0 +1,11 @@
+SELECT 42;
+go /* trailing block comment */
+SELECT 42;
+--~
+{
+  "Batches" :
+  [
+    { "Batch" : "SELECT 42;", "Count" : 1 },
+    { "Batch" : "SELECT 42;", "Count" : 1 }
+  ]
+}

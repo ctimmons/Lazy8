@@ -1,0 +1,14 @@
+﻿USE [finance]
+go
+
+IF OBJECT_ID('dbo.CK_CONSTRAINT_IS_WEEKEND', 'C') IS NOT NULL
+  ALTER TABLE [dbo].[FEDERAL_CALENDAR] DROP CONSTRAINT [CK_CONSTRAINT_IS_WEEKEND]
+GO
+--~
+{
+  "Batches" :
+  [
+    { "Batch" : "USE [finance]", "Count" : 1 },
+    { "Batch" : "IF OBJECT_ID('dbo.CK_CONSTRAINT_IS_WEEKEND', 'C') IS NOT NULL\n  ALTER TABLE [dbo].[FEDERAL_CALENDAR] DROP CONSTRAINT [CK_CONSTRAINT_IS_WEEKEND]", "Count" : 1 }
+  ]
+}
