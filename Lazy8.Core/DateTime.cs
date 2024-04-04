@@ -173,12 +173,29 @@ public static class DateTimeUtils
   }
 
   /// <summary>
-  /// Return an <see cref="System.Int32"/> indicating the "day rank" of the given date within its month.
-  /// E.g. "1" for the first Tuesday, "3" for the third Friday, etc.
+  /// Given a date, specify the nthDay and dayOfWeek parameters to determine if date is the 
+  /// "nthDay dayOfWeek" of date's month.  For example, is date the second Wednesday of date's month
+  /// (nthDay == 2, dayOfWeek = DayOfWeek.Wednesday)?
   /// </summary>
   /// <param name="date">A <see cref="System.DateTime"/>.</param>
-  /// <returns>An <see cref="System.Int32"/>.</returns>
-  public static Int32 NthDayInMonth(this DateTime date) => (Int32) Math.Ceiling(date.Day / 7.0d);
+  /// <param name="nthDay">A <see cref="System.Int32"/> indicating the day's ordinal position w/i date's month.</param>
+  /// <param name="dayOfWeek">A <see cref="System.DayOfWeek"/> indicating the day of the week.</param>
+  /// <returns>A <see cref="System.Boolean"/> indicating if the supplied date is the nth "day name" for date's month.
+  /// E.g. is date the third Tuesday (nthDay == 3, dayOfWeek == DayOfWeek.Tuesday) of date's month?</returns>
+  public static Boolean IsNthDayOfMonth(this DateTime date, Int32 nthDay, DayOfWeek dayOfWeek)
+  {
+    /* Visualize a month as a series of 7-day blocks.  These blocks are not formal weeks.
+       I.e. days 1 thru 7 are in block 1, days 8 thru 14 are in block 2, and so on.
+
+       Simple division indicates which 7-day block a day falls in.*/
+
+    var daysPositionInSevenDayBlocks = (Int32) Math.Ceiling(date.Day / 7.0d);
+
+    /* Combining the day's position w/i a 7-day block, and the provided
+       dayOfWeek, results in a boolean indicating where dayOfWeek falls
+       in the month (e.g. first Monday, third Friday, etc.) */
+    return (nthDay == daysPositionInSevenDayBlocks) && (date.DayOfWeek == dayOfWeek);
+  }
 
   /// <summary>
   /// Return a <see cref="System.Boolean"/> indicating if the given date is a U.S. Federal holiday.
@@ -194,21 +211,20 @@ public static class DateTimeUtils
     /* U.S. federal holidays are defined by law at https://www.law.cornell.edu/uscode/text/5/6103. */
 
     var isMonday = date.DayOfWeek == DayOfWeek.Monday;
-    var isThursday = date.DayOfWeek == DayOfWeek.Thursday;
-    var isLastMondayInMay = isMonday && (date.AddDays(7).Month == 6);
+    //var isThursday = date.DayOfWeek == DayOfWeek.Thursday;
 
     return
-      (date.Month == 1 && date.Day == 1) ||                                              // January 1
-      (date.Month == 1 && isMonday && date.NthDayInMonth() == 3 && date.Year >= 1986) || // MLK Day
-      (date.Month == 2 && isMonday && date.NthDayInMonth() == 3) ||                      // Washington's Birthday
-      (date.Month == 5 && isLastMondayInMay) ||                                          // Memorial Day
-      (date.Month == 6 && date.Day == 19 && date.Year >= 2021) ||                        // Juneteenth National Independence Day
-      (date.Month == 7 && date.Day == 4) ||                                              // Independence Day
-      (date.Month == 9 && isMonday && date.NthDayInMonth() == 1) ||                      // Labor Day
-      (date.Month == 10 && isMonday && date.NthDayInMonth() == 2) ||                     // Columbus Day
-      (date.Month == 11 && date.Day == 11) ||                                            // Veterans Day
-      (date.Month == 11 && isThursday && date.NthDayInMonth() == 4) ||                   // Thanksgiving Day
-      (date.Month == 12 && date.Day == 25);                                              // Christmas Day
+      ((date.Month == 1) && (date.Day == 1)) ||                                                  // January 1
+      ((date.Month == 1) && date.IsNthDayOfMonth(3, DayOfWeek.Monday) && (date.Year >= 1986)) || // MLK Day
+      ((date.Month == 2) && date.IsNthDayOfMonth(3, DayOfWeek.Monday)) ||                        // Washington's Birthday
+      ((date.Month == 5) && isMonday && (date.AddDays(7).Month == 6)) ||                         // Memorial Day
+      ((date.Month == 6) && (date.Day == 19) && (date.Year >= 2021)) ||                          // Juneteenth National Independence Day
+      ((date.Month == 7) && (date.Day == 4)) ||                                                  // Independence Day
+      ((date.Month == 9) && date.IsNthDayOfMonth(1, DayOfWeek.Monday)) ||                        // Labor Day
+      ((date.Month == 10) && date.IsNthDayOfMonth(2, DayOfWeek.Monday)) ||                       // Columbus Day
+      ((date.Month == 11) && (date.Day == 11)) ||                                                // Veterans Day
+      ((date.Month == 11) && date.IsNthDayOfMonth(4, DayOfWeek.Thursday)) ||                     // Thanksgiving Day
+      ((date.Month == 12) && (date.Day == 25));                                                  // Christmas Day
   }
 
   /// <summary>

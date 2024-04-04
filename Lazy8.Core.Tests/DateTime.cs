@@ -172,12 +172,21 @@ public class DateTimeUtilsTests
   }
 
   [Test]
-  public void NthDayInMonthTest()
+  public void IsNthDayOfMonthTest()
   {
-    Assert.That(new DateTime(2021, 10, 1).NthDayInMonth(), Is.EqualTo(1)); // First Friday.
-    Assert.That(new DateTime(2021, 10, 8).NthDayInMonth(), Is.EqualTo(2)); // Second Friday.
-    Assert.That(new DateTime(2021, 10, 13).NthDayInMonth(), Is.EqualTo(2)); // Second Wednesday.
-    Assert.That(new DateTime(2021, 10, 30).NthDayInMonth(), Is.EqualTo(5)); // Fifth Saturday.
+    Assert.That(new DateTime(2021, 10, 1).IsNthDayOfMonth(1, DayOfWeek.Friday), Is.EqualTo(true)); // First Friday.
+    Assert.That(new DateTime(2021, 10, 1).IsNthDayOfMonth(2, DayOfWeek.Friday), Is.EqualTo(false)); // First Friday, not second Friday.
+
+    Assert.That(new DateTime(2021, 10, 8).IsNthDayOfMonth(2, DayOfWeek.Friday), Is.EqualTo(true)); // Second Friday.
+    Assert.That(new DateTime(2021, 10, 8).IsNthDayOfMonth(2, DayOfWeek.Thursday), Is.EqualTo(false)); // Second Friday, not second Thursday.
+
+    Assert.That(new DateTime(2021, 10, 13).IsNthDayOfMonth(2, DayOfWeek.Wednesday), Is.EqualTo(true)); // Second Wednesday.
+    Assert.That(new DateTime(2021, 10, 13).IsNthDayOfMonth(1, DayOfWeek.Sunday), Is.EqualTo(false)); // Second Wednesday, not first Sunday.
+    
+    Assert.That(new DateTime(2021, 10, 30).IsNthDayOfMonth(5, DayOfWeek.Saturday), Is.EqualTo(true)); // Fifth Saturday.
+    Assert.That(new DateTime(2021, 10, 30).IsNthDayOfMonth(3, DayOfWeek.Monday), Is.EqualTo(false)); // Fifth Saturday, not third Monday.
+    
+    Assert.That(new DateTime(2021, 10, 30).IsNthDayOfMonth(7, DayOfWeek.Monday), Is.EqualTo(false)); // Monday can't appear seven times in one month.
   }
 
   [Test]
