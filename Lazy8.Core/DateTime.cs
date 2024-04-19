@@ -211,7 +211,6 @@ public static class DateTimeUtils
     /* U.S. federal holidays are defined by law at https://www.law.cornell.edu/uscode/text/5/6103. */
 
     var isMonday = date.DayOfWeek == DayOfWeek.Monday;
-    //var isThursday = date.DayOfWeek == DayOfWeek.Thursday;
 
     return
       ((date.Month == 1) && (date.Day == 1)) ||                                                  // January 1
