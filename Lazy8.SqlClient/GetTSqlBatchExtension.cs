@@ -20,7 +20,6 @@ namespace Lazy8.SqlClient;
 
 public record TSqlBatch(String Batch, Int32 Count);
 
-/// <include file='GetTSqlBatchExtension.xml' path='docs/members[@name="sqlclient"]/GetTSqlBatchExtension/*'/>
 public static class GetTSqlBatchExtension
 {
   /// <summary>
