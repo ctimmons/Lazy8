@@ -61,7 +61,11 @@ t-sql = { { go } | { string-literal } | { comment } | ? any character ? }
 
 (* GO *)
 
-go = ^ { multi-line-comment } "go" [ go-quantifier ] [ { multi-line-comment } | single_line_comment ] $
+(* Note that 'GO 0' is legal, as are calls like 'GO 00' and 'GO 09'.
+   This means the go-quantifier rule can match 0, 00, or 000, etc.,
+   and numbers with leading zeros. *)
+
+go = ^ { white-space | multi-line-comment } "go" [ go-quantifier ] [ { white-space | multi-line-comment } ] [ single_line_comment ] $
 
 go-quantifier = { white-space } digit { digit }
 

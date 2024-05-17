@@ -130,7 +130,6 @@ public static class SqlServerExtensionMethods
 
     using (var command = new SqlCommand() { Connection = connection, CommandType = CommandType.StoredProcedure, CommandText = storedProcedureName })
     {
-      command.Parameters.Clear();
       if (parameters is not null)
         command.Parameters.AddRange(parameters);
 
