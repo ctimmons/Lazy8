@@ -10,6 +10,7 @@ using System.Data.SqlTypes;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -52,20 +53,9 @@ public static class SqlServerExtensionMethods
          return new SqlConnection(originalConnection.ConnectionString);
     
        Because using this approach won't copy any of originalConnection's modified properties,
-       whereas cloning will (with exceptions noted below). */
-
-    var clonedConnection = (SqlConnection) ((ICloneable) originalConnection).Clone();
-
-    /* clonedConnection will always start out with a State of 'Closed', regardless of what
-       originalConnection's State is.  Ensure clonedConnection's State property correctly
-       reflects originalConnection's State property. */
-
-    if ((originalConnection.State == ConnectionState.Connecting) || (originalConnection.State == ConnectionState.Open))
-      clonedConnection.Open();
-
-    /* BUG WORKAROUND
-
-       The current (March 2024) help entries for both the .NetFx and .Net Core libraries for SqlConnection.Clone() state:
+       whereas cloning will (with exceptions noted below).
+    
+       The current (June 2024) help entries for both the .NetFx and .Net Core libraries for SqlConnection.Clone() method:
 
          "This member is only supported by the .NET Compact Framework."
 
@@ -81,12 +71,21 @@ public static class SqlServerExtensionMethods
 
        This leads to the probable conclusion that this line in the help file is incorrect, and should be removed.
 
-       Until that issue is clarified, we'll charge ahead with using the Clone() method on the latest .Net release,
+       Until that issue is clarified, we'll charge ahead with using the Clone() method,
        assuming the help file is wrong and that such calls are OK and won't blow up in our face.
+    */
 
-       That being said, the Clone() method has at least one bug.
+    var clonedConnection = (SqlConnection) ((ICloneable) originalConnection).Clone();
 
-       Cloning an SqlConnection will NOT clone the original connection's Database property.
+    /* clonedConnection.State will always start out 'Closed', regardless of what originalConnection.State is.
+       Ensure clonedConnection.State correctly reflects originalConnection.State. */
+
+    if ((originalConnection.State == ConnectionState.Connecting) || (originalConnection.State == ConnectionState.Open))
+      clonedConnection.Open();
+
+    /* Like the State property, clonedConnection.Database has to be set, too.
+
+       Cloning an SqlConnection will not clone the original connection's Database property.
        The connection string's database is cloned instead.  These can differ if ChangeDatabase() was called
        on the original connection.  If necessary, the cloned connection must explicitly change
        the database to match the original connection's database. */
@@ -95,8 +94,8 @@ public static class SqlServerExtensionMethods
       /* Don't check to see if clonedConnection is open.  Just let ChangeDatabase()
          throw an InvalidOperationException if clonedConnection isn't open.
 
-         (clonedConnection's State *should* be open (see the previous line of code), but ADO.Net's implementation
-         has so many corner cases it's possible that clonedConnection is closed at this point). */
+         clonedConnection's State *should* be open (see the previous 'if' statement), but ADO.Net's implementation
+         has so many corner cases it's possible that clonedConnection is closed at this point. */
       clonedConnection.ChangeDatabase(originalConnection.Database);
 
     return clonedConnection;
@@ -113,6 +112,20 @@ public static class SqlServerExtensionMethods
   {
     using (var command = new SqlCommand() { Connection = connection, CommandTimeout = commandTimeout, CommandType = CommandType.Text, CommandText = sql })
       return GetDataSet(command);
+  }
+
+  /// <summary>
+  /// Executes the given sql on the connection, and asynchronously
+  /// returns the result wrapped in a <see cref="System.Data.DataSet">DataSet</see>.
+  /// </summary>
+  /// <param name="connection"><see cref="Microsoft.Data.SqlClient.SqlConnection">SqlConnection</see> the sql is sent to.  The connection must be opened before calling this method.</param>
+  /// <param name="sql"><see cref="System.String">String</see> containing sql to execute.</param>
+  /// <param name="cancellationToken">The cancellation instruction.</param>
+  /// <returns>A DataSet.</returns>
+  public static async Task<DataSet> GetDataSetAsync(this SqlConnection connection, String sql, Int32 commandTimeout = 0, CancellationToken cancellationToken = default)
+  {
+    using (var command = new SqlCommand() { Connection = connection, CommandTimeout = commandTimeout, CommandType = CommandType.Text, CommandText = sql })
+      return await GetDataSetAsync(command, cancellationToken).ConfigureAwait(false);
   }
 
   /// <summary>
@@ -138,6 +151,30 @@ public static class SqlServerExtensionMethods
   }
 
   /// <summary>
+  /// Given an SqlConnection, execute the stored procedure in storeProcedureName on that connection,
+  /// passing the optional sqlParameters to the stored procedure.  Asynchronously return all of the result sets returned
+  /// by the stored procedure in a DataSet.
+  /// </summary>
+  /// <param name="connection"><see cref="Microsoft.Data.SqlClient.SqlConnection">SqlConnection</see> the sql is sent to.  The connection must be opened before calling this method.</param>
+  /// <param name="storedProcedureName">A valid stored procedure name.</param>
+  /// <param name="cancellationToken">The cancellation instruction.</param>
+  /// <param name="parameters">An optional array of SqlParameters.  Defaults to null.</param>
+  /// <returns>A DataSet.</returns>
+  public static async Task<DataSet> GetDataSetFromStoredProcedureAsync(this SqlConnection connection, String storedProcedureName,
+    CancellationToken cancellationToken = default, params SqlParameter[] parameters)
+  {
+    storedProcedureName.Name(nameof(storedProcedureName)).NotNullEmptyOrOnlyWhitespace();
+
+    using (var command = new SqlCommand() { Connection = connection, CommandType = CommandType.StoredProcedure, CommandText = storedProcedureName })
+    {
+      if (parameters is not null)
+        command.Parameters.AddRange(parameters);
+
+      return await GetDataSetAsync(command, cancellationToken).ConfigureAwait(false);
+    }
+  }
+
+  /// <summary>
   /// Given an SqlCommand, return the results of the command in a DataSet.
   /// </summary>
   /// <param name="command">A valid SqlCommand instance.</param>
@@ -156,6 +193,33 @@ public static class SqlServerExtensionMethods
   }
 
   /// <summary>
+  /// Given an SqlCommand, asynchronously return the results of the command in a DataSet.
+  /// </summary>
+  /// <param name="command">A valid SqlCommand instance.</param>
+  /// <param name="cancellationToken">The cancellation instruction.</param>
+  /// <returns>A DataSet.</returns>
+  public static async Task<DataSet> GetDataSetAsync(SqlCommand command, CancellationToken cancellationToken = default)
+  {
+    command.Name(nameof(command)).NotNull();
+
+    using (var adapter = new SqlDataAdapter())
+    {
+      return
+        /* As of .Net 8.0 there is no way to asynchronously fill a dataset.
+           Therefore synchronous code has to be wrapped inside a Task.Run() call. */
+        await Task.Run(
+          () =>
+          {
+            var dataSet = new DataSet();
+            adapter.SelectCommand = command;
+            adapter.Fill(dataSet);
+            return dataSet;
+          }, cancellationToken)
+        .ConfigureAwait(false);
+    }
+  }
+
+  /// <summary>
   /// Given an SqlConnection, execute the T-SQL in the sql parameter on that connection, and return
   /// the results as an IEnumerable&lt;DataRow&gt;.
   /// </summary>
@@ -164,6 +228,20 @@ public static class SqlServerExtensionMethods
   /// <returns>An IEnumerable&lt;DataRow&gt;.</returns>
   public static IEnumerable<DataRow> GetDataRows(this SqlConnection connection, String sql) =>
     connection.GetDataSet(sql).Tables[0].Rows.Cast<DataRow>();
+
+  /// <summary>
+  /// Given an SqlConnection, execute the T-SQL in the sql parameter on that connection, and asynchronously return
+  /// the results as an IEnumerable&lt;DataRow&gt;.
+  /// </summary>
+  /// <param name="connection">A valid SqlConnection.</param>
+  /// <param name="sql">A string containing T-SQL code.</param>
+  /// <param name="cancellationToken">The cancellation instruction.</param>
+  /// <returns>An IEnumerable&lt;DataRow&gt;.</returns>
+  public static async Task<IEnumerable<DataRow>> GetDataRowsAsync(this SqlConnection connection, String sql, CancellationToken cancellationToken = default)
+  {
+    var dataSet = await connection.GetDataSetAsync(sql, commandTimeout: 0, cancellationToken).ConfigureAwait(false);
+    return dataSet.Tables[0].Rows.Cast<DataRow>();
+  }
 
   /// <summary>
   /// Given an SqlConnection, execute the T-SQL in the sql parameter on that connection, and return
@@ -175,6 +253,21 @@ public static class SqlServerExtensionMethods
   /// <returns>A value of type T.</returns>
   public static T GetSingleValue<T>(this SqlConnection connection, String sql) =>
     (T) connection.GetDataRows(sql).First()[0];
+
+  /// <summary>
+  /// Given an SqlConnection, execute the T-SQL in the sql parameter on that connection, and return
+  /// the result in a single variable of type T.
+  /// </summary>
+  /// <typeparam name="T">The type of the returned value.</typeparam>
+  /// <param name="connection">A valid SqlConnection.</param>
+  /// <param name="sql">A string containing T-SQL code.</param>
+  /// <param name="cancellationToken">The cancellation instruction.</param>
+  /// <returns>A value of type T.</returns>
+  public static async Task<T> GetSingleValueAsync<T>(this SqlConnection connection, String sql, CancellationToken cancellationToken = default)
+  {
+    var rows = await connection.GetDataRowsAsync(sql, cancellationToken).ConfigureAwait(false);
+    return (T) rows.First()[0];
+  }
 
   /// <summary>
   /// Given an SqlConnection, execute the T-SQL in the sql parameter on that connection.
@@ -193,11 +286,12 @@ public static class SqlServerExtensionMethods
   /// </summary>
   /// <param name="connection">A valid SqlConnection.</param>
   /// <param name="sql">A string containing T-SQL code.</param>
-  /// <returns>A Task&lt;Int32&gt; indicating the number of rows affected.</returns>
-  public static async Task<Int32> ExecuteNonQueryAsync(this SqlConnection connection, String sql, Int32 commandTimeout = 0)
+  /// <param name="cancellationToken">The cancellation instruction.</param>
+  /// <returns>An Int32 indicating the number of rows affected.</returns>
+  public static async Task<Int32> ExecuteNonQueryAsync(this SqlConnection connection, String sql, Int32 commandTimeout = 0, CancellationToken cancellationToken = default)
   {
     using (var command = new SqlCommand() { Connection = connection, CommandTimeout = commandTimeout, CommandType = CommandType.Text, CommandText = sql })
-      return await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+      return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
   }
 
   /// <summary>

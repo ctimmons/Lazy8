@@ -24,7 +24,7 @@ public enum StringAssertion
 /*
 
   A small collection of extension methods which reduce the code needed to
-  check a method's variables for pre-conditions before executing the method's
+  check a method's parameters for pre-conditions before executing the method's
   core logic.
 
   A common idiom in C# methods is using one or more if/then statements to check parameter(s) for validity.
@@ -246,7 +246,7 @@ public class AssertionContext<T>
 
   public AssertionContext(T value)
   {
-    this.Name = "<Unknown variable name>";
+    this.Name = "<Identifier not specified>";
     this.Value = value;
   }
 
