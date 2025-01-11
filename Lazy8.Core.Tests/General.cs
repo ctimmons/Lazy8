@@ -36,6 +36,9 @@ public partial class GeneralUtilsTests
   [GeneratedRegex(@"CS\d{4}:")]
   private static partial Regex CsWarningRegex();
 
+  [GeneratedRegex(@"\u001b](?:.*?)\u001b\\")]
+  private static partial Regex OperatingSystemCommandsRegex();
+
   [Test]
   public void RunProcessTest()
   {
@@ -63,11 +66,52 @@ public partial class GeneralUtilsTests
           StdOutPredicate = line => !CsWarningRegex().IsMatch(line)
         };
 
-      var runProcessOutput = GeneralUtils.RunProcess(runProcessInfo);
+      /* The .Net SDK has an INCREDIBLY ANNOYING behavior.
 
-      Assert.That(runProcessOutput.ExitCode, Is.EqualTo(this._expectedExitCode));
-      Assert.That(runProcessOutput.StdOutput, Is.EqualTo(this._expectedStdOut));
-      Assert.That(runProcessOutput.StdError, Is.EqualTo(this._expectedStdErr));
+         After installing a new SDK, .Net ignores the '--nologo' flag for the FIRST run of any app on the SDK [0].
+         It respects the '--nologo' flag on subsequent runs for that app, and any others.
+
+         The first run will unconditionally write something like 'Welcome to .NET 9.0!' to stdout.
+         This screws up the assertion for this unit test.
+
+         The solution is this ugly 'for' loop.  If the first run has that stupid welcome message,
+         just try again hoping that it won't be present in the second run.
+      
+         (I'm aware of the DOTNET_NOLOGO environment variable [1].  It *should* enforce the same behavior as
+         the '--nologo' flag, but doesn't.  DOTNET_NOLOGO suppresses both the welcome message and logo,
+         whereas '--nologo' just supresses the logo message.  It's not worth the aggravation to detect if
+         this environment variable is already set, possibly change its setting, and then change it back
+         to its original value just for this unit test.  The ugly 'for' loop is sufficient for now.)
+
+           [0] https://github.com/dotnet/sdk/issues/3828
+           [1] https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-environment-variables#dotnet_nologo
+      */
+
+      var wereTestsExecuted = false;
+      for (var i = 1; i <= 2; i++)
+      {
+        var runProcessOutput = GeneralUtils.RunProcess(runProcessInfo);
+
+        /* For some unknown reason, StdOutput will sometimes contain Operating
+           System Command (OSC) escape codes [0].  I don't know if it's a
+           .Net thing or a Windows thing.  Remove them to get the test to pass.
+
+           [0] https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences */
+
+        var sanitizedStdOutput = OperatingSystemCommandsRegex().Replace(runProcessOutput.StdOutput, "");
+
+        if (sanitizedStdOutput.ContainsCI("Welcome to .NET"))
+          /* If we received that dumbass 'welcome' message, try again. */
+          continue;
+
+        Assert.That(sanitizedStdOutput, Is.EqualTo(this._expectedStdOut));
+        Assert.That(runProcessOutput.StdError, Is.EqualTo(this._expectedStdErr));
+        Assert.That(runProcessOutput.ExitCode, Is.EqualTo(this._expectedExitCode));
+
+        wereTestsExecuted = true;
+      }
+
+      Assert.That(wereTestsExecuted, Is.True);
     }
     finally
     {
@@ -94,7 +138,7 @@ public partial class GeneralUtilsTests
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <IsPublishable>False</IsPublishable>

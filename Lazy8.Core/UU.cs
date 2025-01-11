@@ -143,10 +143,10 @@ public partial class UU
        approach subject to a bug where only the first part of the filename is extracted. */
 
     var match = UuBeginHeaderRegex().Match(line);
-    if (!match.Success)
-      throw new Exception($"'begin' line found, but does not appear to contain a filename.  Line = \n\n{line}");
-
-    return match.Groups["filename"].Value.Trim();
+    return
+      match.Success
+      ? match.Groups["filename"].Value.Trim()
+      : throw new Exception($"'begin' line found, but does not appear to contain a filename.  Line = \n\n{line}");
   }
 
   public static UUData Decode(String uuEncodedText)
@@ -232,7 +232,7 @@ public partial class UU
     var endLine = "end\n";
 
     /* Calculate how large the encoded string will be.
-       Initialize StringBuilder to that capacity so it won't have to
+       Set the StringBuilder's capacity so it won't have to
        perform any memory reallocations while it's being populated with data. */
 
     var encodedDataLength = (data.Contents.Length * 4) / 3;

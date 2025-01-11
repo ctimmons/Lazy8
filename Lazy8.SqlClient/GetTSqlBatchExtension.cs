@@ -212,9 +212,23 @@ public static class GetTSqlBatchExtension
 
   private static String MatchStringLiteral(StringScanner scanner)
   {
-    /* All T-SQL string literals can be delimited by single quotes.
+    /* All T-SQL string literals are delimited by single quotes.
        When SET QUOTED_IDENTIFIER OFF has been executed, string literals may also
        be delimited by double quotes.
+
+       The following are legal strings in T-SQL.  Note the 'nesting' that
+       can be done by wrapping parts of the string in matching ' characters.
+       This method has to take such nesting into account:
+
+         'Hello, world!'
+         'Hello, 'world!''
+         'foo ''bar ''baz ''quux'''' norf'''
+
+       Printing the latter results in this:
+
+         foo 'bar 'baz 'quux'' norf'
+
+       ------------------------------------------------------------------------------------------------
 
        Why match string literals?
 
@@ -235,21 +249,25 @@ public static class GetTSqlBatchExtension
 
     StringBuilder result = new(actualQuoteCharacter);
 
-    /* A starting quote has already been matched, so start the
-       string nesting level at one instead of zero. */
-    var stringNestingLevel = 1;
+    /* A starting quote has already been matched, so set a flag indicating
+       a string literal is being parsed. */
+    var isParsingStringLiteral = true;
 
-    while ((stringNestingLevel > 0) && (scanner.Peek() != StringScanner.END_OF_INPUT))
+    while (isParsingStringLiteral && (scanner.Peek() != StringScanner.END_OF_INPUT))
     {
       if (scanner.MatchLiteral(actualQuoteCharacter))
       {
         /* Is this an escape sequence? */
         if (scanner.MatchLiteral(actualQuoteCharacter))
+        {
           /* Yes. Add it to the result. */
           result.Append(actualQuoteCharacter);
+        }
         else
+        {
           /* No. It indicates the end of the string literal. */
-          stringNestingLevel--;
+          isParsingStringLiteral = false;
+        }
 
         result.Append(actualQuoteCharacter);
       }
@@ -259,7 +277,9 @@ public static class GetTSqlBatchExtension
       }
     }
 
-    if (stringNestingLevel != 0)
+    if (isParsingStringLiteral)
+      /* If END_OF_INPUT has been reached, but the method thinks it's still parsing,
+         that means the nested quotes in the string are unbalanced. */
       throw new Exception("Unbalanced string literal.");
     else
       return result.ToString();

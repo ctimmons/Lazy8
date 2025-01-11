@@ -33,6 +33,9 @@ public class StringScanner
   private Int32 _column;
   private readonly Stack<(Int32 Position, Int32 Line, Int32 Column)> _positions = new();
 
+  public Int32 Index => this._index;
+  public String Data => this._s!;
+
   /// <summary>
   /// A tuple containing the scanner's current line and column.  Both of these values are one-based.
   /// </summary>
@@ -93,6 +96,9 @@ public class StringScanner
 
   /// <summary>
   /// Reads the next character from the input string.
+  /// <para>
+  /// Side effects? If the scanner has not reached the end of the input string, the scanner's position is incremented by one.
+  /// </para>
   /// </summary>
   /// <returns>An integer representing the character read from the underlying string,
   /// or END_OF_INPUT (-1) if no more characters are available.</returns>
@@ -106,13 +112,13 @@ public class StringScanner
     this._index++;
 
     /* When a new line is encountered, the _line and _column fields have to be updated.
-       That requires some extra logic to correctly handle all three of these cases.
+       That requires some extra logic to correctly handle all three of the following cases.
 
        Strings can contain three different kinds of new lines:
 
-         a carriage return/line feed combo (\r\n) (all versions of Windows),
-         a solitary line feed (\n) (Unix, Linux, MacOS (aka OSX), and recent versions of Windows), or
-         a solitary carriage return (\r) (classic MacOS) */
+         - a carriage return/line feed combo (\r\n) (all versions of Windows),
+         - a solitary line feed (\n) (Unix, Linux, MacOS (aka OSX), and recent versions of Windows), or
+         - a solitary carriage return (\r) (classic MacOS) */
 
     if ((Char) currentChar == '\r')
     {
@@ -149,19 +155,71 @@ public class StringScanner
 
   /// <summary>
   /// Returns the next available character but does not consume it.
+  /// <para>
+  /// Side effects? No.
+  /// </para>
   /// </summary>
   /// <returns>An integer representing the next character to be read, or END_OF_INPUT (-1) if at the end of the string.</returns>
   public Int32 Peek() => this.IsEof ? END_OF_INPUT : this._s![this._index];
 
   /// <summary>
   /// Returns the previously available character but does not consume it.
+  /// <para>
+  /// Side effects? No.
+  /// </para>
   /// </summary>
   /// <returns>Returns an integer representing the character immediately prior to the scanner's current position,
   /// or END_OF_INPUT (-1) if at the beginning of the string.</returns>
   public Int32 ReversePeek() => this.IsBof ? END_OF_INPUT : this._s![this._index - 1];
 
   /// <summary>
+  /// Match a sequence of a given character between minimum and maximum number of times (inclusive).
+  /// <para>
+  /// Side effects? On a successful match, the scanner's position is advanced by the number of characters matched. Otherwise, no.
+  /// </para>
+  /// </summary>
+  /// <param name="c">The Char to match.</param>
+  /// <param name="minimum">The minimum number of times the character is to be matched.
+  /// Must be zero or greater, and less than or equal to maximum.</param>
+  /// <param name="maximum">The maximum number of times the character is to be matched.
+  /// Must be zero or greater, and greater than or equal to minimum. Defaults to Int32.MaxValue.</param>
+  /// <returns>A String with zero or more matched characters.</returns>
+  public String MatchRepeatedCharacter(Char c, Int32 minimum, Int32 maximum = Int32.MaxValue)
+  {
+    if (minimum < 0)
+      throw new Exception($"minimum ({minimum}) must be between zero and {Int32.MaxValue}, inclusive.");
+    if (maximum < 0)
+      throw new Exception($"maximum ({maximum}) must be between zero and {Int32.MaxValue}, inclusive.");
+    else if (minimum > maximum)
+      throw new Exception($"minimum ({minimum}) must be less than or equal to maximum ({maximum}).");
+
+    this.SavePosition();
+
+    Int32 count = 0;
+    Int32 nextChar;
+    while (((nextChar = this.Peek()) != END_OF_INPUT) && ((Char) nextChar == c) && (count <= maximum))
+    {
+      this.Read();
+      count++;
+    }
+
+    if (count >= minimum)
+    {
+      this.AcceptNewPosition();
+      return c.ToString().Repeat(count);
+    }
+    else
+    {
+      this.GoBackToSavedPosition();
+      return "";
+    }
+  }
+
+  /// <summary>
   /// Match zero or more characters as long as the <paramref name="predicate"/> returns true.
+  /// <para>
+  /// Side effects? On a successful match, the scanner's position is advanced by the number of characters matched. Otherwise, no.
+  /// </para>
   /// </summary>
   /// <param name="predicate">A method that takes a Char and returns a Boolean.</param>
   /// <returns>A String with zero or more matched characters.</returns>
@@ -175,7 +233,37 @@ public class StringScanner
   }
 
   /// <summary>
-  /// Attempts to completely match <paramref name="s"/> to the portion of the scanner's string starting at the scanner's current position.
+  /// Attempts to match <paramref name="c"/> to the next character in the scanner's string.
+  /// <para>
+  /// Side effects? On a successful match, the scanner's position is advanced by 1. Otherwise, no.
+  /// </para>
+  /// </summary>
+  /// <param name="c">The character to match.</param>
+  /// <returns>A Boolean indicating if the match was succesful.  Returns false if the next character in the scanner's string
+  /// cannot be matched, or if there are no more characters to read.</returns>
+  public Boolean MatchLiteral(Char c)
+  {
+    Int32 nextChar = this.Peek();
+
+    if (nextChar == END_OF_INPUT)
+      return false;
+
+    if ((Char) nextChar == c)
+    {
+      this.Read();
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  /// <summary>
+  /// Attempts to completely match <paramref name="s"/> to the portion of the scanner's string starting at the current position.
+  /// <para>
+  /// Side effects?  On a successful match, the scanner's position is advanced by the length of <paramref name="s"/>. Otherwise, no.
+  /// </para>
   /// </summary>
   /// <param name="s">The string to match.  Null and empty strings will result in a failed match.  As will strings
   /// that are longer than the remaining unmatched portion of the scanner's string.</param>
@@ -222,19 +310,31 @@ public class StringScanner
 
   /// <summary>
   /// Starting from the scanner's current position, skip one or more line ending characters (carriage return (\r) or line feed (\n)).
+  /// <para>
+  /// Side effects?  On a successful match, the scanner's position is advanced by the number of characters matched. Otherwise, no.
+  /// </para>
   /// </summary>
-  public void SkipLineEndings() => this.MatchWhile(IsLineEnding);
+  /// <returns>A String with zero or more matched characters.</returns>
+  public String SkipLineEndings() => this.MatchWhile(IsLineEnding);
 
   /// <summary>
   /// Starting from the scanner's current position, skip one or more whitespace characters (but not
   /// line ending characters (carriage return (\r) or line feed (\n))).
+  /// <para>
+  /// Side effects?  On a successful match, the scanner's position is advanced by the number of characters matched. Otherwise, no.
+  /// </para>
   /// </summary>
-  public void SkipLinearWhitespace() => this.MatchWhile(c => !IsLineEnding(c) && Char.IsWhiteSpace(c));
+  /// <returns>A String with zero or more matched characters.</returns>
+  public String SkipLinearWhitespace() => this.MatchWhile(c => !IsLineEnding(c) && Char.IsWhiteSpace(c));
 
   /// <summary>
   /// Skips all whitespace, regardless of type. Combination of <see cref="SkipLineEndings"/> and <see cref="SkipLinearWhitespace"/>.
+  /// <para>
+  /// Side effects?  On a successful match, the scanner's position is advanced by the number of characters matched. Otherwise, no.
+  /// </para>
   /// </summary>
-  public void SkipWhitespace() => this.MatchWhile(Char.IsWhiteSpace);
+  /// <returns>A String with zero or more matched characters.</returns>
+  public String SkipWhitespace() => this.MatchWhile(Char.IsWhiteSpace);
 
   /// <summary>
   /// Push the scanner's current position onto an internal stack.

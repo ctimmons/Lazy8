@@ -180,7 +180,8 @@ public static partial class StringUtils
   /// <para>
   /// <ul>
   ///   <li><paramref name="value"/> cannot be null</li>
-  ///   <li><paramref name="count"/> must be greater than zero.</li>
+  ///   <li><paramref name="count"/> must be zero or greater.</li>
+  ///   <li>A <paramref name="count"/> of zero returns an empty string.</li>
   ///   <li>A <paramref name="count"/> of one returns value.</li>
   ///   <li>A <paramref name="count"/> of more than one returns value repeated <paramref name="count"/> times.</li>
   ///   <li>If (<paramref name="value"/>.Length * <paramref name="count"/>) > Int32.Max, an OverflowException is thrown.</li>

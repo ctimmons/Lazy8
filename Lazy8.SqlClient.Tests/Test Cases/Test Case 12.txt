@@ -2,7 +2,7 @@
 -- comment
 /* comment */
 label:
-declare @s varchar(max) = '/* not a ''comment'' */';
+declare @s varchar(max) = '/* foo ''bar ''baz ''quux'''' norf'' */';
 goto label--comment
 /*
 go
@@ -13,6 +13,6 @@ go
 {
   "Batches" :
   [
-    { "Batch" : "label:\ndeclare @s varchar(max) = '/* not a ''comment'' */';\ngoto label\n\nprint '-- not a comment';", "Count" : 1 }
+    { "Batch" : "label:\ndeclare @s varchar(max) = '/* foo ''bar ''baz ''quux'''' norf'' */';\ngoto label\n\nprint '-- not a comment';", "Count" : 1 }
   ]
 }

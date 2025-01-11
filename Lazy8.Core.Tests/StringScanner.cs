@@ -245,7 +245,7 @@ public class StringScannerTests
   }
 
   [Test]
-  public void MatchWhitespaceTest()
+  public void SkipWhitespaceTest()
   {
     var s = new StringScanner("\n 1 \n 23\t\n 4");
     s.SkipWhitespace();

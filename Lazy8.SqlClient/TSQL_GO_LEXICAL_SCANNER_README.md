@@ -40,13 +40,13 @@ extremely difficult and impossible.  But I'll briefly list the reasons here so a
 First, the word GO can appear in comments and string literals.  Naively splitting on GO will
 most likely result in the T-SQL string being split in incorrect places.  Second, if a regex is first used to remove
 block comments, that regex can remove the wrong text because string literals can contain character sequences
-like '/\*' and '*/'.  This would cause the comment-removal regex to remove the wrong text.
+like '--', '/\*', and '*/'.  This would cause the comment-removal regex to remove the wrong text.
 
 There are many other drawbacks to using regexes to parse T-SQL (or any non-linear data structure), but I'll stop here for the sake of brevity.
 
 4. Actual Solution
 
-The only bug-free solution I could think of was to create the GetTSqlBatchExtension static class with extension methods.  It implements a lexical scanner to perform a single pass of the T-SQL code, identifying and ignoring any comments it encounters.
+The only bug-free solution I could think of was to create the GetTSqlBatchExtension static class with extension methods.  It implements a lexical scanner that perform a single pass of the T-SQL code, identifying and ignoring any comments it encounters.
 When the scanner encounters a GO statement, the number of GO repetitions is determined (i.e. is the statement
 "GO &lt;count&gt;", or just "GO"?). The T-SQL batch string and GO count are placed in a TSqlBatch record.
 
@@ -54,7 +54,7 @@ When the scanner encounters a GO statement, the number of GO repetitions is dete
 
 The rules reflect the fact that T-SQL allows nested multiline comments and string literals.
 
-The EBNF syntax used here generally follows the description in [this Wikipedia page](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form).
+The EBNF syntax used here generally follows the description in [this Wikipedia page](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form). The ^ and $ characters are standard regular expression anchors (beginning of line and end of line, respectively).
 
 ```
 t-sql = { { go } | { string-literal } | { comment } | ? any character ? }
@@ -65,7 +65,7 @@ t-sql = { { go } | { string-literal } | { comment } | ? any character ? }
    This means the go-quantifier rule can match 0, 00, or 000, etc.,
    and numbers with leading zeros. *)
 
-go = ^ { white-space | multi-line-comment } "go" [ go-quantifier ] [ { white-space | multi-line-comment } ] [ single_line_comment ] $
+go = ^ { white-space | multi-line-comment } "go" [ go-quantifier ] { white-space | multi-line-comment } [ single_line_comment ] $
 
 go-quantifier = { white-space } digit { digit }
 
@@ -101,7 +101,7 @@ no-abstract-newline = ? any character except abstract-newline ?
 
    Note that the abstract-newline rule could also be expressed as '( [ carriage-return ] newline ) | carriage-return'. *)
 
-abstract-newline = ( carriage-return, newline ) | newline | carriage-return
+abstract-newline = ( carriage-return newline ) | newline | carriage-return
 
 carriage-return = '\r'
 
