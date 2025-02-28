@@ -26,7 +26,7 @@ public static class ReflectionUtils
      under CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/)
      See https://stackoverflow.com/help/licensing for more info. */
 
-  private static Object? GetPropValue(Object obj, String name)
+  private static Object GetPropValue(Object obj, String name)
   {
     foreach (var part in name.Split('.'))
     {
@@ -34,11 +34,11 @@ public static class ReflectionUtils
         return null;
 
       Type type = obj.GetType();
-      PropertyInfo? info = type.GetProperty(part);
+      PropertyInfo info = type.GetProperty(part);
       if (info is null)
         return null;
 
-      obj = info.GetValue(obj, null)!;
+      obj = info.GetValue(obj, null);
     }
 
     return obj;
@@ -51,9 +51,9 @@ public static class ReflectionUtils
   /// <param name="obj">A System.Object.</param>
   /// <param name="name">The property's name.</param>
   /// <returns></returns>
-  public static T? GetPropValue<T>(this Object obj, String name)
+  public static T GetPropValue<T>(this Object obj, String name)
   {
-    Object? retval = GetPropValue(obj, name);
+    Object retval = GetPropValue(obj, name);
     if (retval is null)
       return default;
     else
@@ -73,7 +73,7 @@ public static class ReflectionUtils
   /// <param name="sources"></param>
   /// <param name="target"></param>
   /// <param name="converters"></param>
-  public static void PopulateDataTable<Source>(IEnumerable<Source> sources, DataTable target, Dictionary<String, Action<Source, DataRow>>? converters = null)
+  public static void PopulateDataTable<Source>(IEnumerable<Source> sources, DataTable target, Dictionary<String, Action<Source, DataRow>> converters = null)
   {
     void addRowToTarget(Source source)
     {
@@ -106,7 +106,7 @@ public static class ReflectionUtils
   /// <param name="source"></param>
   /// <param name="converters"></param>
   /// <returns></returns>
-  public static Target GetTargetFromSource<Source, Target>(Source source, Dictionary<String, Action<Source, Target>>? converters = null)
+  public static Target GetTargetFromSource<Source, Target>(Source source, Dictionary<String, Action<Source, Target>> converters = null)
     where Source : class
     where Target : class, new()
   {
@@ -175,7 +175,7 @@ public static class ReflectionUtils
     return
       type
       .GetProperties(bindingFlags)
-      .Select(propertyInfo => propertyInfo.Name + " = " + (type.GetProperty(propertyInfo.Name)!.GetValue(source, null) ?? "NULL"))
+      .Select(propertyInfo => propertyInfo.Name + " = " + (type.GetProperty(propertyInfo.Name).GetValue(source, null) ?? "NULL"))
       .Join("\n");
   }
 
@@ -216,9 +216,9 @@ public static class ReflectionUtils
     return $"new {t.Name}() {{ {result.OrderBy(s => s).Join(", ")} }}";
   }
 
-  private static String GetLiteralDisplayValue(Object? value)
+  private static String GetLiteralDisplayValue(Object value)
   {
-    value!.Name(nameof(value)).NotNull();
+    value.Name(nameof(value)).NotNull();
 
     if (value is Char)
     {
@@ -230,7 +230,7 @@ public static class ReflectionUtils
     }
     else if (value is Enum)
     {
-      var ve = (value as Enum)!;
+      var ve = (value as Enum);
       var typename = ve.GetType().Name;
       return
         ve
@@ -242,7 +242,7 @@ public static class ReflectionUtils
     }
     else
     {
-      return value!.ToString()!;
+      return value.ToString();
     }
   }
 }

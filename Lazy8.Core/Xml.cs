@@ -22,13 +22,13 @@ public static class XmlUtils
   /// </summary>
   /// <param name="xdoc">An XDocument instance.</param>
   /// <returns>An IEnumerable&lt;XmlNamespace&gt;.</returns>
-  public static IEnumerable<XmlNamespace> GetXmlNamespaces(this XDocument? xdoc)
+  public static IEnumerable<XmlNamespace> GetXmlNamespaces(this XDocument xdoc)
   {
-    xdoc!.Name(nameof(xdoc)).NotNull();
+    xdoc.Name(nameof(xdoc)).NotNull();
 
     return
-      xdoc!
-      .Root!
+      xdoc
+      .Root
       .DescendantsAndSelf()
       .Attributes()
       .Where(attribute => attribute.IsNamespaceDeclaration)
@@ -72,12 +72,12 @@ public static class XmlUtils
   /// <typeparam name="T">Any type.</typeparam>
   /// <param name="filename">A <see cref="String"/> containing an existing filename.</param>
   /// <returns>An object of type <typeparamref name="T"/>.</returns>
-  public static T DeserializeObjectFromXmlFile<T>(String? filename)
+  public static T DeserializeObjectFromXmlFile<T>(String filename)
   {
-    filename!.Name(nameof(filename)).NotNullEmptyOrOnlyWhitespace().FileExists();
+    filename.Name(nameof(filename)).NotNullEmptyOrOnlyWhitespace().FileExists();
 
-    using (var fs = new FileStream(filename!, FileMode.Open, FileAccess.Read, FileShare.Read))
-      return (T) (new XmlSerializer(typeof(T))).Deserialize(fs)!;
+    using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+      return (T) (new XmlSerializer(typeof(T))).Deserialize(fs);
   }
 
   /// <summary>
@@ -86,7 +86,7 @@ public static class XmlUtils
   /// <typeparam name="T">Any type.</typeparam>
   /// <param name="value">An object of type <typeparamref name="T"/>.</param>
   /// <returns>An <see cref="XDocument"/>.</returns>
-  public static XDocument SerializeObjectToXDocument<T>(T? value)
+  public static XDocument SerializeObjectToXDocument<T>(T value)
   {
     value.Name(nameof(value)).NotNull();
 
@@ -100,7 +100,7 @@ public static class XmlUtils
        The comments have to be inserted by a separate call to InsertXmlComments(). */
 
     /* This must be executed after writer has been closed. */
-    InsertXmlComments(value!, doc.Elements(), 1);
+    InsertXmlComments(value, doc.Elements(), 1);
 
     return doc;
   }
@@ -111,13 +111,13 @@ public static class XmlUtils
   /// <typeparam name="T">Any type.</typeparam>
   /// <param name="value">An <see cref="XDocument"/> instance.</param>
   /// <returns>The deserialized object of type <typeparamref name="T"/>.</returns>
-  public static T DeserializeObjectFromXDocument<T>(XDocument? value)
+  public static T DeserializeObjectFromXDocument<T>(XDocument value)
   {
-    value!.Name(nameof(value)).NotNull();
+    value.Name(nameof(value)).NotNull();
 
-    var doc = new XDocument(value!);
+    var doc = new XDocument(value);
     using (var reader = doc.CreateReader())
-      return (T) (new XmlSerializer(typeof(T))).Deserialize(reader)!;
+      return (T) (new XmlSerializer(typeof(T))).Deserialize(reader);
   }
 
   /// <summary>
@@ -126,9 +126,9 @@ public static class XmlUtils
   /// <typeparam name="T">Any type.</typeparam>
   /// <param name="value">An object of type <typeparamref name="T"/>.</param>
   /// <returns>An XML document in the form of a <see cref="String"/>.</returns>
-  public static String SerializeObjectToXmlString<T>(T? value)
+  public static String SerializeObjectToXmlString<T>(T value)
   {
-    value!.Name(nameof(value)).NotNull();
+    value.Name(nameof(value)).NotNull();
 
     return SerializeObjectToXDocument(value).ToString();
   }
@@ -140,12 +140,12 @@ public static class XmlUtils
   /// <typeparam name="T">Any type.</typeparam>
   /// <param name="s">A <see cref="String"/>.</param>
   /// <returns>The deserialized object of type <typeparamref name="T"/>.</returns>
-  public static T DeserializeObjectFromXmlString<T>(String? s)
+  public static T DeserializeObjectFromXmlString<T>(String s)
   {
-    s!.Name(nameof(s)).NotNull();
+    s.Name(nameof(s)).NotNull();
 
-    using (var sr = new StringReader(s!))
-      return (T) (new XmlSerializer(typeof(T))).Deserialize(sr)!;
+    using (var sr = new StringReader(s))
+      return (T) (new XmlSerializer(typeof(T))).Deserialize(sr);
   }
 
   private static readonly Type _xmlCommentAttributeType = typeof(XmlCommentAttribute);
@@ -193,7 +193,7 @@ public static class XmlUtils
           .AddBeforeSelf(getXCommentWithIndentedText(xmlComment));
         }
 
-        InsertXmlComments(propertyInfo.GetValue(obj, null)!, xElements.Elements(propertyInfo.Name), level + 1);
+        InsertXmlComments(propertyInfo.GetValue(obj, null), xElements.Elements(propertyInfo.Name), level + 1);
       }
     }
   }

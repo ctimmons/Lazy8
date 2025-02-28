@@ -157,7 +157,7 @@ public partial class UU
 
       using (StringReader sr = new(uuEncodedText.Trim()))
       {
-        String? line;
+        String line;
 
         /* Do not trim 'line', because trailing spaces are significant
            in the UU-encoding scheme. */

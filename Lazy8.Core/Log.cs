@@ -37,7 +37,7 @@ public enum LogEntryType
 
 public class Log
 {
-  private readonly TextWriter? _writer;
+  private readonly TextWriter _writer;
   private readonly Boolean _useUtcTimestamps;
 
   private Log()
@@ -71,7 +71,7 @@ public class Log
       _ => "UNK",
     };
 
-    this._writer!.WriteLine($"{timestamp} - {type} - {message}");
+    this._writer.WriteLine($"{timestamp} - {type} - {message}");
     this._writer.Flush();
   }
 

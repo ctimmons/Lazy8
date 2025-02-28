@@ -12,7 +12,7 @@
     <Version Condition=" '$(Version)' != '' ">$(Version)</Version>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <IsPublishable>False</IsPublishable>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>

@@ -223,8 +223,8 @@ public partial class FileIO
   [Test]
   public void SafelyCreateEmptyFileTest()
   {
-    String? filename = null;
-    Assert.That(() => FileUtils.SafelyCreateEmptyFile(filename!), Throws.TypeOf<ArgumentNullException>());
+    String filename = null;
+    Assert.That(() => FileUtils.SafelyCreateEmptyFile(filename), Throws.TypeOf<ArgumentNullException>());
 
     filename = "";
     Assert.That(() => FileUtils.SafelyCreateEmptyFile(filename), Throws.TypeOf<ArgumentException>());
@@ -241,8 +241,8 @@ public partial class FileIO
   [Test]
   public void CreateEmptyFileTest()
   {
-    String? filename = null;
-    Assert.That(() => FileUtils.CreateEmptyFile(filename!, OverwriteFile.No), Throws.TypeOf<ArgumentNullException>());
+    String filename = null;
+    Assert.That(() => FileUtils.CreateEmptyFile(filename, OverwriteFile.No), Throws.TypeOf<ArgumentNullException>());
 
     filename = "";
     Assert.That(() => FileUtils.CreateEmptyFile(filename, OverwriteFile.No), Throws.TypeOf<ArgumentException>());
@@ -299,8 +299,8 @@ public partial class FileIO
   [Test]
   public void DeleteEmptyDirectoriesTest()
   {
-    String? rootDir = null;
-    Assert.That(() => FileUtils.DeleteEmptyDirectories(rootDir!), Throws.TypeOf<ArgumentNullException>());
+    String rootDir = null;
+    Assert.That(() => FileUtils.DeleteEmptyDirectories(rootDir), Throws.TypeOf<ArgumentNullException>());
 
     rootDir = "";
     Assert.That(() => FileUtils.DeleteEmptyDirectories(rootDir), Throws.TypeOf<ArgumentException>());
@@ -339,8 +339,8 @@ public partial class FileIO
   [Test]
   public void IsDirectoryEmptyTest()
   {
-    String? rootDir = null;
-    Assert.That(() => FileUtils.IsDirectoryEmpty(rootDir!), Throws.TypeOf<ArgumentNullException>());
+    String rootDir = null;
+    Assert.That(() => FileUtils.IsDirectoryEmpty(rootDir), Throws.TypeOf<ArgumentNullException>());
 
     rootDir = "";
     Assert.That(() => FileUtils.IsDirectoryEmpty(rootDir), Throws.TypeOf<ArgumentException>());
@@ -364,8 +364,8 @@ public partial class FileIO
   [Test]
   public void DuplicateBackslashesTest()
   {
-    String? directory = null;
-    Assert.That(() => directory!.DuplicateBackslashes(), Throws.TypeOf<ArgumentNullException>());
+    String directory = null;
+    Assert.That(() => directory.DuplicateBackslashes(), Throws.TypeOf<ArgumentNullException>());
 
     directory = "";
     Assert.That(directory.DuplicateBackslashes() == "");
@@ -380,8 +380,8 @@ public partial class FileIO
   [Test]
   public void AddTrailingSeparatorTest()
   {
-    String? directory = null;
-    Assert.That(() => directory!.AddTrailingSeparator(), Throws.TypeOf<ArgumentNullException>());
+    String directory = null;
+    Assert.That(() => directory.AddTrailingSeparator(), Throws.TypeOf<ArgumentNullException>());
 
     directory = @"c:\temp";
     Assert.That(directory.AddTrailingSeparator() == directory + Path.DirectorySeparatorChar);
@@ -393,8 +393,8 @@ public partial class FileIO
   [Test]
   public void RemoveTrailingSeparatorTest()
   {
-    String? directory = null;
-    Assert.That(() => directory!.RemoveTrailingSeparator(), Throws.TypeOf<ArgumentNullException>());
+    String directory = null;
+    Assert.That(() => directory.RemoveTrailingSeparator(), Throws.TypeOf<ArgumentNullException>());
 
     directory = @"c:\temp";
     Assert.That((directory + Path.DirectorySeparatorChar).RemoveTrailingSeparator() == directory);

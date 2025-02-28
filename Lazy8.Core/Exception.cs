@@ -53,7 +53,7 @@ public static class ExceptionUtils
   {
     var result = new List<String>();
 
-    void rec(Exception? currentException)
+    void rec(Exception currentException)
     {
       if (currentException is null)
         return;

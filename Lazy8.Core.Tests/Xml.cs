@@ -23,7 +23,7 @@ public class TestClass
 Multi-line comment.
 Another line.
 ")]
-  public String? StringProperty1 { get; set; }
+  public String StringProperty1 { get; set; }
 
   [XmlComment(@"Single-line comment.")]
   public Int32 Int32Property1 { get; set; }
@@ -32,9 +32,9 @@ Another line.
 Multi-line comment.
 Another line.
 ")]
-  public List<Int32>? ListInt32Property1 { get; set; }
+  public List<Int32> ListInt32Property1 { get; set; }
 
-  public TestClass? TestClassInstance { get; set; }
+  public TestClass TestClassInstance { get; set; }
 
   public static TestClass GetInstance()
   {
@@ -62,7 +62,7 @@ Another line.
     return
       (expected.StringProperty1 == actual.StringProperty1) &&
       (expected.Int32Property1 == actual.Int32Property1) &&
-      (expected.ListInt32Property1!.Count == actual.ListInt32Property1!.Count) &&
+      (expected.ListInt32Property1.Count == actual.ListInt32Property1.Count) &&
       Enumerable.SequenceEqual(expected.ListInt32Property1, actual.ListInt32Property1) &&
       (expected.TestClassInstance == null || actual.TestClassInstance == null || AreTestClassInstancesEqual(expected.TestClassInstance, actual.TestClassInstance));
   }

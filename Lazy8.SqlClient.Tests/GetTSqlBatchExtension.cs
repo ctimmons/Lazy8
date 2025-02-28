@@ -15,7 +15,7 @@ namespace Lazy8.SqlClient.Tests;
 
 public class TSqlBatchTest
 {
-  public TSqlBatch[]? Batches { get; set; }
+  public TSqlBatch[] Batches { get; set; }
 }
 
 public class GetTSqlBatchExtensionTests
@@ -28,7 +28,7 @@ public class GetTSqlBatchExtensionTests
        has been split on its GO statements. */
 
     var contents = File.ReadAllText(filename).Split("--~", StringSplitOptions.RemoveEmptyEntries);
-    return (contents[0], JsonSerializer.Deserialize<TSqlBatchTest>(contents[1])!.Batches!);
+    return (contents[0], JsonSerializer.Deserialize<TSqlBatchTest>(contents[1]).Batches);
   }
 
   [Test]

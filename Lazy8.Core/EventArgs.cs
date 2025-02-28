@@ -22,7 +22,7 @@ public static class EventArgsExtensions
   {
     EventHandler<TEventArgs> temp = Volatile.Read(ref handler);
 
-    temp?.Invoke(sender, eventArgs);
+    temp.Invoke(sender, eventArgs);
   }
 }
 

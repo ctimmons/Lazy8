@@ -18,7 +18,7 @@ public readonly record struct UUTestFilenames(String UnencodedDataFilename, Stri
 public class UUTests
 {
   /* A post-build event copies the "UU Test Data" folder to this folder. */
-  private static readonly String _dataPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "UU Test Data");
+  private static readonly String _dataPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "UU Test Data");
 
   private static void TestTextFile(UUTestFilenames uuTestFilenames)
   {
@@ -77,7 +77,7 @@ public class UUTests
 
     var expectedUnencodedSource = File.ReadAllBytes(Path.Combine(_dataPath, "uutest.bin"));
     var uuEncodedSource = File.ReadAllText(Path.Combine(_dataPath, "uutest_trimmed.uue")).LF();
-    var actualUnencodedSource = UU.Decode(uuEncodedSource!).Contents;
+    var actualUnencodedSource = UU.Decode(uuEncodedSource).Contents;
     Assert.That(actualUnencodedSource, Is.EqualTo(expectedUnencodedSource));
   }
 
@@ -102,7 +102,7 @@ public class UUTests
 
     var expectedUnencodedSource = File.ReadAllBytes(Path.Combine(_dataPath, "uutest.bin"));
     var uuEncodedSource = File.ReadAllText(Path.Combine(_dataPath, "uutest_backticks.uue")).LF();
-    var actualUnencodedSource = UU.Decode(uuEncodedSource!).Contents;
+    var actualUnencodedSource = UU.Decode(uuEncodedSource).Contents;
     Assert.That(actualUnencodedSource, Is.EqualTo(expectedUnencodedSource));
   }
 }

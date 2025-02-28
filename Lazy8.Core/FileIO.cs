@@ -285,24 +285,24 @@ public static partial class FileUtils
   /// <param name="errorHandler">An <see cref="Action"/> that takes a <see cref="String"/> and an <see cref="Exception"/> as parameters
   /// <para>The string is the path that was being processed when the exception was thrown.</para></param>
   /// <returns>An <see cref="IEnumerable&lt;FileSystemInfo&gt;"/> containing the matching <see cref="FileSystemInfo"/>s.</returns>
-  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(String directory, String filemask, SearchOption searchOption, Action<String, Exception>? errorHandler)
+  public static IEnumerable<FileSystemInfo> EnumerateFileSystemInfos(String directory, String filemask, SearchOption searchOption, Action<String, Exception> errorHandler)
   {
     directory.Name(nameof(directory)).NotNullEmptyOrOnlyWhitespace().DirectoryExists();
     filemask.Name(nameof(filemask)).NotNullEmptyOrOnlyWhitespace();
-    errorHandler!.Name(nameof(errorHandler)).NotNull();
+    errorHandler.Name(nameof(errorHandler)).NotNull();
 
     /* Yield statements cannot appear anywhere inside of a 'try/catch' statement, or in a 'finally' block.
        (See https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/statements#1315-the-yield-statement).
        That's why the di and diEnumerator variables, and the associated if/then logic, are necessary. */
 
-    DirectoryInfo? di = null;
+    DirectoryInfo di = null;
     try
     {
       di = new DirectoryInfo(directory);
     }
     catch (Exception ex)
     {
-      errorHandler?.Invoke(directory, ex);
+      errorHandler.Invoke(directory, ex);
     }
 
     if (di is null)
@@ -313,14 +313,14 @@ public static partial class FileUtils
     {
       yield return di;
 
-      IEnumerable<FileSystemInfo>? diEnumerator = null;
+      IEnumerable<FileSystemInfo> diEnumerator = null;
       try
       {
         diEnumerator = di.EnumerateFileSystemInfos(filemask);
       }
       catch (Exception ex)
       {
-        errorHandler?.Invoke(directory, ex);
+        errorHandler.Invoke(directory, ex);
       }
 
       if (diEnumerator is null)
@@ -587,7 +587,7 @@ public static partial class FileUtils
   /// Returns the path of the currently executing assembly.
   /// </summary>
   /// <returns>A <see cref="String"/> containing the directory of the currently executing assembly.</returns>
-  public static String GetExecutablePath() => Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!.AddTrailingSeparator();
+  public static String GetExecutablePath() => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location).AddTrailingSeparator();
 
   [GeneratedRegex(@"\\+", RegexOptions.Singleline)]
   private static partial Regex MultipleBackslashesRegex();

@@ -57,9 +57,9 @@ public enum StringAssertion
 
     // The following lines of code are equivalent.
 
-    String? s = null;  s!.Name(nameof(s)).NotNull();
+    String s = null;  s.Name(nameof(s)).NotNull();
 
-    ((String) null!).Name(nameof(s)).NotNull();
+    ((String) null).Name(nameof(s)).NotNull();
 
 
   See the unit tests in Lazy8.Core.Tests/Assert.cs for usage examples.

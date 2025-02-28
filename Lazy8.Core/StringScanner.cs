@@ -21,7 +21,7 @@ public class StringScanner
 {
   public const Int32 END_OF_INPUT = -1;
 
-  private readonly String? _s;
+  private readonly String _s;
   private readonly Int32 _length;
 
   /* _index is the current linear position of the scanner (i.e. treating _s as a one-dimensional vector).
@@ -34,7 +34,7 @@ public class StringScanner
   private readonly Stack<(Int32 Position, Int32 Line, Int32 Column)> _positions = new();
 
   public Int32 Index => this._index;
-  public String Data => this._s!;
+  public String Data => this._s;
 
   /// <summary>
   /// A tuple containing the scanner's current line and column.  Both of these values are one-based.
@@ -160,7 +160,7 @@ public class StringScanner
   /// </para>
   /// </summary>
   /// <returns>An integer representing the next character to be read, or END_OF_INPUT (-1) if at the end of the string.</returns>
-  public Int32 Peek() => this.IsEof ? END_OF_INPUT : this._s![this._index];
+  public Int32 Peek() => this.IsEof ? END_OF_INPUT : this._s[this._index];
 
   /// <summary>
   /// Returns the previously available character but does not consume it.
@@ -170,7 +170,7 @@ public class StringScanner
   /// </summary>
   /// <returns>Returns an integer representing the character immediately prior to the scanner's current position,
   /// or END_OF_INPUT (-1) if at the beginning of the string.</returns>
-  public Int32 ReversePeek() => this.IsBof ? END_OF_INPUT : this._s![this._index - 1];
+  public Int32 ReversePeek() => this.IsBof ? END_OF_INPUT : this._s[this._index - 1];
 
   /// <summary>
   /// Match a sequence of a given character between minimum and maximum number of times (inclusive).

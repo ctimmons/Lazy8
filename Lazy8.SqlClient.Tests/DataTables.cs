@@ -204,9 +204,9 @@ public static class DataTables
     result.Tables.Add(GetOrders());
     result.Tables.Add(GetOrderDetails());
 
-    result.Relations.Add(new DataRelation("Customer_Order", result.Tables["customer"]!.Columns["id"]!, result.Tables["order"]!.Columns["customer_id"]!));
-    result.Relations.Add(new DataRelation("Item_OrderDetail", result.Tables["item"]!.Columns["id"]!, result.Tables["order_detail"]!.Columns["item_id"]!));
-    result.Relations.Add(new DataRelation("Order_OrderDetail", result.Tables["order"]!.Columns["id"]!, result.Tables["order_detail"]!.Columns["order_id"]!));
+    result.Relations.Add(new DataRelation("Customer_Order", result.Tables["customer"].Columns["id"], result.Tables["order"].Columns["customer_id"]));
+    result.Relations.Add(new DataRelation("Item_OrderDetail", result.Tables["item"].Columns["id"], result.Tables["order_detail"].Columns["item_id"]));
+    result.Relations.Add(new DataRelation("Order_OrderDetail", result.Tables["order"].Columns["id"], result.Tables["order_detail"].Columns["order_id"]));
 
     return result;
   }

@@ -136,7 +136,7 @@ public static partial class IEnumerableUtils
   /// <returns>Lazily returns the lines in the string as an <see cref="IEnumerable&lt;String&gt;"/>.</returns>
   public static IEnumerable<String> Lines(this String s)
   {
-    String? line;
+    String line;
     using (var sr = new StringReader(s))
       while ((line = sr.ReadLine()) != null)
         yield return line;
@@ -200,7 +200,7 @@ public static partial class IEnumerableUtils
 
      Licensed under CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/)
      See https://stackoverflow.com/help/licensing for more info. */
-  public static IEnumerable<T> OrderByNatural<T>(this IEnumerable<T> items, Func<T, String> selector, StringComparer? stringComparer = null)
+  public static IEnumerable<T> OrderByNatural<T>(this IEnumerable<T> items, Func<T, String> selector, StringComparer stringComparer = null)
   {
     var maxDigits =
       items

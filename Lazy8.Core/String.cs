@@ -593,7 +593,7 @@ public static partial class StringUtils
   /// </summary>
   /// <param name="source">Source string</param>
   /// <returns>Modified string</returns>
-  public static String? LF(this String source)
+  public static String LF(this String source)
   {
     source.Name(nameof(source)).NotNull();
 

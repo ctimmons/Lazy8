@@ -26,7 +26,7 @@ public partial class Http
   [GeneratedRegex(@"attachment;\s+filename=(?<filename>.*$)")]
   private static partial Regex FilenameRegex();
 
-  private static String? GetFilenameFromHttpResponseMessage(HttpResponseMessage responseMessage)
+  private static String GetFilenameFromHttpResponseMessage(HttpResponseMessage responseMessage)
   {
     if (!responseMessage.Content.Headers.TryGetValues("Content-Disposition", out var values))
       return null;
@@ -47,10 +47,10 @@ public partial class Http
 
   private static String GetFilenameFromUri(Uri uri) => uri.Segments.Last();
 
-  public static async Task DownloadFileAsync(String sourceUrl, String destinationFolder, String? destinationFilename = null) =>
-    await DownloadFileAsync(new Uri(sourceUrl), destinationFolder, destinationFilename!).ConfigureAwait(false);
+  public static async Task DownloadFileAsync(String sourceUrl, String destinationFolder, String destinationFilename = null) =>
+    await DownloadFileAsync(new Uri(sourceUrl), destinationFolder, destinationFilename).ConfigureAwait(false);
 
-  public static async Task DownloadFileAsync(Uri uri, String destinationFolder, String? destinationFilename = null)
+  public static async Task DownloadFileAsync(Uri uri, String destinationFolder, String destinationFilename = null)
   {
     using (var responseMessage = await HttpClientInstance.GetAsync(uri))
     {
