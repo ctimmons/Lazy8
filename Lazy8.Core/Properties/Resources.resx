@@ -187,6 +187,9 @@
     <value>Stack Trace:
 {0}</value>
   </data>
+  <data name="FileUtils_FileOrDirectoryDoesNotExist" xml:space="preserve">
+    <value>Parameter '{0}''s value ({1}) does not represent either a file or directory.</value>
+  </data>
   <data name="MathUtils_BadDigit" xml:space="preserve">
     <value>The parameter 'otherBaseNumber' ({0}) contains digits that are not valid for the parameter 'fromBase' {1}.</value>
   </data>

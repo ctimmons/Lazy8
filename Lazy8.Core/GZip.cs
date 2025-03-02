@@ -23,7 +23,7 @@ public static class GZipExtensions
   /// contains GZip data.)</returns>
   public static Boolean IsGzippedFile(this FileInfo fi)
   {
-    /* The first two bytes of a gzipped file are 0x1F and 0x8B.
+    /* The first two bytes of a GZipped file are 0x1F and 0x8B.
     
        https://www.ietf.org/rfc/rfc1952.txt */
 
@@ -48,6 +48,32 @@ public static class GZipExtensions
   /// or the file's length is less than two. (The first two bytes are checked to see if the file
   /// contains GZip data.)</returns>
   public static Boolean IsGzippedFile(this String filename) => (new FileInfo(filename)).IsGzippedFile();
+
+  /// <summary>
+  /// Use GZip to compress the contents of <paramref name="uncompressedFileName"/> to <paramref name="compressedFileName"/>.
+  /// <paramref name="compressedFileName"/> will be created if it doesn't exist. The file will be overwritten if it already exists.
+  /// </summary>
+  /// <param name="uncompressedFileName">A <see cref="String"/> containing a relative or absolute path.</param>
+  /// <param name="compressedFileName">A <see cref="String"/> containing a relative or absolute path.</param>
+  public static void CompressFile(String uncompressedFileName, String compressedFileName)
+  {
+    using (FileStream uncompressedFileStream = File.OpenRead(uncompressedFileName))
+      using (FileStream compressedFileStream = File.Create(compressedFileName))
+        uncompressedFileStream.CompressTo(compressedFileStream);
+  }
+
+  /// <summary>
+  /// Use GZip to decompress the contents of <paramref name="compressedFileName"/> to <paramref name="decompressedFileName"/>.
+  /// <paramref name="decompressedFileName"/> will be created if it doesn't exist. The file will be overwritten if it already exists.
+  /// </summary>
+  /// <param name="compressedFileName">A <see cref="String"/> containing a relative or absolute path.</param>
+  /// <param name="decompressedFileName">A <see cref="String"/> containing a relative or absolute path.</param>
+  public static void DecompressFile(String compressedFileName, String decompressedFileName)
+  {
+    using (FileStream compressedFileStream = File.OpenRead(compressedFileName))
+      using (FileStream decompressedFileStream = File.Create(decompressedFileName))
+        compressedFileStream.DecompressTo(decompressedFileStream);
+  }
 
   /* Code below this comment for GZipExtensions is from StackOverflow answer
      https://stackoverflow.com/a/64582157/116198 posted by

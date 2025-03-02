@@ -269,6 +269,15 @@ namespace Lazy8.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Parameter &apos;{0}&apos;&apos;s value ({1}) does not represent either a file or directory..
+        /// </summary>
+        public static string FileUtils_FileOrDirectoryDoesNotExist {
+            get {
+                return ResourceManager.GetString("FileUtils_FileOrDirectoryDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The parameter &apos;otherBaseNumber&apos; ({0}) contains digits that are not valid for the parameter &apos;fromBase&apos; {1}..
         /// </summary>
         public static string MathUtils_BadDigit {

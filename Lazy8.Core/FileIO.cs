@@ -691,5 +691,36 @@ public static partial class FileUtils
       return (fb1 == fb2);
     }
   }
+
+  /* Code for MoveToRecycleBin is from StackOverflow answer
+     https://stackoverflow.com/a/78308818/116198 posted by
+     Simon Mourier (https://stackoverflow.com/users/403671/simon-mourier).
+
+     Modifications: 
+       - Added parameter checking
+
+     Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+     See https://stackoverflow.com/help/licensing for more info. */
+
+  /// <summary>
+  /// Move the file or directory specified by <paramref name="fileOrDirectoryPath"/>
+  /// to the recycle bin.
+  /// <para>Note: This method works only on Windows.</para>
+  /// </summary>
+  /// <param name="fileOrDirectoryPath">The name of the file or directory to move. Can include a relative or absolute path.</param>
+  /// <exception cref="ArgumentExceptionFmt">
+  /// The file or directory specified by <paramref name="fileOrDirectoryPath"/> does not exist.
+  /// </exception>
+  public static void MoveToRecycleBin(this String fileOrDirectoryPath)
+  {
+    if (!File.Exists(fileOrDirectoryPath) && !Directory.Exists(fileOrDirectoryPath))
+      throw new ArgumentExceptionFmt(Properties.Resources.FileUtils_FileOrDirectoryDoesNotExist,
+        nameof(fileOrDirectoryPath), fileOrDirectoryPath);
+
+    const Int32 ssfBITBUCKET = 0xA;
+    dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application"));
+    var recycleBin = shell.Namespace(ssfBITBUCKET);
+    recycleBin.MoveHere(fileOrDirectoryPath);
+  }
 }
 
