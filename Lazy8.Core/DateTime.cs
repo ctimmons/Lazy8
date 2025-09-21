@@ -100,7 +100,14 @@ public static class DateTimeUtils
   /// <param name="dateTime1">A <see cref="DateTime"/> value.</param>
   /// <param name="dateTime2">A <see cref="DateTime"/> value.</param>
   /// <returns>A <see cref="Boolean"/> value.</returns>
-  public static Boolean AreDatesInSameYearAndQuarter(DateTime dateTime1, DateTime dateTime2) => (dateTime1.FirstDayOfQuarter() == dateTime2.FirstDayOfQuarter());
+  public static Boolean AreDatesInSameYearAndQuarter(DateTime dateTime1, DateTime dateTime2)
+  {
+    if (dateTime1.Kind == dateTime2.Kind)
+      return (dateTime1.FirstDayOfQuarter() == dateTime2.FirstDayOfQuarter());
+    else
+      throw new ArgumentExceptionFmt(Properties.Resources.DateTimeUtils_DatesNotComparable, nameof(dateTime1), dateTime1.Kind,
+        nameof(dateTime2), dateTime2.Kind);
+  }
 
   /// <summary>
   /// Returns a <see cref="Boolean"/> indicating if <paramref name="dateTime"/> falls within the given <paramref name="year"/> and <paramref name="quarter"/>.
@@ -116,25 +123,39 @@ public static class DateTimeUtils
   }
 
   /// <summary>
-  /// Analagous to the <see cref="System.Math.Min"/> method.  Given two <see cref="DateTime"/> values,
-  /// return the smaller (earlier) of the two.
+  /// Analagous to the <see cref="System.Math.Min"/> method.  Given two <see cref="DateTime"/> values
+  /// of the same 'Kind', return the smaller (earlier) of the two.
   /// </summary>
   /// <param name="dateTime1">A <see cref="DateTime"/> value.</param>
   /// <param name="dateTime2">A <see cref="DateTime"/> value.</param>
   /// <returns>The smaller (earlier) <see cref="DateTime"/> value.</returns>
-  public static DateTime Min(DateTime dateTime1, DateTime dateTime2) => (dateTime1 < dateTime2) ? dateTime1 : dateTime2;
+  public static DateTime Min(DateTime dateTime1, DateTime dateTime2)
+  {
+    if (dateTime1.Kind == dateTime2.Kind)
+      return (dateTime1 < dateTime2) ? dateTime1 : dateTime2;
+    else
+      throw new ArgumentExceptionFmt(Properties.Resources.DateTimeUtils_DatesNotComparable, nameof(dateTime1), dateTime1.Kind,
+        nameof(dateTime2), dateTime2.Kind);
+  }
 
   /// <summary>
-  /// Analagous to the <see cref="System.Math.Max"/> method.  Given two <see cref="DateTime"/> values,
-  /// return the larger (later) of the two.
+  /// Analagous to the <see cref="System.Math.Max"/> method.  Given two <see cref="DateTime"/> values
+  /// of the same 'Kind', return the larger (later) of the two.
   /// </summary>
   /// <param name="dateTime1">A <see cref="DateTime"/> value.</param>
   /// <param name="dateTime2">A <see cref="DateTime"/> value.</param>
   /// <returns>The larger (later) <see cref="DateTime"/> value.</returns>
-  public static DateTime Max(DateTime dateTime1, DateTime dateTime2) => (dateTime1 > dateTime2) ? dateTime1 : dateTime2;
+  public static DateTime Max(DateTime dateTime1, DateTime dateTime2)
+  {
+    if (dateTime1.Kind == dateTime2.Kind)
+      return (dateTime1 > dateTime2) ? dateTime1 : dateTime2;
+    else
+      throw new ArgumentExceptionFmt(Properties.Resources.DateTimeUtils_DatesNotComparable, nameof(dateTime1), dateTime1.Kind,
+        nameof(dateTime2), dateTime2.Kind);
+  }
 
   /// <summary>
-  /// Return an <see cref="IEnumerable&lt;DateTime&gt;"/>
+  /// Given two <see cref="DateTime"/> values of the same 'Kind', return an <see cref="IEnumerable&lt;DateTime&gt;"/>
   /// containing a list of all DateTimes between (and including) <paramref name="startDateTime"/> and <paramref name="endDateTime"/>.
   /// <para>If <paramref name="startDateTime"/> is earlier than <paramref name="endDateTime"/>, then the result will be in ascending order.
   /// If the opposite is true, the result set will be in descending order.  If <paramref name="startDateTime"/> and <paramref name="endDateTime"/>
@@ -164,6 +185,10 @@ public static class DateTimeUtils
   /// <returns>An <see cref="IEnumerable&lt;DateTime&gt;"/> of <see cref="DateTime"/> values.</returns>
   public static IEnumerable<DateTime> To(this DateTime startDateTime, DateTime endDateTime)
   {
+    if (startDateTime.Kind != endDateTime.Kind)
+      throw new ArgumentExceptionFmt(Properties.Resources.DateTimeUtils_DatesNotComparable, nameof(startDateTime), startDateTime.Kind,
+        nameof(endDateTime), endDateTime.Kind);
+
     var range = Enumerable.Range(0, Math.Abs((endDateTime - startDateTime).Days) + 1);
 
     return

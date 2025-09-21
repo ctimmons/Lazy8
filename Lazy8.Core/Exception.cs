@@ -19,9 +19,9 @@ public class ExceptionFmt(String message, params Object[] args) : Exception(Stri
 }
 
 /// <summary>
-/// Simplifies creating an NotImplementedException with a message created via String.Format().
-/// <para>Instead of calling 'throw new NotImplementedException(String.Format("", ...))', this class's
-/// constructor eliminates the need to call String.Format(), i.e. 'throw new NotImplementedExceptionFmt("", ...)'.</para>
+/// Simplifies creating an ArgumentException with a message created via String.Format().
+/// <para>Instead of calling 'throw new ArgumentException(String.Format("", ...))', this class's
+/// constructor eliminates the need to call String.Format(), i.e. 'throw new ArgumentExceptionFmt("", ...)'.</para>
 /// </summary>
 public class ArgumentExceptionFmt(String message, params Object[] args) : ArgumentException(String.Format(message, args))
 {

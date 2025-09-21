@@ -24,7 +24,16 @@ public class IEnumerableTests
   }
 
   [Test]
-  public void JoinTest()
+  public void JoinTest_Chars()
+  {
+    var data = new List<Char>() { 'A', 'B', 'C', 'D', 'E' };
+    var expected = "ABCDE";
+    var actual = data.Join();
+    Assert.That(expected, Is.EqualTo(actual));
+  }
+
+  [Test]
+  public void JoinTest_Strings()
   {
     var data = new List<String>() { "A", "B", "C", "D", "E" };
     var expected = "A, B, C, D, E";

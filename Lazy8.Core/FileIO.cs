@@ -23,6 +23,54 @@ public static partial class FileUtils
   public static readonly Char[] DirectorySeparators = [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
 
   /// <summary>
+  /// Emulate how the Windows 'where' command searches for an .exe file.
+  /// <para>Given a <paramref name="exeFilename"/> with or without a '.exe' extension, first search the current directory,
+  /// then the directories in the PATH environment variable
+  /// for that <paramref name="exeFilename"/>.  If found, return the full path.  If not found, return null.</para>
+  /// </summary>
+  /// <param name="exeFilename">A <see cref="String"/> containing a executable filename, with or without the '.exe' extension. </param>
+  /// <returns>The full path of <paramref name="exeFilename"/> if found either in the current directory, or a directory
+  /// in the PATH environment variable.  Return null if not found.</returns>
+  public static String Where(String exeFilename)
+  {
+    if (!exeFilename.EndsWithCI(".exe"))
+      exeFilename = Path.ChangeExtension(exeFilename, ".exe");
+
+    /* Don't memoize either the current directory or the PATH directories.
+       Both are subject to change. */
+
+    List<String> paths =
+      [
+        Directory.GetCurrentDirectory(),
+        ..
+        Environment
+        .GetEnvironmentVariable("PATH")
+        .Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries),
+      ];
+
+    return
+      paths
+      .Select(path => Path.Combine(path, exeFilename))
+      .FirstOrDefault(File.Exists);
+  }
+
+  /// <summary>
+  /// Given a <paramref name="filemasks"/> string containing one or more filemasks separated by the '|' character,
+  /// return an <see cref="IEnumerable&lt;String&gt;"/> containing all of the filenames that match the filemasks.
+  /// </summary>
+  /// <param name="folder">An existing folder.</param>
+  /// <param name="filemasks">A string containing one or more filemasks separated by the '|' character.</param>
+  /// <returns>An <see cref="IEnumerable&lt;String&gt;"/> containing all of the filenames that match the filemasks.</returns>
+  public static IEnumerable<String> GetFilenames(String folder, String filemasks)
+  {
+    return
+      filemasks
+      .Split('|', StringSplitOptions.RemoveEmptyEntries)
+      .Select(filemask => Directory.GetFiles(folder, filemask.Trim(), SearchOption.TopDirectoryOnly))
+      .SelectMany(path => path);
+  }
+
+  /// <summary>
   /// Same behavior as <see cref="System.IO.Directory.Delete"/>(<paramref name="directory"/>, true), except this method will
   /// also delete read-only files.
   /// </summary>

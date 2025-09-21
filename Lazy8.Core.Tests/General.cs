@@ -30,8 +30,8 @@ public partial class GeneralUtilsTests
   }
 
   private readonly Int32 _expectedExitCode = 99;
-  private readonly String _expectedStdOut = "standard output";
-  private readonly String _expectedStdErr = "standard error";
+  private readonly String _expectedStdOut = "standard output\r\nstandard output\r\nstandard output\r\n";
+  private readonly String _expectedStdErr = "standard error\r\nstandard error\r\nstandard error\r\n";
 
   [GeneratedRegex(@"CS\d{4}:")]
   private static partial Regex CsWarningRegex();
@@ -96,7 +96,9 @@ public partial class GeneralUtilsTests
            System Command (OSC) escape codes [0].  I don't know if it's a
            .Net thing or a Windows thing.  Remove them to get the test to pass.
 
-           [0] https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences */
+           OSC codes don't seem to appear in StdError, at least for this simple test.
+
+             [0] https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences */
 
         var sanitizedStdOutput = OperatingSystemCommandsRegex().Replace(runProcessOutput.StdOutput, "");
 
@@ -175,8 +177,8 @@ public class Program
 
     var quux = DateTime.Now;
 
-    Console.Out.Write({this._expectedStdOut.DoubleQuote()});
-    Console.Error.Write({this._expectedStdErr.DoubleQuote()});
+    Console.Out.Write(@{this._expectedStdOut.DoubleQuote()});
+    Console.Error.Write(@{this._expectedStdErr.DoubleQuote()});
     Environment.Exit({this._expectedExitCode});
   }}
 }}

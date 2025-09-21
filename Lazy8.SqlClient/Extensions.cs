@@ -503,30 +503,22 @@ public static class SqlServerExtensionMethods
   /// <param name="connection">A valid SqlConnection instance.</param>
   /// <param name="database">A valid database accessible by the connection.</param>
   /// <param name="action">An Action instance.</param>
-  public static void ExecuteUnderDatabaseInvariant(this SqlConnection connection, String database, Action action)
+  public static void ExecuteUnderDatabaseInvariant(this SqlConnection connection, Action action)
   {
     /* Some operations need to change the database in order to get the data they want.
 
        However, it's not polite to switch a connection to a different database
        without guaranteeing that the connection will be switched back to
-       its original database.
+       its original database. */
 
-       So, this method treats the connection's current database as an invariant.
-       I.e. it stores the connection's current database,
-       point to the new database (if necessary), and perform the action.
-       Finally, it switches the connection back to its old database (if necessary). */
-
-    var previousDatabase = (connection.Database == database) ? null : connection.Database;
+    var previousDatabase = connection.Database;
     try
     {
-      if (previousDatabase != null)
-        connection.ChangeDatabase(database);
-
       action();
     }
     finally
     {
-      if (previousDatabase != null)
+      if (previousDatabase != connection.Database)
         connection.ChangeDatabase(previousDatabase);
     }
   }

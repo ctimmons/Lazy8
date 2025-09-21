@@ -35,17 +35,17 @@ public enum LogEntryType
      log.WriteLine(LogEntryType.Info, "Hello, world!");
 */
 
-public class Log
+public class Lazy8Log
 {
   private readonly TextWriter _writer;
   private readonly Boolean _useUtcTimestamps;
 
-  private Log()
+  private Lazy8Log()
     : base()
   {
   }
 
-  public Log(TextWriter writer, Boolean useUtcTimestamps = false)
+  public Lazy8Log(TextWriter writer, Boolean useUtcTimestamps = false)
     : this()
   {
     writer.Name(nameof(writer)).NotNull();

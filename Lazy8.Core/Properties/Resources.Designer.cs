@@ -232,6 +232,15 @@ namespace Lazy8.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}.Kind ({1}) is not the same as {2}.Kind ({3}).  The DateTimes cannot be compared..
+        /// </summary>
+        public static string DateTimeUtils_DatesNotComparable {
+            get {
+                return ResourceManager.GetString("DateTimeUtils_DatesNotComparable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A quarter of {0} is not valid. quarter must be between 1 and 4 inclusive..
         /// </summary>
         public static string DateTimeUtils_QuarterNotInRange {
