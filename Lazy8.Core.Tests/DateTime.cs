@@ -34,6 +34,17 @@ public class DateTimeUtilsTests
   }
 
   [Test]
+  public void GetNormalizedTimeStringMillisecondsTest()
+  {
+    Assert.That("02:12:58.604000000".GetNormalizedTimeStringMilliseconds(), Is.EqualTo("02:12:58.6040000"));
+    Assert.That("02:12:58.123456789".GetNormalizedTimeStringMilliseconds(), Is.EqualTo("02:12:58.1234567"));
+    Assert.That("02:12:58.12345678".GetNormalizedTimeStringMilliseconds(), Is.EqualTo("02:12:58.1234567"));
+    Assert.That("02:12:58.1234567".GetNormalizedTimeStringMilliseconds(), Is.EqualTo("02:12:58.1234567"));
+    Assert.That("02:12:58.123456".GetNormalizedTimeStringMilliseconds(), Is.EqualTo("02:12:58.123456"));
+    Assert.That("02:12:58.000000000".GetNormalizedTimeStringMilliseconds(), Is.EqualTo("02:12:58.0000000"));
+  }
+
+  [Test]
   public void WeekNumberOfMonthTest()
   {
     /* April 2017 is spread over 6 numerical weeks. */

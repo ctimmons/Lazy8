@@ -13,8 +13,40 @@ namespace Lazy8.Core;
 public static class DateTimeUtils
 {
   /// <summary>
+  /// Normalize the milliseconds portion (after the decimal point) of a time string literal to a max
+  /// of 7 digits.
+  /// </summary>
+  /// <param name="timeString">A <see cref="String"/> containing a time string literal that may
+  /// have too many digits in the millisecond portion (after the decimal point).</param>
+  /// <returns><paramref name="timeString"/> modified so the milliseconds portion conforms to
+  /// what TimeSpan.Parse() expects as legal input.</returns>
+  public static String GetNormalizedTimeStringMilliseconds(this String timeString)
+  {
+    /* A time string like '02:12:58.604000000' cannot be parsed into a TimeSpan.
+       The fractional milliseconds portion has too many digits.  TimeSpan.Parse()
+       only accepts a max of 7, whereas this string has 9.  TimeSpan.Parse()
+       apparently isn't smart enough to ignore the trailing zeros.
+    
+       If the time string has excess millisecond digits, simply truncate them. */
+
+    int dotIndex = timeString.IndexOf('.');
+    if (dotIndex > -1)
+    {
+      const Int32 MAX_NUMBER_OF_MILLISECOND_DIGITS_ALLOWED = 7;
+
+      var numberOfMillisecondDigits = (timeString.Length - dotIndex) - 1;
+      var numberOfDigitsToTruncate = numberOfMillisecondDigits - MAX_NUMBER_OF_MILLISECOND_DIGITS_ALLOWED;
+      return (numberOfDigitsToTruncate > 0) ? timeString[..^numberOfDigitsToTruncate] : timeString;
+    }
+    else
+    {
+      return timeString;
+    }
+  }
+
+  /// <summary>
   /// Return the 1-based week number within the given <see cref="DateTime"/>'s month.
-  /// Assumes that Sunday is the start of the week.
+  /// Assumes Sunday is the start of the week.
   /// <para>For example, April 2, 2017 falls in the second week of that month, so this method
   /// will return 2 for that date.</para>
   /// </summary>
